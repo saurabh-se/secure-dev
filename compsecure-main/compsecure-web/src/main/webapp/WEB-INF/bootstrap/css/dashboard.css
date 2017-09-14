@@ -1,0 +1,314 @@
+/*
+ * Base structure
+ */
+
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+  padding-top: 50px;
+}
+
+.nav-sidebar{
+    font-size: small;
+    width: 500px;
+}
+
+/*
+ * Global add-ons
+ */
+
+.sub-header {
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee;
+}
+
+/*
+ * Top navigation
+ * Hide default border to remove 1px line.
+ */
+.navbar-fixed-top {
+  border: 0;
+}
+
+/*
+ * Sidebar
+ */
+
+/* Hide for mobile, show later */
+.sidebar {
+  display: none;
+}
+@media (min-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 51px;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+    background-color: #f5f5f5;
+    border-right: 1px solid #eee;
+  }
+}
+
+/* Sidebar navigation */
+.nav-sidebar {
+  margin-right: -21px; /* 20px padding + 1px border */
+  margin-bottom: 20px;
+  margin-left: -20px;
+}
+.nav-sidebar > li > a {
+  padding-right: 20px;
+  padding-left: 20px;
+}
+.nav-sidebar > .active > a,
+.nav-sidebar > .active > a:hover,
+.nav-sidebar > .active > a:focus {
+  color: #fff;
+  background-color: #428bca;
+}
+
+
+/*
+ * Main content
+ */
+
+.main {
+  padding: 20px;
+}
+@media (min-width: 768px) {
+  .main {
+    padding-right: 40px;
+    padding-left: 40px;
+  }
+}
+.main .page-header {
+  margin-top: 0;
+}
+
+
+/*
+ * Placeholder dashboard ideas
+ */
+
+.placeholders {
+  margin-bottom: 30px;
+  text-align: center;
+}
+.placeholders h4 {
+  margin-bottom: 0;
+}
+.placeholder {
+  margin-bottom: 20px;
+}
+.placeholder img {
+  display: inline-block;
+  border-radius: 50%;
+}
+
+.input-group-addon{
+   
+}
+
+.label-general{
+    padding: 5%;
+    margin-left: -5%;
+}
+
+#comp-name{
+    width: 50%;
+}
+#regulator-name{
+    width: inherit;
+}
+#comp-description{
+    width: 75%;
+}
+
+#comp-description-label{
+}
+
+.button-box{
+    margin-left: 25%;
+}
+#button-cancel,#button-next,#button-save{
+    margin: 3px;
+}
+#organization,#compliance-selector{
+    width: inherit;
+}
+#comp-description,#assessment-description{
+    margin-left: 5%;
+}
+#assessment-description{
+    width: 75%;
+}
+#assessment-name,#assessment-selector{
+    width: inherit;
+}
+#assessment-from,#assessment-to{
+    padding: 1%;
+    width: inherit;
+}
+
+#domain_code,#subdomain_code{
+    width: inherit;
+}
+
+.gap{
+    margin-top: 2px;
+}
+
+.qb{}
+
+#ce-domain-panel-title{
+    font-size: small;
+    color:#2b669a;
+    padding: 1px;
+    background-color: none;
+}
+
+.mainPanel{
+    background-color: none;
+}
+.show_hide {
+    display:none;
+}
+
+table, th, td {
+   border: 1px solid black;
+   font-size: small;
+}
+th{
+    background-color: #1b6d85;
+    color: #fff;
+    font-stretch: extra-expanded;
+}
+td{
+    font-stretch: semi-condensed;
+}
+
+.panel-body,.panel,.panel-heading,.panel-default,.panel-collapse,.panel-default > .panel-heading {
+background:#fff;
+}
+
+.panel-body,.panel,.panel-heading,.panel-default,.panel-collapse,.panel-default > .panel-heading{
+    border: 0;
+}
+
+.label-default{
+    font-size: small;
+}
+
+#control_effectiveness-list3{
+    padding: 0;
+}
+
+.sidebar{
+    font-size: small;
+    width: 175px;
+}
+
+#qBtn{
+    font-size: smaller;   
+}
+
+.ce-qBtn{
+    font-size: smaller;
+   
+    margin:0;
+    padding:2%;
+}
+
+.glyphicon-arrow-right{
+     font-size: smaller;
+     color: #31b0d5;
+     padding-left: 5px;
+}
+
+.breadcrumb{
+    font-size: smaller;
+}
+
+.navbar-fixed-top{
+    background-color: #204d74;
+}
+
+.nav.navbar-nav.navbar-right li a {
+    color:white;
+    font-size: small;
+}
+
+.navbar-header a.navbar-brand{
+     color:white;
+}
+
+.navbar-header a.navbar-brand:hover{
+     color:#ccc;
+}
+
+.nav.navbar-nav.navbar-right li a:hover {
+     color:#ccc;
+}
+
+#upload-recEffectiveness,#upload-implEffectiveness,#upload-file{
+    border:none;
+    color: #1b6d85;
+    margin-top:2%;
+    margin-left:0;
+    padding:5%;
+    font-weight: bold;
+}
+  
+#docEffUploadBtn,#implEffUploadBtn,#recEffUploadBtn{
+	
+	font-size: smaller;
+    background-color: #eee;
+    border:none;
+    color: #1b6d85;
+    margin-top:2%;
+    margin-left:10px;
+    font-weight: bold;
+}
+
+.btn{
+    font-size: smaller;
+    font-weight: bold;
+    background-color: #204d74;
+    border: none;
+}
+
+.input-group-addon,.input-group,.form-control{
+    font-size: small;
+}
+
+#displayQ  th{
+	text-align: center;
+	background-color: #00bcd4;
+	color: white;
+}
+
+#displayQ{
+	
+	
+	border-collapse: collapse;
+    border-radius: 5px;
+    border-style: hidden; /* hide standard table (collapsed) border */
+    
+    box-shadow: 0 0 0 1px #666; /* this draws the table border  */ 
+	
+	width: 50%;
+	text-align: center;
+	font-style: italic;
+	font-size: smaller;
+	font-weight : lighter;
+}
+
+#displayQ td{
+}
+
+#qDisplay{
+	background-color: #ede9ce;
+}
