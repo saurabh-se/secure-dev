@@ -1,5 +1,8 @@
 package com.se.compsecure.controller;
 
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -9,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.google.gson.Gson;
 import com.se.compsecure.model.User;
@@ -29,7 +31,8 @@ public class LoginController {
     }
 	
 	@RequestMapping(value="/login", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String authenticate(@RequestBody User user, Model model, BindingResult bindingResult) {
+    public @ResponseBody String authenticate(@RequestBody User user, Model model, BindingResult bindingResult,
+    		HttpServletRequest request, HttpSession httpSession) {
         
 		Gson gson = new Gson();
 		model.addAttribute("user", user);
@@ -47,6 +50,8 @@ public class LoginController {
         	String roleId = role.getRoleId().toString();
         	authenticatedUser.setRole(role);
         	authenticatedUser.setPassword("");
+        	
+        	httpSession.setAttribute("user", authenticatedUser);
         	return gson.toJson(authenticatedUser);
         }
         else{
