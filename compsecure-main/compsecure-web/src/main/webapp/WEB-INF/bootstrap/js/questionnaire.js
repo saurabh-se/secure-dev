@@ -31,14 +31,6 @@ $(document).ready(function () {
             questionHtmlTR = questionHtmlTR + "<tr><td class='text-center' style='padding:2px;'>"+count+"</td>\n\
                                                    <td class='text-center' style='padding:2px;'><input type='text' readonly='readonly' class='qCode' name='questionCode' id='questionCode' style='border:none' value='"+value["questionCode"]+"'></input></td><td class='text-left' style='padding:2px;'>"+value["question"]+"</td>\n\
                                                    <td class='text-center' style='padding:2px;'>" + setSelect(value["questionResponse"]) +
-//                                                   		"<select class='text-center' id='questionSelect' class='qSelect'  name='questionResponse'>" +
-//                                                   		"<options>" +
-//                                                   		"<option>Select</option>" +
-//                                                   		"<option>Yes</option>" +
-//                                                   		"<option>No</option>" +
-//                                                   		"<option>NA</option>" +
-//                                                   		"</options>" +
-//                                                   		"</select>" +
                                                    	"</td>\n\
                                                     <td class='text-center' style='padding:2px;'>" +
                                                     "<textarea class='text-center' rows='2' id='questionRemarks' class='qRemarks' name='questionRemarks'>"+ setRemarks(value["questionRemarks"])+"</textarea></td>";
@@ -94,7 +86,7 @@ $(document).ready(function () {
    }
    
    function setRemarks(remarks){
-	   alert(remarks);
+//	   alert(remarks);
 	   var qRemarks = '';
 	   if(remarks===undefined){
 		   qRemarks = "";
@@ -108,21 +100,9 @@ $(document).ready(function () {
    alert(selfAssessmentOption);
     
     $("#qn-button-next").click(function () {
-        alert("next clicked!!");
+//        alert("next clicked!!");
         var questionResponse = [];
         console.log($("#questionForm").serialize());
-        
-//         $('tr :input', '#questionForm').each(function () {
-//            var questionObj = new QuestionObject(this.name, this.value);
-//            questionResponse.push(questionObj);
-//         });
-        var table = document.getElementById('questionnaire-list');
-
-        // count of the number of rows
-        var rowLength = table.rows.length;
-        alert(rowLength);
-        
-//        var trDetails = {"productData": []};
          var trDetails = [];
         
        $('#questionForm tr').each(function(i,v) {
@@ -135,13 +115,6 @@ $(document).ready(function () {
         })
         
         console.log(JSON.stringify(trDetails));
-//        $.ajax({
-//           method:"POST",
-//           url: "http://localhost:8080/CompSecureApplication/handleJson",
-//           dataType:"json",
-//           data:JSON.stringify(trDetails)
-//        });
-//        
         $.ajax({
                 url: "http://localhost:8080/compsecure-web/handleJson",
                 type: "POST",
