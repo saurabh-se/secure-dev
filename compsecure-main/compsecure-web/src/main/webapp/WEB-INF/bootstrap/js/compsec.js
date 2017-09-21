@@ -137,7 +137,7 @@ $("#compliance-selector").change(function () {
 });
 
 $("#button-start").click(function(){
-//   alert("Start Clicked");
+//   ("Start Clicked");
    console.log(complianceSelected);
    localStorage.setItem("complianceId",complianceSelected);
    window.location.href = "questionnaire";

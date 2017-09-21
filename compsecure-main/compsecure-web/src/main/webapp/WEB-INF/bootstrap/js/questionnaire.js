@@ -9,9 +9,9 @@ $(document).ready(function () {
     var assessmentId = localStorage.assessmentId;
     var selfAssessmentOption = localStorage.selfAssessmentOption;
     //alert(complianceId);
-    alert(assessmentId);
+//    alert(assessmentId);
     if(assessmentId === undefined){
-    	alert("no assessmentId");
+    	console.log("In Questionnaire - no assessmentId");
     	assessmentId = "";
     }
     var questionHtmlTR = "";
@@ -42,7 +42,7 @@ $(document).ready(function () {
    
    function setSelect(selectedValue){
 	   
-	   alert(selectedValue);
+//	   alert(selectedValue);
 	   var selectedOption = '';
 	   
 	   var yesSelected ='';
@@ -97,10 +97,11 @@ $(document).ready(function () {
    }
    
     // to check if the assessment selected is an existing one or a new one
-   alert(selfAssessmentOption);
+//   alert(selfAssessmentOption);
     
     $("#qn-button-next").click(function () {
 //        alert("next clicked!!");
+    	localStorage.setItem("complianceId",complianceId);
         var questionResponse = [];
         console.log($("#questionForm").serialize());
          var trDetails = [];
@@ -122,7 +123,7 @@ $(document).ready(function () {
                 dataType: "JSON",
                 data:JSON.stringify(trDetails),
         }).then(function(data){
-        	alert(data);
+//        	alert(data);
             console.log(data);
             window.location="control-effectiveness";
         });

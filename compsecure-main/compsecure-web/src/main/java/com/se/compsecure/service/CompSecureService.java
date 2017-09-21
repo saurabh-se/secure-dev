@@ -67,4 +67,6 @@ public interface CompSecureService {
 	List<Questions> getQuestions(String controlCode, String assessmentId);
 
 	List<ComplianceHeader> getComplianceDetailsForOrg(String organizationId);
+
+	List<Entry<String, Domain>> getDomainDetailsForCompliance(String complianceId);
 }

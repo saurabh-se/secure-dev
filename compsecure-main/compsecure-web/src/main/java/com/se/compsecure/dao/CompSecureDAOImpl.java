@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -47,6 +48,8 @@ import com.se.compsecure.model.UserRoles;
 public class CompSecureDAOImpl implements CompSecureDAO {
 
 	private JdbcTemplate jdbcTemplate;
+	
+	private final Logger LOGGER = Logger.getLogger(CompSecureDAOImpl.class.getName());
 
 	public CompSecureDAOImpl(DataSource dataSource) {
 		jdbcTemplate = new JdbcTemplate(dataSource);
@@ -54,7 +57,6 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 
 	/**
 	 * TODO to be moved to a utility class
-	 *
 	 */
 	private Object convertToString(Date date) {
 		String converted = null;
@@ -243,6 +245,26 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 		
 //	    SqlRowSet srs = jdbcTemplate.queryForRowSet(sql);
 		
+		return listDomainDetails(sql);
+	}
+	
+	public List<Entry<String, Domain>> getDomainDetailsForCompliance(String complianceDesc) {
+		System.out.println("Inside getDomainDetailsForCompliance");
+		
+		List<Domain> domainList = new ArrayList<Domain>();		
+		String sql = "select c.control_code,c.control_value,sd.subdomain_code,sd.subdomain_name,ab.domain_name,ab.domain_code,po.principle,po.objective "
+				+ " from 			compsecure_sama.subdomain sd, compsecure_sama.controls c,compsecure_sama.principle_objective po "
+				+ " left join		(select domain_id,domain_code,domain_name from 	compsecure_sama.domain d "
+				+ " inner join 		compsecure_sama.compliance_header ch "
+				+ " on 				ch.compliance_id = d.compliance_id " + " where 			ch.compliance_description='"+complianceDesc.trim()+"') ab "
+				+ " on 				ab.domain_id where ab.domain_id= sd.domain_id and c.subdomain_id = sd.domain_id and po.subdomain_id = sd.subdomain_id group by c.control_id";
+		
+//	    SqlRowSet srs = jdbcTemplate.queryForRowSet(sql);
+		
+		return listDomainDetails(sql);
+	}
+
+	private List<Entry<String, Domain>> listDomainDetails(String sql) {
 		Map<String, Domain> domainMap = new HashMap<String, Domain>();
 		
 		Map<String, Subdomain> subdomainMap = new HashMap<String, Subdomain>();
@@ -344,14 +366,18 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 		} else {
 
 			sql = " select distinct qm.question_code,qm.question,qr.question_response,qr.question_remarks from compsecure_sama.questionnaire_master qm join "
-					+ " (select control_code,control_id from compsecure_sama.controls c join "
+					+ " (select control_code,control_id,ad.assessment_id from compsecure_sama.controls c join "
 					+ " compsecure_sama.subdomain sd on c.subdomain_id join compsecure_sama.domain d on sd.domain_id "
 					+ " join compsecure_sama.compliance_header ch on ch.compliance_id join compsecure_sama.assessment_details ad on ad.assessment_id"
 					+ " where ad.assessment_id = ch.assessment_id " + " and ch.compliance_id = d.domain_id "
 					+ " and sd.subdomain_id = c.subdomain_id and ch.compliance_description='"
 					+ complianceDescription.trim() + "' and ad.assessment_id='" + assessmentId + "') "
-					+ "abc on abc.control_id = qm.control_id join compsecure_sama.question_response qr on qm.question_code = qr.question_code";
+					+ "abc on abc.control_id = qm.control_id join compsecure_sama.question_response qr "
+					+ "on qm.question_code = qr.question_code and abc.assessment_id=qr.assessment_id";
 		}
+		
+		LOGGER.info(" Get Compliance Questions :" + sql);
+		
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
 		for(Map row : rows){
 			Questions questions = new Questions();
@@ -364,6 +390,8 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 		return complianceQuestionsList;
 	}
 
+
+	
 	public Integer saveComplianceQuestionsResponse(List<QuestionsResponse> questRes) {
 		
 		Integer count =0;
@@ -558,6 +586,8 @@ public class CompSecureDAOImpl implements CompSecureDAO {
             ex.printStackTrace();
         }
 	}
+
+
 }
 
 

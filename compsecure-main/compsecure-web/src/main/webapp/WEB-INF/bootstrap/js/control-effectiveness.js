@@ -10,9 +10,13 @@ $(document).ready(function () {
 //    })
 
     var assessmentId = localStorage.getItem("assessmentId");
+    var complianceId = localStorage.getItem("complianceId");
     $.ajax({
         url: "http://localhost:8080/compsecure-web/getDomainDetails",
-        data: {"assessmentId": assessmentId}
+        data: {
+        		"assessmentId": assessmentId,
+        		"complianceId": complianceId
+        }
     }).then(function (data) {
         console.log("Completed....");
         console.log(data);
@@ -102,15 +106,15 @@ $(document).ready(function () {
     	
     	event.preventDefault();
     	
-    	alert("AssessmentId - " + assessmentId);
-    	alert("ControlCode - " + $(this).attr('name'));
+//    	alert("AssessmentId - " + assessmentId);
+//    	alert("ControlCode - " + $(this).attr('name'));
     	
     	var controlCode = $(this).attr('name');
     	
     	var file_data = "";
     	
-    	alert("Upload Button Clicked");
-    	alert($(this).attr('id'));
+//    	alert("Upload Button Clicked");
+//    	alert($(this).attr('id'));
     	if($(this).attr('id')==='docEff'){
 //    		fileSelect = $("#upload-file").val();
     		file_data = $("#upload-file").prop("files")[0];
@@ -119,7 +123,7 @@ $(document).ready(function () {
     	}else{
     		file_data = $("#upload-recEffectiveness").prop("files")[0];
     	}
-    		alert(file_data);
+//    		alert(file_data);
     		var form_data = new FormData();
     		form_data.append("file", file_data) 
     		              // Adding extra parameters to form_data
@@ -138,7 +142,7 @@ $(document).ready(function () {
     $("#ce-button-next").on("click", function (event) {
     	var count =0;
         event.preventDefault();
-        alert("clicked!!");
+//        alert("clicked!!");
         var t = $("#controlEffectiveForm").serializeArray();
         console.log($("#controlEffectiveForm").serialize());
         console.log(JSON.stringify(t));
@@ -146,7 +150,7 @@ $(document).ready(function () {
         var table = document.getElementById('control_effectiveness-list3');
         // count of the number of rows
         var rowLength = table.rows.length;
-        alert(rowLength);
+//        alert(rowLength);
         
         var controlEffectiveness= [];
         
@@ -179,7 +183,7 @@ $(document).ready(function () {
             dataType: "JSON",
             data:JSON.stringify(controlEffectiveness),
     }).then(function(data){
-    	alert(data);
+//    	alert(data);
         console.log(data);
         window.location="control-effectiveness";
     });
@@ -206,7 +210,7 @@ $(document).ready(function () {
 $(document).on("click", ".ce-qBtn", function (event) {
 	var assessmentId = localStorage.getItem("assessmentId");
     var clicked = "";
-    alert($(this).attr('name'));  
+//    alert($(this).attr('name'));  
     clicked = $(this).attr('name');
     var controlCode = $(this).val();
     

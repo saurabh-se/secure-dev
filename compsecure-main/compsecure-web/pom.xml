@@ -80,7 +80,7 @@
   </dependencies>
   
   <build>
-        <finalName>CompSecureApplication</finalName>
+        <finalName>compsecure-web</finalName>
         <plugins>
         
             <!-- Config: Maven Tomcat Plugin -->

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +28,11 @@ import com.se.compsecure.service.CompSecureService;
 public class CompSecureController {
 	
 	private static final Logger LOGGER = Logger.getLogger(CompSecureController.class.getName());
+
+	private static final String SELF_ASSESSMENT_OPTION = "self_assessment_option";
+	private static final Object SELF_ASSESSMENT_OPTION_NEW = "new";
+	private static final Object SELF_ASSESSMENT_OPTION_EXISTING = "existing";
+	
 	
 	private final Integer  ORG_LIST_ZERO_ID  = 0;
 	private final String ORG_LIST_ZERO_VALUE = "Please Select";
@@ -49,9 +56,22 @@ public class CompSecureController {
     }
 	
 	@RequestMapping("/self-assessment")
-    public String getSelfAssessmentPage(Model model) {
+    public String getSelfAssessmentPage(Model model,HttpSession httpSession) {
         
-        model.addAttribute("greeting", "Hello Spring MVC");
+        System.out.println("Inside Self Assessment New");
+        
+        httpSession.setAttribute(SELF_ASSESSMENT_OPTION, SELF_ASSESSMENT_OPTION_NEW);
+        
+        return "self-assessment";
+    }
+	
+	@RequestMapping("/self-assessment-existing")
+    public String getSelfAssessmentExistingPage(Model model,HttpSession httpSession) {
+        
+        System.out.println("Inside Self Assessment Existing");
+        
+        httpSession.setAttribute(SELF_ASSESSMENT_OPTION, SELF_ASSESSMENT_OPTION_EXISTING);
+        
         return "self-assessment";
     }
 	
@@ -72,9 +92,7 @@ public class CompSecureController {
 	@RequestMapping("/hello1")
 	@ResponseBody
     public String hello1(Model model) {
-		
 		return null;
-	
     }
 	
 	@RequestMapping("/getOrgDetails/{userId}/{roleId}")

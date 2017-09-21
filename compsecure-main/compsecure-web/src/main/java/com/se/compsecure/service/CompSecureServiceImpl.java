@@ -47,6 +47,10 @@ public class CompSecureServiceImpl implements CompSecureService {
 	public List<ComplianceHeader> getComplianceDetails(String assessmentId) {
 		return compSecureDAO.getComplianceDetails(assessmentId);
 	}
+	
+	public List<Entry<String, Domain>> getDomainDetailsForCompliance(String complianceId) {
+		return compSecureDAO.getDomainDetailsForCompliance(complianceId);
+	}
 
 	// 2. Get the questionnaire for that assessment
 	public List<Questionnaire> getQuestionnaire(Integer levelHeaderId) {
@@ -192,5 +196,7 @@ public class CompSecureServiceImpl implements CompSecureService {
 	public List<ComplianceHeader> getComplianceDetailsForOrg(String organizationId) {
 		return compSecureDAO.getComplianceDetailsForOrg(organizationId);
 	}
+
+	
 
 }

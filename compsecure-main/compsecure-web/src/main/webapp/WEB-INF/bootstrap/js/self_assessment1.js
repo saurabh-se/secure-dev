@@ -12,7 +12,7 @@ $(document).ready(function () {
    
     $("#button-existing-assessment").click(function(){
       localStorage.setItem("option","existing");
-      window.location.href="self-assessment.html"; 
+      window.location.href="self-assessment-existing"; 
    });  
    
  });

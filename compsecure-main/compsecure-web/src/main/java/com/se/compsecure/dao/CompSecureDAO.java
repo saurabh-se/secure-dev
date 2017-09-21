@@ -56,4 +56,6 @@ public interface CompSecureDAO {
 
 	List<ComplianceHeader> getComplianceDetailsForOrg(String organizationId);
 
+	List<Entry<String, Domain>> getDomainDetailsForCompliance(String complianceId);
+
 }

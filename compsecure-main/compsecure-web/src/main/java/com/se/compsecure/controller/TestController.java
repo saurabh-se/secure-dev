@@ -8,16 +8,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
-import org.springframework.validation.ValidationUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +32,7 @@ import com.se.compsecure.model.Control;
 import com.se.compsecure.model.Domain;
 import com.se.compsecure.model.Questions;
 import com.se.compsecure.model.QuestionsResponse;
+import com.se.compsecure.model.User;
 import com.se.compsecure.service.CompSecureService;
 
 @Controller
@@ -45,12 +44,11 @@ public class TestController {
 	@Autowired
 	private CompSecureService compSecureService;
 
-	@Autowired
-	private HttpSession httpSession;
 
 	@RequestMapping("/getAssessmentDetails")
 	@ResponseBody
-	public String getAssessmentDetails(Model model, @RequestParam(value = "selected") String selectedVal) {
+	public String getAssessmentDetails(Model model, @RequestParam(value = "selected") String selectedVal,
+			HttpServletRequest request, HttpSession httpSession) {
 
 		LOGGER.info("Inside the TestController");
 
@@ -173,12 +171,25 @@ public class TestController {
 
 	@RequestMapping("/getQuestionnaireDetails")
 	@ResponseBody
-	public String getQuestionnaireDetails(@RequestParam(value = "complianceId") String complianceName,@RequestParam(value="assessmentId") String assessmentId ) {
+	public String getQuestionnaireDetails(@RequestParam(value = "complianceId") String complianceName,
+			@RequestParam(value="assessmentId") String assessmentId, HttpSession httpSession ) {
 
+		
+		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option");
+		
+		if(self_assessment_option.equals("new")){
+			LOGGER.info("**********" + self_assessment_option);
+			assessmentId = null;
+		}
+		
 		List<Questions> complianceQuestionsList = compSecureService.getComplianceQuestions(complianceName,assessmentId);
 
 		LOGGER.info("INSIDE the getQuestionnaire method : " + complianceName);
+		
+		User user = (User)httpSession.getAttribute("user");
+		LOGGER.info("In the Questionnaire Details section *** " + user.getUsername() + " - " + user.getUserId());
 
+		
 		Gson gson = new Gson();
 		String complianceQList = gson.toJson(complianceQuestionsList);
 
@@ -256,9 +267,18 @@ public class TestController {
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/getDomainDetails")
-	public @ResponseBody String getDomainDetails(@RequestParam("assessmentId") String assessmentId) {
+	public @ResponseBody String getDomainDetails(@RequestParam("assessmentId") String assessmentId,@RequestParam("complianceId") String complianceId, HttpSession httpSession) {
 
-		List<Entry<String, Domain>> domainDetailsList = compSecureService.getDomainDetails(assessmentId);
+		List<Entry<String, Domain>> domainDetailsList = null;
+		
+		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option");
+		
+		if(self_assessment_option.equals("new")){
+			domainDetailsList = compSecureService.getDomainDetailsForCompliance(complianceId);
+		}
+		else{
+			domainDetailsList = compSecureService.getDomainDetails(assessmentId);
+		}
 		List<Domain> domainList = new ArrayList<Domain>();
 
 		for (Iterator iterator = domainDetailsList.iterator(); iterator.hasNext();) {

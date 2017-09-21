@@ -35,13 +35,13 @@ $(document).ready(function () {
 				var roleId = data["role"]["roleId"];
 				var userId=data["userId"];
 				
-				alert(role  + " " + roleId + " " +userId);
+//				alert(role  + " " + roleId + " " +userId);
 				
 				localStorage.setItem("userId",userId);
 				localStorage.setItem("roleId",roleId);
 				
 				if (role === "admin") {
-					window.location.href = "welcome";
+					window.location.href = "self-assessment_1";
 				} else {
 					window.location.href = "self-assessment_1";
 				}

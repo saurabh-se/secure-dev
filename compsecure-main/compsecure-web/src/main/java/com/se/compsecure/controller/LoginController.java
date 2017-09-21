@@ -33,6 +33,8 @@ public class LoginController {
 	@RequestMapping(value="/login", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String authenticate(@RequestBody User user, Model model, BindingResult bindingResult,
     		HttpServletRequest request, HttpSession httpSession) {
+		
+		httpSession = request.getSession(false);
         
 		Gson gson = new Gson();
 		model.addAttribute("user", user);
@@ -60,7 +62,8 @@ public class LoginController {
     }
 	
 	@RequestMapping("/logout")
-    public String logout() {
+    public String logout(HttpSession httpSession) {
+		httpSession.invalidate();
 		System.out.println("Logout called!!");
 		return "logout";
 	}
