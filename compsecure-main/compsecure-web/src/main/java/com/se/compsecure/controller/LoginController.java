@@ -25,8 +25,9 @@ public class LoginController {
 	private CompSecureService compSecureService;
 	
 	@RequestMapping("/")
-    public String login(Model model) {
+    public String login(Model model,HttpServletRequest httpServletRequest) {
         model.addAttribute("greeting", "Hello Spring MVC");
+        System.out.println(httpServletRequest.getContextPath());
         return "login";
     }
 	
