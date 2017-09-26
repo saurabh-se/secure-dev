@@ -8,16 +8,20 @@ $(document).ready(function () {
     var complianceId = localStorage.complianceId;
     var assessmentId = localStorage.assessmentId;
     var selfAssessmentOption = localStorage.selfAssessmentOption;
-    //alert(complianceId);
-//    alert(assessmentId);
+    alert(complianceId);
+    alert(assessmentId);
     if(assessmentId === undefined){
     	console.log("In Questionnaire - no assessmentId");
     	assessmentId = "";
     }
+    if(complianceId === undefined){
+    	console.log("In Questionnaire - no assessmentId");
+    	complianceId = "";
+    }
     var questionHtmlTR = "";
     var count = 1;
    $.ajax({
-        url: "http://localhost:8080/compsecure-web/getQuestionnaireDetails",
+        url: "/compsecure-web/getQuestionnaireDetails",
         data : {
         		 complianceId: complianceId,
         		 assessmentId : assessmentId
@@ -100,14 +104,24 @@ $(document).ready(function () {
 //   alert(selfAssessmentOption);
     
     $("#qn-button-next").click(function () {
-//        alert("next clicked!!");
+    	
+    	var selfAssessmentOption = localStorage.getItem("selfAssessmentOption");
+    	console.log("SelfAssessmentOption : " + selfAssessmentOption);
+    	
+    	// alert("next clicked!!");
+    	
+    	var url = "/compsecure-web/handleJson";
+    	if(selfAssessmentOption==="existing"){
+    		url = "/compsecure-web/handleAlterJson";
+    	}
+    	
     	localStorage.setItem("complianceId",complianceId);
         var questionResponse = [];
         console.log($("#questionForm").serialize());
          var trDetails = [];
         
        $('#questionForm tr').each(function(i,v) {
-           alert($(this).find("#questionCode").val());
+           //alert($(this).find("#questionCode").val());
            var a = $(this).find("#questionCode").val();
            var b = $(this).find("#questionSelect").val();
            var c = $(this).find("#questionRemarks").val();
@@ -117,7 +131,7 @@ $(document).ready(function () {
         
         console.log(JSON.stringify(trDetails));
         $.ajax({
-                url: "http://localhost:8080/compsecure-web/handleJson",
+                url: url,
                 type: "POST",
                 contentType:"application/json",
                 dataType: "JSON",

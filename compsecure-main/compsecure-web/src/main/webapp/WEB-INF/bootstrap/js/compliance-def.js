@@ -5,24 +5,42 @@
  */
 
 $(document).ready(function () {
+	
+	$.ajax({
+		url 	: "/compsecure-web/getComplianceDetails",
+		data 	: {"selected":""}
+	}).then(function (data) {
+        console.log("Inside get Compliance Details");
+        console.log(data);
+        var ddata = $.parseJSON(data);
+        console.log(ddata);
+        $('#comp_name').append($('<option></option>').val(0).html("Please Select"));
+        $.each(ddata, function (val, text) {
+            $('#comp_name').append($('<option></option>').val(text).html(val))
+        });
+    });
+	
     var i = 1;
+    var controlCount = 1;
+    
     $("#button-add-control").click(function () {
         alert("Add Control");
         $("#cntrl").after("<tr><td style='width: 5%'><input id='control_chkBox_id' type='checkbox' class='checkbox' name='control_no'></td>\n\
                             <td style='width: 25%'><input id='control_code' type='text' class='form-control gap' name='control_code' placeholder='Control Code'></td>\n\
-<td><input id='control' type='text' class='form-control gap' name='control' placeholder='Control Details'></td></tr>");
+        					<td><input id='control' type='text' class='form-control gap' name='control' placeholder='Control Details'></td></tr>");
         //$('#subdomainTable').append('<tr id="cntrl' + (i + 1) + '"></tr>');
     });
 
-    $("#button-save-control").click(function () {
-        alert("save");
-        var control_code = $("#control_code").val();
-        var control_details = $("#control").val();
-        $("#cntrl").after("<tr><td><input type='checkbox' name='control_no'></td><td style='width: 25%'><td style='width: 25%'>" + control_code + "</td>\n\
-                               <td style='width:35%'>" + control_details + "</td><td style='width:35%'></td></tr>");
-        $("#control_code").val("");
-        $("#control").val("");
-    });
+    // COMMENTED - SEEMS REDUNDANT CODE - Sep 24th
+//    $("#button-save-control").click(function () {
+//        alert("save");
+//        var control_code = $("#control_code").val();
+//        var control_details = $("#control").val();
+//        $("#cntrl").after("<tr><td><input type='checkbox' name='control_no'></td><td style='width: 25%'><td style='width: 25%'>" + control_code + "</td>\n\
+//                               <td style='width:35%'>" + control_details + "</td><td style='width:35%'></td></tr>");
+//        $("#control_code").val("");
+//        $("#control").val("");
+//    });
 
     $("#button-delete-control").click(function () {
         $("table tbody").find('input[name="control_no"]').each(function () {
@@ -34,30 +52,32 @@ $(document).ready(function () {
 
     $("#button-save").click(function () {
         alert("Inside the buttonsave");
-        var x = $("#complianceForm").serializeArray();
-        console.log(x);
-        $.ajax({
-            method: "post",
-            url: "http://localhost:8080/CompSecureApplication/saveComplianceDetails",
-            data: {"details": JSON.stringify(x)},
-            dataType: "json"
-        }).then(function (data) {
-            console.log(data);
-        });
+        doSave();
+//        var x = $("#complianceForm").serializeArray();
+//        console.log(x);
+//        $.ajax({
+//            method: "post",
+//            url: "/compsecure-web/saveComplianceDetails",
+//            data: {"details": JSON.stringify(x)},
+//            dataType: "json"
+//        }).then(function (data) {
+//            console.log(data);
+//        });
     });
     
-    $("#button-next").click(function(){
-      window.location.href="questions_add.html";
-    });
     
     $(document).on('click','#button-add-subdomain',function(){
-        alert("clicked");
-        var strSubdomain ="<br><div class='input-group col-sm-12'><span class='input-group-addon' id='subdomainId'>Subdomain</span>\n\
+    	alert("add subdomain clicked");
+        var strSubdomain ="<br><br><div class='input-group col-sm-12'><span class='input-group-addon' id='subdomainId'>Subdomain</span>\n\
                                     <input id='subdomain_code' type='text' style='width:100%;' class='form-control' name='subdomain_code' placeholder='Subdomain Code'>\n\
                                     <input id='subdomain' type='text' style='width:100%;' class='form-control gap' name='subdomain' placeholder='Subdomain Value'>\n\
                                     <textarea id='principle' style='width:100%;' class='form-control gap' name='principle' placeholder='Principle' rows='2'></textarea>\n\
                                     <textarea id='objective' style='width:100%;' class='form-control gap' name='objective' placeholder='Objective' rows='2'></textarea></div><br>";
-    $(this).before(strSubdomain);
+        
+        
+    //$(this).before(strSubdomain);
+       $("#subdomain-group").after(strSubdomain + "<br>"+ getControlTableHTML(controlCount) );
+       controlCount++;
     });
     
     
@@ -84,10 +104,84 @@ $(document).ready(function () {
                         </tr></thead>\n\
                      <tbody><tr id='cntrl'><td style='align-content: center'><input type='checkbox' name='control_no'></td>\n\
                      <td style='width: 25%'><input id='control_code' type='text' class='form-control gap' name='control_code' placeholder='Control Code'></td>\n\
-                     <td style='width: 35%'><input id='control' type='text' class='form-control gap' name='control' placeholder='Control Details'></td>\n\
-                     <!--<td style='width: 35%'><button id='button-save-control' type='button' class='btn btn-success gap'>Add </button></td>--></tr></tbody></table></div>\n\
-                     </div></div></div>";
+                     <td style='width: 35%'><input id='control' type='text' class='form-control gap' name='control' placeholder='Control Details'></td><div class='col-sm-6' align='right'>\n\
+                     <button type='button' id='button-add-control' class='btn btn-success gap'>Add Control</button>\n\
+                     <button type='button' id='button-delete-control' class='btn btn-success gap'>Delete Control</button>\n\
+                     <br>\n\
+                     </div></div>\n\
+                     <div class='row'><div class='col-sm-3'><button type='button' id='button-add-subdomain' class='btn btn-success gap'>Add Subdomain</button></div></div>\n\
+                     </div></div>";
         $(this).before(strCompliance);
     });
+    
+    function doSave(){
+    	console.log("In the doSave method");
+    	console.log(JSON.stringify($("#complianceDefForm").serialize()));
+    	   $("#complianceDefForm").each(function() {
+    		   var domain_code 		= $("#domain_code").val();
+    		   var domain_value 	= $("#domain_value").val();
+    		   var subdomainList = [];
+    		   $("#subdomain-group div").each(function(){
+    			   var subdomain_code 	= $(this).find("input[name='sudbomain_code']").val();
+    			   var subdomain_value 	= $(this).find("input[name='subdomain_value']").val();
+    			   var principle 		= $(this).find("textarea[name='principle']").val();
+        		   var objective 		= $(this).find("textarea[name='objective']").val();
+        		   var control_code 	= $(this).find("input[name='control_code']").val();
+        		   var control_value	= $(this).find("input[name='control_value']").val();
+        		   var subdomainObject = new SubdomainObj(subdomain_code ,subdomain_value ,principle ,objective ,control_code ,control_value);
+        		   subdomainList.push(subdomainObject);
+    		   });
+    		   //var subdomain_code 	= $("#subdomain_code").val();
+    		   //var subdomain_value 	= $("#subdomain_value").val();
+    		   //var principle 		= $("#principle").val();
+    		   //var objective 		= $("#objective").val();
+    		   //var control_code 	= $("#control_code").val();
+    		   //var control_value	= $("#control_value").val();
+    		   
+    		   var complianceObject = new ComplianceObject(domain_code ,domain_value,subdomainList);
+    		   console.log(JSON.stringify(complianceObject));
+    	   });
+    }
+    
+    function SubdomainObj(subdomain_code ,subdomain_value ,principle ,objective ,control_code ,control_value){
+    	this.subdomainCode = subdomain_code;
+    	alert(subdomain_code);
+    	this.subdomainValue = subdomain_value;
+    	alert(subdomain_value);
+    	this.principle = principle;
+    	alert(principle);
+    	this.objective = objective;
+    	alert(objective);
+    	this.controlCode = control_code;
+    	alert(control_code);
+    	this.controlValue = control_value;
+    	alert(control_value);
+    }
 });
 
+function ComplianceObject(domain_code ,domain_value ,subdomainList){
+	this.domainCode  = domain_code;
+	this.domainValue = domain_value;
+	this.subdomainList = subdomainList;
+}
+
+function getControlTableHTML(controlCount){
+	return "<div> <label class='input-group'>Controls</label></div><br>" +
+			   "<div class='row'> <table class='table' id='subdomainTable'> <thead> <tr> <th>Select</th> <th>Control Code</th> <th>Control Detail</th> </tr> </thead>" +
+			   "<tbody> <tr id='cntrl'> <td style='width:5%;align-content: center'><input type='checkbox' name='control_no' id='control_"+controlCount+"'></td> <td style='width: 25%'>" +
+			   "<input id='control_code' type='text' class='form-control gap' name='control_code' placeholder='Control Code'></td> <td style='width: 35%'>" +
+			   "<input id='control' type='text' class='form-control gap' name='control' placeholder='Control Details'></td>" +
+			   "<!--<td style='width: 35%'><button id='button-save-control' type='button' class='btn btn-success gap'>Add </button></td>--> </tr> </tbody> </table> </div>" +
+			   "<div class='col-sm-6' align='right'> <button type='button' id='button-add-control-'"+controlCount+"' class='btn btn-success gap'>Add Control</button> " +
+			   "<button type='button' id='button-delete-control'"+controlCount+"' class='btn btn-success gap'>Delete Control</button> <br> </div>";
+	
+}
+
+function doSave(){
+	console.log("In the doSave method");
+	console.log(JSON.stringify($("#complianceDefForm").serialize()));
+}
+
+function doNext(){
+	console.log("In the doNext method");
+}

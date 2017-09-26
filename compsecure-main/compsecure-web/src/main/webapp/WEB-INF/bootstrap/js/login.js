@@ -17,7 +17,7 @@ $(document).ready(function () {
 		console.log(JSON.stringify(loginObj));
                
 		$.ajax({
-			 url: "http://localhost:8080/compsecure-web/login",
+			 url: "/compsecure-web/login",
 			 type:"POST",
 			 contentType:"application/json",
              dataType: "JSON",

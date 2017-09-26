@@ -52,6 +52,11 @@ public class TestController {
 
 		LOGGER.info("Inside the TestController");
 
+		User user = (User)httpSession.getAttribute("user");
+		if(!user.equals(null)){
+			System.out.println(user.getUsername() +" " + user.getUserId());
+		}
+		
 		List<AssessmentDetails> assessmentDetails = compSecureService.getAssessmentDetails(selectedVal);
 
 		Map<String, AssessmentDetails> assessmentDetailsKV = new HashMap<String, AssessmentDetails>();
@@ -174,15 +179,17 @@ public class TestController {
 	public String getQuestionnaireDetails(@RequestParam(value = "complianceId") String complianceName,
 			@RequestParam(value="assessmentId") String assessmentId, HttpSession httpSession ) {
 
-		
+		List<Questions> complianceQuestionsList = new ArrayList<Questions>();
 		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option");
 		
-		if(self_assessment_option.equals("new")){
-			LOGGER.info("**********" + self_assessment_option);
-			assessmentId = null;
-		}
+		httpSession.setAttribute("assessmentId",assessmentId);
+		httpSession.setAttribute("complianceDesc", complianceName);
 		
-		List<Questions> complianceQuestionsList = compSecureService.getComplianceQuestions(complianceName,assessmentId);
+		if(self_assessment_option.equals("existing")){
+			complianceQuestionsList = compSecureService.getComplianceQuestionsForExistingAssessment(assessmentId);
+		}else{
+			complianceQuestionsList = compSecureService.getComplianceQuestions(complianceName,assessmentId);
+		}
 
 		LOGGER.info("INSIDE the getQuestionnaire method : " + complianceName);
 		
@@ -272,12 +279,14 @@ public class TestController {
 		List<Entry<String, Domain>> domainDetailsList = null;
 		
 		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option");
+		complianceId = (String)httpSession.getAttribute("complianceDesc");
+		
 		
 		if(self_assessment_option.equals("new")){
 			domainDetailsList = compSecureService.getDomainDetailsForCompliance(complianceId);
 		}
 		else{
-			domainDetailsList = compSecureService.getDomainDetails(assessmentId);
+			domainDetailsList = compSecureService.getDomainDetails(assessmentId,complianceId);
 		}
 		List<Domain> domainList = new ArrayList<Domain>();
 
@@ -298,6 +307,7 @@ public class TestController {
 	 * @param s
 	 * @return
 	 */
+
 
 	@RequestMapping(value = "/handleJson", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody String handleJson(@RequestBody List<QuestionsResponse> questionResponseList,
@@ -325,7 +335,53 @@ public class TestController {
 
 		return response;
 	}
+	
+	
+	@RequestMapping(value = "/handleAlterJson", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody String handleAlterJson(@RequestBody List<QuestionsResponse> questionResponseList,
+			BindingResult bindingResult) {
 
+		String response = "";
+		JsonResponse json = new JsonResponse();
+
+		LOGGER.info("****************** INSIDE ALTER JSON *********************");
+		
+		for (Iterator iterator = questionResponseList.iterator(); iterator.hasNext();) {
+
+			QuestionsResponse questionsResponse = (QuestionsResponse) iterator.next();
+			LOGGER.info("Response : " + questionsResponse.getQuestionResponse());
+			LOGGER.info("Q-Code : " + questionsResponse.getQuestionCode());
+			LOGGER.info("Remarks : " + questionsResponse.getQuestionRemarks());
+		}
+
+		Integer count = compSecureService.alterComplianceQuestionsResponse(questionResponseList);
+
+		String countUpdated = "recordsUpdated " + count;
+		json.setResult(countUpdated);
+		Gson gson = new Gson();
+		response = gson.toJson(json);
+
+		LOGGER.info("questions returned : " + questionResponseList.size());
+
+		return response;
+	}
+
+	
+	@RequestMapping(value = "/saveAssessmentDetails", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public String saveAssessmentDetails(@RequestBody AssessmentDetails assessmentDetails,HttpSession httpSession) {
+				
+		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option");
+		
+		if(self_assessment_option.equals("existing")){
+			compSecureService.saveAssessmentDetails(assessmentDetails);
+		}
+		
+		System.out.println(assessmentDetails.getAssessmentName());
+		System.out.println(assessmentDetails.getAssessmentDesc());
+				
+		return "questionnaire";
+	}
+	
 	/**
 	 * TEST
 	 * 

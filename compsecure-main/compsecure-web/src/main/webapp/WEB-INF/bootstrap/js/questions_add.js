@@ -6,7 +6,7 @@
 $(document).ready(function () {
     //var complianceId = localStorage.complianceId;
     $.ajax({
-       url:"http://localhost:8080/CompSecureApplication/getControls" 
+       url:"/compsecure-web/getControls" 
     }).then(function(data){
         console.log(data);
         
@@ -49,7 +49,7 @@ $("#button-save").click(function () {
         console.log(x);
         $.ajax({
             type: "POST",
-            url: "http://localhost:8080/CompSecureApplication/saveQuestions",
+            url: "/compsecure-web/saveQuestions",
             data: {"details": JSON.stringify(x)},
             dataType: "json"
         }).then(function (data) {

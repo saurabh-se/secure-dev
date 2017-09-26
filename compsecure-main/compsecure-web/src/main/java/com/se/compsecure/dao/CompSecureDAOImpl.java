@@ -2,7 +2,6 @@ package com.se.compsecure.dao;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,14 +21,13 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-import com.mysql.cj.core.util.StringUtils;
+import com.mysql.jdbc.StringUtils;
 import com.se.compsecure.model.AssessmentDetails;
 import com.se.compsecure.model.ComplianceHeader;
 import com.se.compsecure.model.Control;
@@ -59,22 +57,21 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 	 * TODO to be moved to a utility class
 	 */
 	private Object convertToString(Date date) {
-		String converted = null;
-		Date convertedDate = null;
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		try {
-			converted = sdf.format(date);
-			convertedDate = sdf.parse(converted);
-			System.out.println("Converted Date : " + convertedDate);
-		} catch (ParseException e) {
-			e.printStackTrace();
+		if(date==null||date.equals("")){
+			return "";
+		} else {
+			String converted = null;
+			Date convertedDate = null;
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			try {
+				converted = sdf.format(date);
+				convertedDate = sdf.parse(converted);
+				System.out.println("Converted Date : " + convertedDate);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			return converted;
 		}
-		Calendar cal = Calendar.getInstance();
-
-		cal.setTime(convertedDate);
-		cal.add(Calendar.MONTH, 1);
-		System.out.println(cal.toString());
-		return cal;
 	}
 	
 	public void addFramework(Regulator regulator) {
@@ -97,9 +94,9 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 			assessmentDetails.setAssessmentId((String.valueOf(row.get("assessment_id"))));
 			assessmentDetails.setOrganizationId((String.valueOf(row.get("organization_id"))));
 			assessmentDetails.setAssessmentStatus((String) row.get("assessment_status"));
-			assessmentDetails.setRemarks((String) row.get("remarks"));
-			assessmentDetails.setAssessmentStartDate((Calendar) row.get(convertToString((Date) row.get("assessment_start_date"))));
-			assessmentDetails.setAssessmentToDate((Calendar) row.get(convertToString((Date) row.get("assessment_to_date"))));
+			assessmentDetails.setAssessmentDesc((String) row.get("remarks"));
+			assessmentDetails.setAssessmentStartDate((String) (convertToString((Date) row.get("assessment_start_date"))));
+			assessmentDetails.setAssessmentToDate((String) (convertToString((Date) row.get("assessment_to_date"))));
 			assessmentDetails.setAssessmentName((String)row.get("assessment_name"));
 			assessmentDetailsList.add(assessmentDetails);
 		}
@@ -112,8 +109,14 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 	 */
 	public List<ComplianceHeader> getComplianceDetails(String assessmentId) {
 
-		String sql = "select * from compliance_header where assessment_id=" + assessmentId;
-
+		//String sql = "select * from compliance_header where assessment_id=" + assessmentId;
+		String sql = " select * from compsecure_sama.compliance_header ch join compsecure_sama.assessment_details ad "
+				+ "on ch.compliance_id = ad.compliance_id where ad.assessment_id= " + assessmentId;
+		
+		if(assessmentId.equals(null)|| assessmentId.isEmpty()){
+			sql = "select * from compliance_header";
+		}
+		
 		List<ComplianceHeader> complianceDetailsList = new ArrayList<ComplianceHeader>();
 
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
@@ -121,7 +124,7 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 			ComplianceHeader complianceHeader = new ComplianceHeader();
 			complianceHeader.setComplianceName((String)row.get("compliance_name"));
 			complianceHeader.setComplianceDescription((String)row.get("compliance_description"));
-			complianceHeader.setComplianceId((Integer)row.get("compliance_id"));
+			complianceHeader.setComplianceId(Integer.valueOf((String)row.get("compliance_id")));
 			complianceDetailsList.add(complianceHeader);
 		}
 		return complianceDetailsList;
@@ -231,17 +234,18 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 		return null;
 	}
 	
-	public List<Entry<String , Domain>> getDomainDetails(String assessmentId){
+	public List<Entry<String , Domain>> getDomainDetails(String assessmentId,String complianceDesc){
 		
-		System.out.println("Inside getDomainDetails");
+		System.out.println("Inside getDomainDetails for assessmentId and ComplianceId ");
 		
 		List<Domain> domainList = new ArrayList<Domain>();		
 		String sql = "select c.control_code,c.control_value,sd.subdomain_code,sd.subdomain_name,ab.domain_name,ab.domain_code,po.principle,po.objective "
 				+ " from 			compsecure_sama.subdomain sd, compsecure_sama.controls c,compsecure_sama.principle_objective po "
 				+ " left join		(select domain_id,domain_code,domain_name from 	compsecure_sama.domain d "
 				+ " inner join 		compsecure_sama.compliance_header ch "
-				+ " on 				ch.compliance_id = d.compliance_id " + " where 			ch.assessment_id='"+assessmentId+"') ab "
+				+ " on 				ch.compliance_id = d.compliance_id join assessment_details ad on ad.compliance_id = ch.compliance_id where ad.assessment_id='"+assessmentId+"' and ch.compliance_description = '" + complianceDesc +"') ab "
 				+ " on 				ab.domain_id where ab.domain_id= sd.domain_id and c.subdomain_id = sd.domain_id and po.subdomain_id = sd.subdomain_id group by c.control_id";
+		System.out.println(sql);
 		
 //	    SqlRowSet srs = jdbcTemplate.queryForRowSet(sql);
 		
@@ -256,7 +260,7 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 				+ " from 			compsecure_sama.subdomain sd, compsecure_sama.controls c,compsecure_sama.principle_objective po "
 				+ " left join		(select domain_id,domain_code,domain_name from 	compsecure_sama.domain d "
 				+ " inner join 		compsecure_sama.compliance_header ch "
-				+ " on 				ch.compliance_id = d.compliance_id " + " where 			ch.compliance_description='"+complianceDesc.trim()+"') ab "
+				+ " on 				ch.compliance_id = d.compliance_id " + " where 	ch.compliance_description='"+complianceDesc.trim()+"') ab "
 				+ " on 				ab.domain_id where ab.domain_id= sd.domain_id and c.subdomain_id = sd.domain_id and po.subdomain_id = sd.subdomain_id group by c.control_id";
 		
 //	    SqlRowSet srs = jdbcTemplate.queryForRowSet(sql);
@@ -363,22 +367,21 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 					+ " and sd.subdomain_id = c.subdomain_id and ch.compliance_description='"
 					+ complianceDescription.trim() + "') "
 					+ "abc on abc.control_id = qm.control_id ";
-		} else {
-
-			sql = " select distinct qm.question_code,qm.question,qr.question_response,qr.question_remarks from compsecure_sama.questionnaire_master qm join "
-					+ " (select control_code,control_id,ad.assessment_id from compsecure_sama.controls c join "
-					+ " compsecure_sama.subdomain sd on c.subdomain_id join compsecure_sama.domain d on sd.domain_id "
-					+ " join compsecure_sama.compliance_header ch on ch.compliance_id join compsecure_sama.assessment_details ad on ad.assessment_id"
-					+ " where ad.assessment_id = ch.assessment_id " + " and ch.compliance_id = d.domain_id "
-					+ " and sd.subdomain_id = c.subdomain_id and ch.compliance_description='"
-					+ complianceDescription.trim() + "' and ad.assessment_id='" + assessmentId + "') "
-					+ "abc on abc.control_id = qm.control_id join compsecure_sama.question_response qr "
-					+ "on qm.question_code = qr.question_code and abc.assessment_id=qr.assessment_id";
+		} else if(StringUtils.isNullOrEmpty(complianceDescription)){
+			sql = "select distinct qm.question_code, qm.question, qr.question_response, qr.question_remarks FROM compsecure_sama.questionnaire_master qm join "
+					+ "(select c.control_id,c.control_code from controls c join subdomain sd on sd.subdomain_id = c.subdomain_id join domain d on d.domain_id = sd.domain_id "
+					+ " join compliance_header ch on d.compliance_id = ch.compliance_id where ch.compliance_id = (select ch.compliance_id from compliance_header ch "
+					+ " join assessment_details ad on ad.compliance_id = ch.compliance_id where 	ad.assessment_id= "+ assessmentId +")) abc on abc.control_id = qm.control_id "
+					+ " join question_response qr ON qm.question_code = qr.question_code";
+		}
+		else{	
+			sql = getSQLQueryForQuestionnaire(complianceDescription,assessmentId);
 		}
 		
 		LOGGER.info(" Get Compliance Questions :" + sql);
 		
-		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
+		List<Map<String, Object>> rows = null; 
+				rows = jdbcTemplate.queryForList(sql);
 		for(Map row : rows){
 			Questions questions = new Questions();
 			questions.setQuestionCode((String)row.get("question_code"));
@@ -392,6 +395,19 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 
 
 	
+	private String getSQLQueryForQuestionnaire(String complianceDescription, String assessmentId) {
+		String sql = "SELECT DISTINCT  qm.question_code,   qm.question,    qr.question_response,    qr.question_remarks "
+				+ " FROM    compsecure_sama.questionnaire_master qm        JOIN"
+				+ "    (SELECT control_code, control_id,ad.assessment_id   FROM        compsecure_sama.controls c    JOIN compsecure_sama.subdomain sd ON c.subdomain_id"
+				+ "    JOIN compsecure_sama.domain d ON sd.domain_id    JOIN compsecure_sama.compliance_header ch ON ch.compliance_id"
+				+ "    JOIN compsecure_sama.assessment_details ad ON ad.assessment_id    WHERE        ad.assessment_id = ch.assessment_id"
+				+ "    AND ch.compliance_id = d.compliance_id            AND sd.subdomain_id = c.subdomain_id"
+				+ "    AND ch.compliance_description = '"+ complianceDescription.trim() +"' AND ad.assessment_id = '"+ assessmentId +"') abc ON abc.control_id = qm.control_id"
+				+ "   JOIN    compsecure_sama.question_response qr ON qm.question_code = qr.question_code and abc.assessment_id = qr.assessment_id";
+		
+		return sql;
+	}
+
 	public Integer saveComplianceQuestionsResponse(List<QuestionsResponse> questRes) {
 		
 		Integer count =0;
@@ -505,7 +521,7 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 	        } catch (Exception ex) {
 	            ex.printStackTrace();
 	        }
-		testUpload(3);
+//		testUpload(3);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -585,6 +601,84 @@ public class CompSecureDAOImpl implements CompSecureDAO {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+	}
+
+	public Integer alterComplianceQuestionsResponse(List<QuestionsResponse> questionResponseList) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void createCompliance(final ComplianceHeader complianceHeader) {
+		final String sql = "insert into compliance_header (compliance_name,regulator_id,compliance_description,number_of_levels,assessment_id,organization_id) values (?,?,?,?,?,?)";
+		
+        try {
+            synchronized(this) {
+                jdbcTemplate.update(new PreparedStatementCreator() {
+ 
+                    public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                        PreparedStatement statement = con.prepareStatement(sql);
+                        statement.setString(1, complianceHeader.getComplianceName());
+                        statement.setString(2, complianceHeader.getRegulatorId());
+                        statement.setString(3, complianceHeader.getComplianceDescription());
+                        statement.setInt(4, 0);
+                        statement.setString(5, "1");
+                        statement.setString(6, "1");
+//                        statement.setBytes(4, null);
+//                        statement.setBytes(5, null);
+                        return statement;
+                    }
+                });
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+		
+	}
+
+	public void saveAssessmentDetails(final AssessmentDetails assessmentDetails) {
+	final String sql = "insert into assessment_details (organization_id,assessment_status,remarks,assessment_start_date,assessment_to_date,assessment_name,compliance_id) values (?,?,?,?,?,?,?)";
+		
+        try {
+            synchronized(this) {
+                jdbcTemplate.update(new PreparedStatementCreator() {
+ 
+                    public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                        PreparedStatement statement = con.prepareStatement(sql);
+                        statement.setString(1, assessmentDetails.getOrganizationId());
+                        statement.setString(2, assessmentDetails.getAssessmentStatus());
+                        statement.setString(3, assessmentDetails.getAssessmentDesc());
+                        statement.setString(4, assessmentDetails.getAssessmentStartDate());
+                        statement.setString(5, assessmentDetails.getAssessmentToDate());
+                        statement.setString(6, assessmentDetails.getAssessmentName());
+                        statement.setString(7, assessmentDetails.getComplianceDesc());
+                        return statement;
+                    }
+                });
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+	}
+
+	public List<Questions> getComplianceQuestionsForExistingAssessment(String assessmentId) {
+		List<Questions> complianceQuestionsList = new ArrayList<Questions>();
+		
+		String sql = "select qm.question,qm.question_code,qr.question_response,qr.question_remarks from question_response qr "
+				+ "join questionnaire_master qm on qm.question_code = qr.question_code where qr.assessment_id='" + assessmentId +"'";
+		
+		LOGGER.info(" Get Compliance Questions for Existing Assessment :" + sql);
+		
+		List<Map<String, Object>> rows = null; 
+				rows = jdbcTemplate.queryForList(sql);
+		for(Map row : rows){
+			Questions questions = new Questions();
+			questions.setQuestionCode((String)row.get("question_code"));
+			questions.setQuestion((String)row.get("question"));
+			questions.setQuestionResponse((String)row.get("question_response"));
+			questions.setQuestionRemarks((String)row.get("question_remarks"));
+			complianceQuestionsList.add(questions);
+		}
+		return complianceQuestionsList;
 	}
 
 

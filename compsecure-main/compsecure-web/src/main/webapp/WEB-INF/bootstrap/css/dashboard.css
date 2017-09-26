@@ -312,3 +312,7 @@ background:#fff;
 #qDisplay{
 	background-color: #ede9ce;
 }
+
+#button-add-control,#button-delete-control{
+	background-color: #31b0d5;
+}

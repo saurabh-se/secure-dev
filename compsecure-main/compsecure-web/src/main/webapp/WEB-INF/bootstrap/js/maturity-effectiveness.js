@@ -10,9 +10,13 @@ $(document).ready(function () {
 //    })
 
     var assessmentId = localStorage.getItem("assessmentId");
+    var complianceId = localStorage.getItem("complianceId");
     $.ajax({
-        url: "http://localhost:8080/compsecure-web/getDomainDetails",
-        data: {"assessmentId": assessmentId}
+        url: "/compsecure-web/getDomainDetails",
+        data: {
+        		"assessmentId": assessmentId,
+        		"complianceId": complianceId
+        }
     }).then(function (data) {
         console.log("Completed....");
         console.log(data);
@@ -41,10 +45,8 @@ $(document).ready(function () {
                 var principle = value["principle"];
                 var objective = value["objective"];
                 var cntrlHtml = "";
-                var subdomainDetTable = "<table id='ce-subdomainDetTableId' class='table table-sm table-bordered'><thead><tr><th>Subdomain Code</th> <th>Principle</th> <th>Objective</th></tr> </thead> <tbody> \n\
-                        <tr><td>" + subdomainCode + "</td><td>" + principle + "</td><td>" + objective + "</td>" +
-                        		"" +
-                        		"</tbody> </table>";
+                var subdomainDetTable = "<table id='ce-subdomainDetTableId' class='table table-sm table-bordered'><thead><tr><th>Subdomain Code</th> <th>Principle</th> <th>Objective</th>  </tr> </thead> <tbody> \n\
+                        <tr><td>" + subdomainCode + "</td><td>" + principle + "</td><td>" + objective + "</td></tbody> </table>";
 
                 $("#ce-mainPanelId")
                         .append("<div class='panel-heading' style='padding: 1px;border:0'>\n\
@@ -76,18 +78,18 @@ $(document).ready(function () {
                                                                 <td><select name='ceSelectImplEffectiveness' id='ceSelectImplEffectiveness'><options><option>Select</option><option>Compliant</option><option>Non Compliant</option><option>Partially Compliant</option></options></select></td>\n\
                                                                 <td><input name='upload-implEffectiveness' type='file' id='upload-implEffectiveness'>" +
                                                                 	"<button class='btn btn-info btnUpload' id='implEff'>Upload</button></td>\n\
+                                                                <td><textarea name='ce-remarksImplEff' id='ce-remarksImplEff' rows='2'></textarea></td>\n\
                                                                 <td><select name='ceSelectRecEffectiveness' id='ceSelectRecEffectiveness'><options><option>Select</option><option>Compliant</option><option>Non Compliant</option><option>Partially Compliant</option></options></select></td>\n\
                                                                 <td><input name='upload-recEffectiveness' type='file' id='upload-recEffectiveness'>" +
                                                                 "<button class='btn btn-info btnUpload' id='recEff'>Upload</button></td>\n\
                                                                 <td><textarea name='ce-remarksRE' id='ce-remarksRE' rows='2'></textarea></td> " +
-                                                                "<td><select class='form-control' id='maturityEffSelector'><option>1</option><option>2</option><option>3</option></select></td>" +
-                                                                "</tr>\n\
-\n\<tr><td colspan='11' style='display:none;' id='tdQuestions"+count+"'><div id='demo" + count + "' class='collapse'>Questions</div></td></tr>\
+                                                                "<td><select class='form-control' id='maturityEffSelector'><option>1</option><option>2</option><option>3</option></select></td></tr>\n\
+\n\<tr id='qDisplay'><td colspan='12' style='display:none;' id='tdQuestions"+count+"'><div id='demo" + count + "' class='collapse'>Questions</div></td></tr>\
                                                               "
                                 }) + "</script>"
 //                                         $("#ce-controlTableTR").after("<tr> <th scope='row'>1</th> <td><div id='controlId'>"+controlCode+"<div></td> <td><div id='controlValue'>"+controlValue+"</div></td> <td> </td> <td><input type='file' id='upload-file'></td> <td> </td> <td> </td> <td><input type='file' id='upload-file'></td> <td> </td> <td> </td> <td> </td> </tr>")}) +"</script>"    
                                 ).append("<div id='subdomaincollapse" + i + "' class='panel-collapse collapse'><div class='panel-body'><div>" + subdomainDetTable + "<br>\n\
-                                        <table id='control_effectiveness-list3' class='table table-sm table-bordered'> <thead> <tr> <th>#</th><th style='width:35%;'>Control Code</th><th>Control</th><th>Doc Effectiveness(C/NC/PC)</th> <th>Doc Effectiveness Evidence</th> <th>Remarks</th> <th>Implementation Effectiveness (C/NC/PC)</th> <th>Implementation Effectiveness Evidence </th> <th>Record Effectiveness (C/NC/PC)</th> <th>Record Effectiveness Evidence</th> <th>Record Effectiveness Remarks</th><th>Maturity Level</th> </tr> </thead> <tbody> \n\
+                                        <table id='control_effectiveness-list3' class='table table-sm table-bordered'> <thead> <tr> <th>#</th><th style='width:35%;'>Control Code</th><th>Control</th><th>Doc Effectiveness(C/NC/PC)</th> <th>Doc Effectiveness Evidence</th> <th>Remarks</th> <th>Implementation Effectiveness (C/NC/PC)</th> <th>Implementation Effectiveness Evidence </th><th>Implementation Effectiveness Remarks </th> <th>Record Effectiveness (C/NC/PC)</th> <th>Record Effectiveness Evidence</th> <th>Record Effectiveness Remarks</th><th>Maturity Level</th></tr> </thead> <tbody> \n\
                                         <tr id='ce-controlTableTR'>" + cntrlHtml + "</tbody> </table>" +
                         "</div></div></div>");
                 //                              alert(cntrlHtml);
@@ -104,15 +106,15 @@ $(document).ready(function () {
     	
     	event.preventDefault();
     	
-    	alert("AssessmentId - " + assessmentId);
-    	alert("ControlCode - " + $(this).attr('name'));
+//    	alert("AssessmentId - " + assessmentId);
+//    	alert("ControlCode - " + $(this).attr('name'));
     	
     	var controlCode = $(this).attr('name');
     	
     	var file_data = "";
     	
-    	alert("Upload Button Clicked");
-    	alert($(this).attr('id'));
+//    	alert("Upload Button Clicked");
+//    	alert($(this).attr('id'));
     	if($(this).attr('id')==='docEff'){
 //    		fileSelect = $("#upload-file").val();
     		file_data = $("#upload-file").prop("files")[0];
@@ -121,12 +123,12 @@ $(document).ready(function () {
     	}else{
     		file_data = $("#upload-recEffectiveness").prop("files")[0];
     	}
-    		alert(file_data);
+//    		alert(file_data);
     		var form_data = new FormData();
     		form_data.append("file", file_data) 
     		              // Adding extra parameters to form_data
     		$.ajax({
-                    url: "http://localhost:8080/compsecure-web/doUpload/"+$(this).attr('id')+"/"+assessmentId+"/"+ controlCode,
+                    url: "/compsecure-web/doUpload/"+$(this).attr('id')+"/"+assessmentId+"/"+ controlCode,
                     dataType: 'script',
                     cache: false,
                     contentType: false,
@@ -137,44 +139,107 @@ $(document).ready(function () {
     	
     });
     
+    $("#ce-button-next").on("click", function (event) {
+    	var count =0;
+        event.preventDefault();
+//        alert("clicked!!");
+        var t = $("#controlEffectiveForm").serializeArray();
+        console.log($("#controlEffectiveForm").serialize());
+        console.log(JSON.stringify(t));
+        
+        var table = document.getElementById('control_effectiveness-list3');
+        // count of the number of rows
+        var rowLength = table.rows.length;
+//        alert(rowLength);
+        
+        var controlEffectiveness= [];
+        
+        $("#controlEffectiveForm tr").each(function() {
+//        	console.log($(this).find("input[name='controlCode']").val());
+//        	console.log($(this).find("select[name='ceSelectDocEffectiveness']").val());
+//        	console.log($(this).find("textarea[name='ce-remarksTA']").val());
+//        	console.log($(this).find("select[name='ceSelectImplEffectiveness']").val());
+//        	console.log($(this).find("textarea[name='ce-remarksImplEff']").val());
+//        	console.log($(this).find("select[name='ceSelectRecEffectiveness']").val());
+//        	console.log($(this).find("textarea[name='ce-remarksRE']").val());
+        	
+        	var controlCode = $(this).find("input[name='controlCode']").val();
+        	var selDocEff 	= $(this).find("select[name='ceSelectDocEffectiveness']").val();
+        	var remDocEff 	= $(this).find("textarea[name='ce-remarksTA']").val();
+        	var selImplEff 	= $(this).find("select[name='ceSelectImplEffectiveness']").val();
+        	var remImplEff	= $(this).find("textarea[name='ce-remarksImplEff']").val()
+        	var selRecEff 	= $(this).find("select[name='ceSelectRecEffectiveness']").val();
+        	var remRecEff 	= $(this).find("textarea[name='ce-remarksRE']").val();
+        	
+        	 var ceObj = new CEObj(controlCode,selDocEff,remDocEff,selImplEff,remImplEff,selRecEff,remRecEff);
+        	 controlEffectiveness.push(ceObj);
+        	
+         })
+         console.log(JSON.stringify(controlEffectiveness));
+        $.ajax({
+            url: "/compsecure-web/saveControlEffectiveness",
+            type: "POST",
+            contentType:"application/json",
+            dataType: "JSON",
+            data:JSON.stringify(controlEffectiveness)
+    }).then(function(data){
+//    	alert(data);
+        console.log(data);
+        window.location="control-effectiveness";
+    });
+//        window.location="maturity-effectiveness";
+    });
 });
 
-//$("#ce-button-next").click(function(){
-//     alert("Inside the buttonsave");
-//        var x = $("#controlEffectiveForm").serializeArray();
-//        console.log(x);
-//});
+	function CEObj(controlCode,selDocEff,remDocEff,selImplEff,remImplEff,selRecEff,remRecEff){
+		if(controlCode !='undefined'){
+			this.controlCode = controlCode; 
+			this.docEffectiveness = selDocEff; 
+			this.docEffRemarks = remDocEff;
+			this.implEffectiveness = selImplEff;
+			this.implEffRemarks = remImplEff;
+			this.recEffectiveness = selRecEff;
+			this.recEffRemarks = remRecEff;
+		}
+	}
 
-$("#ce-button-next").on("click", function (event) {
-    event.preventDefault();
-    alert("clicked!!");
-    var t = $("#controlEffectiveForm").serializeArray();
-    console.log($("#controlEffectiveForm").serialize());
-    console.log(JSON.stringify(t));
-    window.location="maturity-effectiveness";
-});
-
+/**
+ * This method is used to display the questions with details 
+ * when the user clicks on the "DisplayQuestions" button
+ */
 $(document).on("click", ".ce-qBtn", function (event) {
+	var assessmentId = localStorage.getItem("assessmentId");
+	
+	
     var clicked = "";
-//       alert($(this).val());
-       alert($(this).attr('name'));  
     clicked = $(this).attr('name');
     var controlCode = $(this).val();
+    
+    console.log(controlCode);
+    console.log(assessmentId);
+    
     var html = "";
     $.ajax({
-        url: "http://localhost:8080/compsecure-web/getQuestions",
-        data: {"controlCode": controlCode}
+        url: "/compsecure-web/getQuestionResponse",
+        data: {
+        		"controlCode": controlCode,
+        		"assessmentId":assessmentId
+        	  }
     }).then(function (data) {
         $("#tdQuestions"+clicked).toggle();
         $("#demo" + clicked).toggle();
         var questions = $.parseJSON(data);
-
+        var divStart = "<div class='row' id='qDisplayDiv' style='margin-left:2px'><table id='displayQ'><tr><th>Question Code</th><th>Question</th><th>Question Response</th></tr>";
+        var divEnd = "<div class='row' style='background-color: white'></div></table></div>"
         $.each(questions, function (key, value) {
-            html = html + "<ul class='list-unstyled'><li class='list-group-item list-group-item-success'>" + value["question"] + "</li></ul>";
-            $("#demo" + clicked).html(html);
-            console.log(value["question"]);
-
+            //html = html + "<ul class='list-unstyled'><li class='list-group-item list-group-item-success'>" + value["questionCode"] + " : "+ value["question"]+ ":" + value["questionResponse"]+ "</li></ul>";
+        	html = html + "<tr><td>"+value["questionCode"]+"</td><td>"+ value["question"]+"</td><td>"+ value["questionResponse"]+"</td>";
+//            $("#demo" + clicked).html(html);
         });
+        $("#demo" + clicked).html(divStart + html + divEnd);
+        console.log(value["questionCode"]);
+        console.log(value["question"]);
+        console.log(value["questionResponse"]);
     });
 });
 

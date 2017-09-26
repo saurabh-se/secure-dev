@@ -12,7 +12,7 @@ $(document).ready(function () {
     var assessmentId = localStorage.getItem("assessmentId");
     var complianceId = localStorage.getItem("complianceId");
     $.ajax({
-        url: "http://localhost:8080/compsecure-web/getDomainDetails",
+        url: "/compsecure-web/getDomainDetails",
         data: {
         		"assessmentId": assessmentId,
         		"complianceId": complianceId
@@ -128,7 +128,7 @@ $(document).ready(function () {
     		form_data.append("file", file_data) 
     		              // Adding extra parameters to form_data
     		$.ajax({
-                    url: "http://localhost:8080/compsecure-web/doUpload/"+$(this).attr('id')+"/"+assessmentId+"/"+ controlCode,
+                    url: "/compsecure-web/doUpload/"+$(this).attr('id')+"/"+assessmentId+"/"+ controlCode,
                     dataType: 'script',
                     cache: false,
                     contentType: false,
@@ -177,11 +177,11 @@ $(document).ready(function () {
          })
          console.log(JSON.stringify(controlEffectiveness));
         $.ajax({
-            url: "http://localhost:8080/compsecure-web/saveControlEffectiveness",
+            url: "/compsecure-web/saveControlEffectiveness",
             type: "POST",
             contentType:"application/json",
             dataType: "JSON",
-            data:JSON.stringify(controlEffectiveness),
+            data:JSON.stringify(controlEffectiveness)
     }).then(function(data){
 //    	alert(data);
         console.log(data);
@@ -209,8 +209,9 @@ $(document).ready(function () {
  */
 $(document).on("click", ".ce-qBtn", function (event) {
 	var assessmentId = localStorage.getItem("assessmentId");
+	
+	
     var clicked = "";
-//    alert($(this).attr('name'));  
     clicked = $(this).attr('name');
     var controlCode = $(this).val();
     
@@ -219,7 +220,7 @@ $(document).on("click", ".ce-qBtn", function (event) {
     
     var html = "";
     $.ajax({
-        url: "http://localhost:8080/compsecure-web/getQuestionResponse",
+        url: "/compsecure-web/getQuestionResponse",
         data: {
         		"controlCode": controlCode,
         		"assessmentId":assessmentId

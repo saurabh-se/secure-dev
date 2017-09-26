@@ -95,11 +95,37 @@ public class CompSecureController {
 		return null;
     }
 	
+	@RequestMapping("/compliance-header")
+    public String getComplianceHeader(Model model) {
+		return "compliance-header";
+    }
+	@RequestMapping("/compliance_definition_add")
+    public String getComplianceDefinitionAdd(Model model) {
+		return "compliance_definition_add";
+    }
+	@RequestMapping("/maturity_definition_add")
+    public String getMaturityDefinitionAdd(Model model) {
+		return "maturity_definition_add";
+    }
+	
+	@RequestMapping("/compliance_qualifier")
+    public String getComplianceQualifier(Model model) {
+		return "welcome";
+    }
+	
+	
+	
 	@RequestMapping("/getOrgDetails/{userId}/{roleId}")
 	@ResponseBody
-    public String getOrgDetails(Model model,@PathVariable String userId,@PathVariable String roleId) {
+    public String getOrgDetails(Model model,@PathVariable String userId,@PathVariable String roleId, HttpSession httpSession) {
 		
 		LOGGER.info("in the getOrgDetails, userId " + userId);
+		
+		User user = (User)httpSession.getAttribute("user");
+		if(!user.equals(null)){
+			System.out.println(user.getUsername() + " " + user.getUserId());
+		}
+		
 		List<OrganizationDetails> orgList = new ArrayList<OrganizationDetails>();
 		
 		if(roleId.equals("1")){

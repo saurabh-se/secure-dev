@@ -1,18 +1,18 @@
 package com.se.compsecure.model;
 
-import java.util.Calendar;
-
 public class AssessmentDetails {
 
 	private String assessmentId;
 	private String assessmentName;
 	private String organizationId;
 	private String assessmentStatus;
-	private String remarks;
+	private String assessmentDesc;
 		
-	private Calendar assessmentStartDate;
-	private Calendar assessmentToDate;
-	
+	private String assessmentStartDate;
+	private String assessmentToDate;
+
+	private String complianceId;
+	private String complianceDesc;
 	
 	public String getAssessmentName() {
 		return assessmentName;
@@ -46,28 +46,43 @@ public class AssessmentDetails {
 		this.assessmentStatus = assessmentStatus;
 	}
 
-	public String getRemarks() {
-		return remarks;
-	}
-
-	public void setRemarks(String remarks) {
-		this.remarks = remarks;
-	}
-
-	public Calendar getAssessmentStartDate() {
+	public String getAssessmentStartDate() {
 		return assessmentStartDate;
 	}
 
-	public void setAssessmentStartDate(Calendar assessmentStartDate) {
+	public void setAssessmentStartDate(String assessmentStartDate) {
 		this.assessmentStartDate = assessmentStartDate;
 	}
 
-	public Calendar getAssessmentToDate() {
+	public String getAssessmentToDate() {
 		return assessmentToDate;
 	}
 
-	public void setAssessmentToDate(Calendar assessmentToDate) {
+	public void setAssessmentToDate(String assessmentToDate) {
 		this.assessmentToDate = assessmentToDate;
 	}
-	
+
+	public String getAssessmentDesc() {
+		return assessmentDesc;
+	}
+
+	public void setAssessmentDesc(String assessmentDesc) {
+		this.assessmentDesc = assessmentDesc;
+	}
+
+	public String getComplianceId() {
+		return complianceId;
+	}
+
+	public void setComplianceId(String complianceId) {
+		this.complianceId = complianceId;
+	}
+
+	public String getComplianceDesc() {
+		return complianceDesc;
+	}
+
+	public void setComplianceDesc(String complianceDesc) {
+		this.complianceDesc = complianceDesc;
+	}
 }

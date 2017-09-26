@@ -32,7 +32,6 @@
     </head>
 
     <body>
-
         <nav class="navbar navbar-inverse navbar-fixed-top">
             <div class="container-fluid">
                 <div class="navbar-header">
@@ -59,7 +58,7 @@
                 </div>
             </div>
         </nav>
-        <form method="post" id="complianceForm">
+        <form method="post" id="complianceDefForm">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-3 col-md-2 sidebar">
@@ -72,11 +71,6 @@
             <li><a href="self-assessment_1.html">Self Assessment</a></li>
                     </ul>
                     <hr>
-                    <ul class="nav nav-sidebar">
-                        <li><a href="">Login As Assessor</a></li>
-                        <li><a href="">Login As Manager</a></li>
-                    </ul>
-                    <hr>
 					 <ul class="nav nav-sidebar">
           				<li><a href="logout.html">Logout</a></li>
          			 </ul>
@@ -87,7 +81,9 @@
 
                     <div class="input-group">
                         <span class="input-group-addon">Compliance Name</span>
-                        <input id="comp_name" type="text" class="form-control" name="comp_name" placeholder="Compliance Name">
+                        <span>
+                        	<select  style="width: 50%;" id="comp_name" type="text" class="form-control" name="comp_name" placeholder="Compliance Name">Please Select</select>
+                    	</span>
                     </div>
                     <br>
                     <br>
@@ -102,29 +98,22 @@
                                 <div class="input-group">
                                     <span class="input-group-addon">Domain Name</span>
                                     <input id="domain_code" type="text" class="form-control " name="domain_code" placeholder="Control Domain Code">
-                                    <input id="domain" type="text" class="form-control gap" name="domain" placeholder="Control Domain Value">
+                                    <input id="domain_value" type="text" class="form-control gap" name="domain_value" placeholder="Control Domain Value">
                                 </div>
+                                <br>
+                                <div id="subdomain-group" class="col-sm-12">
                                 <br>
                                 <div class="input-group">
                                     <span class="input-group-addon" id="subdomainId">Subdomain</span>
                                     <input id="subdomain_code" type="text" class="form-control " name="subdomain_code" placeholder="Subdomain Code">
-                                    <input id="subdomain" type="text" class="form-control gap" name="subdomain" placeholder="Subdomain Value">
+                                    <input id="subdomain_value" type="text" class="form-control gap" name="subdomain_value" placeholder="Subdomain Value">
                                     <textarea id="principle" class="form-control gap" name="principle" placeholder="Principle" rows="2"></textarea>
                                     <textarea id="objective" class="form-control gap" name="objective" placeholder="Objective" rows="2"></textarea>
                                 </div>
                                 <br>
-                                    <button type="button" id="button-add-subdomain" class="btn btn-success gap">Add Subdomain</button>
-                                <br>
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <button type="button" id="button-add-control" class="btn btn-success gap">Add Control</button>
-                                        <button type="button" id="button-delete-control" class="btn btn-success gap">Delete Control</button>
-                                    </div>
-                                </div>
-                                <br>
                                 <div>
                                     <label class="input-group">Controls</label>
-                                </div>
+                                 </div>
                                 <br>
                                 <div class="row">
                                     <table class="table" id="subdomainTable">
@@ -133,19 +122,30 @@
                                                 <th>Select</th>
                                                 <th>Control Code</th>
                                                 <th>Control Detail</th>
-                                                <th></th>
                                             </tr>                                             
-
                                         </thead>
                                         <tbody>
                                             <tr id="cntrl">
-                                                <td style="align-content: center"><input type='checkbox' name='control_no'></td>
+                                                <td style="width:5%;align-content: center"><input type='checkbox' name='control_no'></td>
                                                 <td style="width: 25%"><input id="control_code" type="text" class="form-control gap" name="control_code" placeholder="Control Code"></td>
-                                                <td style="width: 35%"><input id="control" type="text" class="form-control gap" name="control" placeholder="Control Details"></td>
+                                                <td style="width: 35%"><input id="control_value" type="text" class="form-control gap" name="control_value" placeholder="Control Details"></td>
                                                 <!--<td style="width: 35%"><button id="button-save-control" type="button" class="btn btn-success gap">Add </button></td>-->
                                             </tr>
                                         </tbody>
                                     </table>
+                                </div>
+	                           	<div class="col-sm-6" align="right">
+	                               <button type="button" id="button-add-control" class="btn btn-success gap">Add Control</button>
+	                               <button type="button" id="button-delete-control" class="btn btn-success gap">Delete Control</button>
+	                           	<br>
+	                           </div>
+                                   <br>
+                                   </div>
+                                   <hr>
+                                <div class="row">
+                                	<div class="col-sm-3">
+                                		<button type="button" id="button-add-subdomain" class="btn btn-success gap">Add Subdomain</button>
+                                	</div>
                                 </div>
                             </div>
                         </div>
@@ -156,7 +156,7 @@
                     </div>
                         <br>
                         <br>
-                        <div class="button-box">
+                        <div class="button-box" align="center">
                             <button type="button" id="button-cancel" class="btn btn-success">Cancel</button>
                             <button type="button" id="button-save" class="btn btn-success">Save</button>
                             <button type="button" id="button-next" class="btn btn-success">Next</button>

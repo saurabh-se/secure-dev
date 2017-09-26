@@ -36,7 +36,7 @@ public interface CompSecureDAO {
 	
 	List<ComplianceHeader> getComplianceDetails(String assessmentId);
 	
-	List<Entry<String , Domain>> getDomainDetails(String assessmentId);
+	List<Entry<String , Domain>> getDomainDetails(String assessmentId, String complianceId);
 
 	List<Questions> getComplianceQuestions(String complianceName, String assessmentId);
 
@@ -57,5 +57,13 @@ public interface CompSecureDAO {
 	List<ComplianceHeader> getComplianceDetailsForOrg(String organizationId);
 
 	List<Entry<String, Domain>> getDomainDetailsForCompliance(String complianceId);
+
+	Integer alterComplianceQuestionsResponse(List<QuestionsResponse> questionResponseList);
+
+	void createCompliance(ComplianceHeader complianceHeader);
+
+	void saveAssessmentDetails(AssessmentDetails assessmentDetails);
+
+	List<Questions> getComplianceQuestionsForExistingAssessment(String assessmentId);
 
 }

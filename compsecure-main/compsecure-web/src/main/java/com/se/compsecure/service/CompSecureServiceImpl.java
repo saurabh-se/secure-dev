@@ -2,6 +2,7 @@ package com.se.compsecure.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,6 +42,12 @@ public class CompSecureServiceImpl implements CompSecureService {
 	public List<AssessmentDetails> getAssessmentDetails(String organizationId) {
 		
 		List<AssessmentDetails> assessmentDetails = compSecureDAO.getAssessmentDetails(organizationId);
+		for (Iterator iterator = assessmentDetails.iterator(); iterator.hasNext();) {
+			AssessmentDetails assessmentDetails2 = (AssessmentDetails) iterator.next();
+			System.out.println("assessment_from_date " +assessmentDetails2.getAssessmentStartDate());
+			System.out.println("assessment_to_date " + assessmentDetails2.getAssessmentToDate());
+			
+		}
 		return assessmentDetails;
 	}
 
@@ -85,12 +92,12 @@ public class CompSecureServiceImpl implements CompSecureService {
 		return orgList;
 	}
 
-	public List<Entry<String , Domain>> getDomainDetails(String assessmentId) {
+	public List<Entry<String , Domain>> getDomainDetails(String assessmentId,String complianceId) {
 
 		// get all the domain related data and return a list.
 		List<Entry<String , Domain>> domainDetailsList = new ArrayList<Map.Entry<String,Domain>>();
 		
-		domainDetailsList = compSecureDAO.getDomainDetails(assessmentId);
+		domainDetailsList = compSecureDAO.getDomainDetails(assessmentId,complianceId);
 		
 //		for (Iterator iterator = domainDetailsList.iterator(); iterator.hasNext();) {
 //			Domain domain = (Domain) iterator.next();
@@ -195,6 +202,22 @@ public class CompSecureServiceImpl implements CompSecureService {
 
 	public List<ComplianceHeader> getComplianceDetailsForOrg(String organizationId) {
 		return compSecureDAO.getComplianceDetailsForOrg(organizationId);
+	}
+
+	public Integer alterComplianceQuestionsResponse(List<QuestionsResponse> questionResponseList) {
+		return compSecureDAO.alterComplianceQuestionsResponse(questionResponseList);
+	}
+
+	public void createCompliance(ComplianceHeader complianceHeader) {
+		 compSecureDAO.createCompliance(complianceHeader);		
+	}
+
+	public void saveAssessmentDetails(AssessmentDetails assessmentDetails) {
+		compSecureDAO.saveAssessmentDetails(assessmentDetails);
+	}
+
+	public List<Questions> getComplianceQuestionsForExistingAssessment(String assessmentId) {
+		return compSecureDAO.getComplianceQuestionsForExistingAssessment(assessmentId);
 	}
 
 	

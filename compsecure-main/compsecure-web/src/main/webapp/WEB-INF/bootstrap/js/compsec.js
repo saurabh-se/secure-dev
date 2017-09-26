@@ -12,7 +12,7 @@ $(document).ready(function () {
     var i=1;
    
     if(selfAssessmentOption === "new"){
-        $("#assessmentName").html("<input id='assessmentName' type='text' class='form-control'>");
+        $("#assessmentName").html("<input id='assessment_name' type='text' class='form-control'>");
         console.log(selfAssessmentOption);
     	localStorage.setItem("selfAssessmentOption",selfAssessmentOption);
     }else{
@@ -29,7 +29,7 @@ $(document).ready(function () {
     //alert(roleId);
     
     $.ajax({
-        url: "http://localhost:8080/compsecure-web/getOrgDetails/"+userId+"/"+roleId
+        url: "/compsecure-web/getOrgDetails/"+userId+"/"+roleId
     }).then(function (data) {
         console.log("Inside compsec js");
         $("#organization").empty();
@@ -66,7 +66,7 @@ $("#organization").change(function () {
     console.log(selfAssessmentOption);
     if(selfAssessmentOption!="new"){
     $.ajax({
-        url: "http://localhost:8080/compsecure-web/getAssessmentDetails",
+        url: "/compsecure-web/getAssessmentDetails",
         data: {selected: selectedVal}
     }).then(function (data) {
         console.log("Inside orgchange method");
@@ -79,7 +79,7 @@ $("#organization").change(function () {
     });
     }else{
     	$.ajax({
-            url: "http://localhost:8080/compsecure-web/getComplianceDetailsForOrg",
+            url: "/compsecure-web/getComplianceDetailsForOrg",
             data: {selected: selectedVal}
         }).then(function (data) {
             console.log("Inside get Compliance Details for an organization");
@@ -108,12 +108,14 @@ $("#assessment-selector").change(function () {
         console.log(value["assessmentId"]);
         if (selectedVal === value["assessmentId"]) {
             console.log("true");
-            $("#assessment-description").val(value["remarks"]);
+            $("#assessment-description").val(value["assessmentDesc"]);
+            $("#assessment-from").val(value["assessmentStartDate"]);
+            $("#assessment-to").val(value["assessmentToDate"]);
         }
     });
 
     $.ajax({
-        url: "http://localhost:8080/compsecure-web/getComplianceDetails",
+        url: "/compsecure-web/getComplianceDetails",
         data: {selected: selectedVal}
     }).then(function (data) {
         console.log("Inside assessment-change method");
@@ -134,20 +136,56 @@ $("#compliance-selector").change(function () {
     $("#comp-description").val(selectedVal);
     complianceSelected  = selectedVal;
     complianceId = selectedText;
+    localStorage.setItem("complianceId",selectedVal);
 });
 
 $("#button-start").click(function(){
-//   ("Start Clicked");
-   console.log(complianceSelected);
-   localStorage.setItem("complianceId",complianceSelected);
-   window.location.href = "questionnaire";
-//   $.ajax({
-//        url: "http://localhost:8080/CompSecureApplication/toQuestionnaire",
-//        data:{"selected":complianceSelected}
-//    }).then(function(data){
-//        console.log(data);
-//        var obj = $.parseJSON(data);
-//        console.log(obj.complianceId);
-//    });
+   alert("Start Clicked");
+   var optionSelected = localStorage.getItem("option");
+   alert(optionSelected);
+   if(optionSelected==="new"){
+	doSave();
+   }else{
+	   window.location.href="questionnaire.html";
+   }
 });
+
+function doSave(){
+   
+	alert("in dosave");
+	
+	var organizationId = $("#organization :selected").val();
+	var assessmentName = $("#assessment_name").val();
+	var assessmentDesc = $("#assessment-description").val();
+	var assessmentFromDate = $("#assessment-from").val();
+	var assessmentToDate = $("#assessment-to").val();
+	var complianceId = $("#compliance-selector :selected").val();
+	var compDesc = $("#comp-description").val();
+	
+	var assessmentObj = new AssessmentObject(organizationId,assessmentName,assessmentDesc,assessmentFromDate,assessmentToDate,complianceId,compDesc);
+	console.log(assessmentObj);
+	localStorage.setItem("complianceId",complianceId);
+	
+   $.ajax({
+	    url: "/compsecure-web/saveAssessmentDetails",
+	    type:"POST",
+        contentType:"application/json",
+        data: JSON.stringify(assessmentObj)
+    }).then(function(data){
+    	window.location="questionnaire.html";
+    });
+}
+
+function AssessmentObject(organizationId,assessmentName,assessmentDesc,assessmentFromDate,assessmentToDate,complianceId,compDesc){
+	this.organizationId = organizationId;
+	this.assesssmentId = "5";
+	this.assessmentName = assessmentName;
+	this.assessmentDesc = assessmentDesc;
+	this.assessmentStartDate = assessmentFromDate;
+	this.assessmentToDate = assessmentToDate;
+	this.complianceId = complianceId;
+	this.complianceDesc = compDesc;
+	this.assessmentStatus="Started";
+}
+
 

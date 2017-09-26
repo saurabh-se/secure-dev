@@ -1,5 +1,7 @@
 package com.se.compsecure.model;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class Control {
@@ -13,8 +15,10 @@ public class Control {
 	
 	private String subdomainId;
 	
-	@Autowired
-	Questions questions;
+//	@Autowired
+//	Questions questions;
+	
+	List<Questions> controlQuestions;
 
 	public Integer getControlId() {
 		return controlId;
@@ -46,18 +50,17 @@ public class Control {
 	public void setControlHeaderName(String controlHeaderName) {
 		this.controlHeaderName = controlHeaderName;
 	}
-	public Questions getQuestions() {
-		return questions;
-	}
-	public void setQuestions(Questions questions) {
-		this.questions = questions;
-	}
+	
 	public String getSubdomainId() {
 		return subdomainId;
 	}
 	public void setSubdomainId(String subdomainId) {
 		this.subdomainId = subdomainId;
 	}
-	
-	
+	public List<Questions> getControlQuestions() {
+		return controlQuestions;
+	}
+	public void setControlQuestions(List<Questions> controlQuestions) {
+		this.controlQuestions = controlQuestions;
+	}
 }
