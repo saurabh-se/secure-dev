@@ -6,18 +6,24 @@
 
 $(document).ready(function () {
 	
+	var selectedOption 	= localStorage.getItem("selectedOption");
+	var assessmentId 	= localStorage.getItem("assessmentId");
+	var complianceName	= localStorage.getItem("complianceName");
+	
+	console.log("assessmentId in compliance-def page" + assessmentId);
+	console.log("complianceId in compliance-def page" + complianceName);
+	$("label[for='comp_name']").html(complianceName);
+	
 	$.ajax({
-		url 	: "/compsecure-web/getComplianceDetails",
-		data 	: {"selected":""}
+		url 	: "/compsecure-web/getComplianceDefinitionDetails",
+		data 	: {
+					"complianceName": complianceName
+    			}
 	}).then(function (data) {
         console.log("Inside get Compliance Details");
         console.log(data);
         var ddata = $.parseJSON(data);
         console.log(ddata);
-        $('#comp_name').append($('<option></option>').val(0).html("Please Select"));
-        $.each(ddata, function (val, text) {
-            $('#comp_name').append($('<option></option>').val(text).html(val))
-        });
     });
 	
     var i = 1;
@@ -28,19 +34,7 @@ $(document).ready(function () {
         $("#cntrl").after("<tr><td style='width: 5%'><input id='control_chkBox_id' type='checkbox' class='checkbox' name='control_no'></td>\n\
                             <td style='width: 25%'><input id='control_code' type='text' class='form-control gap' name='control_code' placeholder='Control Code'></td>\n\
         					<td><input id='control' type='text' class='form-control gap' name='control' placeholder='Control Details'></td></tr>");
-        //$('#subdomainTable').append('<tr id="cntrl' + (i + 1) + '"></tr>');
     });
-
-    // COMMENTED - SEEMS REDUNDANT CODE - Sep 24th
-//    $("#button-save-control").click(function () {
-//        alert("save");
-//        var control_code = $("#control_code").val();
-//        var control_details = $("#control").val();
-//        $("#cntrl").after("<tr><td><input type='checkbox' name='control_no'></td><td style='width: 25%'><td style='width: 25%'>" + control_code + "</td>\n\
-//                               <td style='width:35%'>" + control_details + "</td><td style='width:35%'></td></tr>");
-//        $("#control_code").val("");
-//        $("#control").val("");
-//    });
 
     $("#button-delete-control").click(function () {
         $("table tbody").find('input[name="control_no"]').each(function () {
@@ -52,17 +46,10 @@ $(document).ready(function () {
 
     $("#button-save").click(function () {
         alert("Inside the buttonsave");
-        doSave();
-//        var x = $("#complianceForm").serializeArray();
-//        console.log(x);
-//        $.ajax({
-//            method: "post",
-//            url: "/compsecure-web/saveComplianceDetails",
-//            data: {"details": JSON.stringify(x)},
-//            dataType: "json"
-//        }).then(function (data) {
-//            console.log(data);
+//        doSave().done(function(){
+//        	window.location =  "toAddQuestions";
 //        });
+        doSave();
     });
     
     
@@ -75,7 +62,6 @@ $(document).ready(function () {
                                     <textarea id='objective' style='width:100%;' class='form-control gap' name='objective' placeholder='Objective' rows='2'></textarea></div><br>";
         
         
-    //$(this).before(strSubdomain);
        $("#subdomain-group").after(strSubdomain + "<br>"+ getControlTableHTML(controlCount) );
        controlCount++;
     });
@@ -117,52 +103,78 @@ $(document).ready(function () {
     function doSave(){
     	console.log("In the doSave method");
     	console.log(JSON.stringify($("#complianceDefForm").serialize()));
+    	console.log(JSON.stringify($("#complianceDefForm").serialize()));
+    	var complianceName 	= $("#comp_name").text();
+//    	var compliance_text 	= $("#comp_name :selected").text();
+    	
+    	var complianceObject = "";
+    	
+    	console.log(complianceName);
+    	
     	   $("#complianceDefForm").each(function() {
+    		   var domainList		= [];
+    		   var subdomainList 	= [];
+    		   
     		   var domain_code 		= $("#domain_code").val();
     		   var domain_value 	= $("#domain_value").val();
-    		   var subdomainList = [];
-    		   $("#subdomain-group div").each(function(){
-    			   var subdomain_code 	= $(this).find("input[name='sudbomain_code']").val();
+    		   
+    		  
+//    		   $("#subdomain-group").each(function(){
+    			   var subdomain_code 	= $(this).find("input[name='sub_code']").val();
     			   var subdomain_value 	= $(this).find("input[name='subdomain_value']").val();
     			   var principle 		= $(this).find("textarea[name='principle']").val();
         		   var objective 		= $(this).find("textarea[name='objective']").val();
         		   var control_code 	= $(this).find("input[name='control_code']").val();
         		   var control_value	= $(this).find("input[name='control_value']").val();
-        		   var subdomainObject = new SubdomainObj(subdomain_code ,subdomain_value ,principle ,objective ,control_code ,control_value);
+        		   var subdomainObject 	= new SubdomainObj(subdomain_code ,subdomain_value ,principle ,objective ,control_code ,control_value);
         		   subdomainList.push(subdomainObject);
-    		   });
-    		   //var subdomain_code 	= $("#subdomain_code").val();
-    		   //var subdomain_value 	= $("#subdomain_value").val();
-    		   //var principle 		= $("#principle").val();
-    		   //var objective 		= $("#objective").val();
-    		   //var control_code 	= $("#control_code").val();
-    		   //var control_value	= $("#control_value").val();
+        		   
+        		   var domainObj 		= new DomainObject(domain_code,domain_value,subdomainList);
+        		   domainList.push(domainObj);
+//    		   });
     		   
-    		   var complianceObject = new ComplianceObject(domain_code ,domain_value,subdomainList);
+    		   complianceObject = new ComplianceObject(complianceName,domainList);
     		   console.log(JSON.stringify(complianceObject));
+    	   });
+    	   
+    	   $.ajax({
+    		   url	:"/compsecure-web/saveComplianceDefData",
+    		   type :"POST",
+    		   contentType:"application/json",
+               dataType: "JSON",
+    		   data : JSON.stringify(complianceObject)
+    	   }).then(function(data){
+    		   window.location="questions_add";
     	   });
     }
     
     function SubdomainObj(subdomain_code ,subdomain_value ,principle ,objective ,control_code ,control_value){
+    	var controlList = [];
     	this.subdomainCode = subdomain_code;
-    	alert(subdomain_code);
     	this.subdomainValue = subdomain_value;
-    	alert(subdomain_value);
     	this.principle = principle;
-    	alert(principle);
     	this.objective = objective;
-    	alert(objective);
-    	this.controlCode = control_code;
-    	alert(control_code);
-    	this.controlValue = control_value;
-    	alert(control_value);
+    	
+    	var controlObj = new ControlObj(control_code,control_value);
+    	controlList.push(controlObj);
+    	this.control = controlList;
+    }
+    
+    function DomainObject(domain_code,domain_value,subdomainList){
+    	this.domainCode  = domain_code;
+    	this.domainName = domain_value;
+    	this.subdomain = subdomainList;
     }
 });
 
-function ComplianceObject(domain_code ,domain_value ,subdomainList){
-	this.domainCode  = domain_code;
-	this.domainValue = domain_value;
-	this.subdomainList = subdomainList;
+function ControlObj(control_code,control_value){
+	this.controlCode 	= control_code;
+	this.controlValue 	= control_value;
+}
+
+function ComplianceObject(complianceName,domainList){
+	this.complianceName = complianceName,
+	this.domains = domainList;
 }
 
 function getControlTableHTML(controlCount){
@@ -177,11 +189,11 @@ function getControlTableHTML(controlCount){
 	
 }
 
-function doSave(){
-	console.log("In the doSave method");
-	console.log(JSON.stringify($("#complianceDefForm").serialize()));
-}
+$("#button-next").click(function(){
+	doNext();
+});
 
 function doNext(){
-	console.log("In the doNext method");
+	alert("In the doNext method");
+		window.location ="questions_add.html";
 }

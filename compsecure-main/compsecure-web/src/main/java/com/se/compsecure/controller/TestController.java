@@ -29,7 +29,9 @@ import com.google.gson.Gson;
 import com.se.compsecure.model.AssessmentDetails;
 import com.se.compsecure.model.ComplianceHeader;
 import com.se.compsecure.model.Control;
+import com.se.compsecure.model.ControlEffectiveness;
 import com.se.compsecure.model.Domain;
+import com.se.compsecure.model.Questionnaire;
 import com.se.compsecure.model.Questions;
 import com.se.compsecure.model.QuestionsResponse;
 import com.se.compsecure.model.User;
@@ -73,9 +75,28 @@ public class TestController {
 		return assessmentList;
 	}
 
+	
+	@RequestMapping("/getAssessmentId")
+	@ResponseBody
+	public String getAssessmentId(@RequestParam(value = "selectedCompliance") String selectedVal,
+			HttpServletRequest request, HttpSession httpSession) {
+
+		LOGGER.info("Inside the TestController");
+
+		User user = (User)httpSession.getAttribute("user");
+		if(!user.equals(null)){
+			System.out.println(user.getUsername() +" " + user.getUserId());
+		}
+		
+		return compSecureService.getAssessmentId(selectedVal);
+
+	}
+	
+	
+	
 	@RequestMapping("/getComplianceDetails")
 	@ResponseBody
-	public String getComplianceDetails(Model model, @RequestParam(value = "selected") String assessmentId,
+	public String getComplianceDetails(@RequestParam(value = "selected") String assessmentId,
 			HttpSession session) {
 
 		LOGGER.info("Inside the TestController");
@@ -91,7 +112,6 @@ public class TestController {
 			LOGGER.info("Compliance Description: " + complianceDetail.getComplianceDescription());
 
 			complianceDetailsKV.put(complianceDetail.getComplianceName(), complianceDetail.getComplianceDescription());
-			model.addAttribute("complianceId", complianceDetail.getComplianceId());
 
 		}
 
@@ -224,42 +244,61 @@ public class TestController {
 		LOGGER.info(complianceDetails);
 	}
 
-	@RequestMapping("/toAddQuestions")
-	public ModelAndView toAddQuestions(ModelAndView model) {
-		return new ModelAndView("questions_add");
-	}
-
+	
 	@RequestMapping(value = "/saveQuestions")
 	public @ResponseBody String saveQuestions(@RequestParam("details") String questions) {
-		LOGGER.info(questions);
-
+		LOGGER.info(questions.toString());
+		String questionCode = "";
+		String question = "";
+		String controlLabel="";
+		List<Questions>  questionsList = new ArrayList<Questions>();
+		
 		Gson gson = new Gson();
+		System.out.println(gson.toJson(questions));
+		
+		String [] array = questions.split("&");
+		System.out.println(array.toString());
+		
+		for (int i = 0; i < array.length; i++) {
+			    if(i%3==0){
+			    	controlLabel=getValue(array[i]);
+			    	questionCode=getValue(array[i+1]);
+			    	question = getValue(array[i+2]);
+//			    	createObject(questionCode,question,questionsList);
+			    	compSecureService.saveQuestions(controlLabel,questionCode,question);
+			    }
+		}
+		
+//		compSecureService.saveQuestions(questionsList);
 		String json = gson.toJson("success");
-
 		return json;
 	}
 
+	private String getValue(String string) {
+		String [] splitValue = string.split("=");
+		return splitValue[1];
+	}
+
+
+	private void createObject(String questionCode,String question,List<Questions> questionsList) {
+		Questions questions = new Questions();
+		String [] codeArray = questionCode.split("=");
+		questions.setQuestionCode(codeArray[1]);
+		String [] questionArray = question.split("=");
+		questions.setQuestion(questionArray[1]);
+		questionsList.add(questions);
+	}
+
+
 	@RequestMapping("/getControls")
 	@ResponseBody
-	public String getControls() {
+	public String getControls(@RequestParam("complianceName") String complianceName,HttpSession httpSession) {
 		LOGGER.info("Inside getControls method");
 
 		List<Control> controlList = new ArrayList<Control>();
 
-		Control control = new Control();
-
-		control.setControlCode("3.2.1");
-		control.setControlValue(" A cyber security committee should be established and be mandated by the board.");
-
-		controlList.add(control);
-
-		Control control1 = new Control();
-		control1.setControlCode("3.1.1-2");
-		control1.setControlValue(
-				"The cyber security committee should be headed by an independent senior manager from a control function. ");
-
-		controlList.add(control1);
-
+		controlList = compSecureService.getControls(complianceName);
+		
 		Gson gson = new Gson();
 		String controlJson = gson.toJson(controlList);
 
@@ -382,38 +421,86 @@ public class TestController {
 		return "questionnaire";
 	}
 	
-	/**
-	 * TEST
-	 * 
-	 * @param s
-	 * @return
-	 */
-	// @RequestMapping("/handleJson")
-	// public @ResponseBody String handleJson(@RequestParam("questionsResponse")
-	// String questionsResponse) {
-	//
-	// JsonParser jsonParser = new JsonParser();
-	//
-	// LOGGER.info(questionsResponse);
-	//
-	// Object obj = jsonParser.parse(questionsResponse);
-	//
-	// try{
-	//// JsonObject jsonObject = (JsonObject)obj;
-	//
-	// JsonArray jsonArray = (JsonArray)obj;
-	//
-	// for (JsonElement jsonElement : jsonArray) {
-	// LOGGER.info(" name --> " + jsonElement.getAsString());
-	// }
-	//
-	//
-	// }catch (Exception e) {
-	// LOGGER.info(e.getMessage());
-	// }
-	//
-	//
-	// return "success";
-	// }
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/getCompleteDetails")
+	public @ResponseBody String getCompleteDetails(@RequestParam("assessmentId") String assessmentId,@RequestParam("complianceId") String complianceId, HttpSession httpSession) {
+
+		List<Entry<String, Domain>> domainDetailsList = null;
+		
+		
+//		complianceId = (String)httpSession.getAttribute("complianceDesc");
+		
+		System.out.println("Compliance Id " + complianceId);
+		
+		domainDetailsList = compSecureService.getCompleteDetails(assessmentId,complianceId);
+		
+		List<Domain> domainList = new ArrayList<Domain>();
+
+		for (Iterator iterator = domainDetailsList.iterator(); iterator.hasNext();) {
+			Entry<String, Domain> entry = (Entry<String, Domain>) iterator.next();
+			domainList.add(entry.getValue());
+		}
+
+		Gson gson = new Gson();
+		String json = gson.toJson(domainList);
+
+		return json;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/getControlEffectivenessDetails")
+	public @ResponseBody String getControlEffectivenessDetails(@RequestParam("assessmentId") String assessmentId,@RequestParam("complianceId") String complianceId, HttpSession httpSession) {
+
+		List<ControlEffectiveness> controlEffectivenessList = null;
+		
+		complianceId = (String)httpSession.getAttribute("complianceDesc");
+		
+		controlEffectivenessList = compSecureService.getControlEffectivenessDetails(assessmentId,complianceId);
+		
+		Gson gson = new Gson();
+		String json = gson.toJson(controlEffectivenessList);
+
+		return json;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/getCompliances")
+	public @ResponseBody String getCompliances(HttpSession httpSession){
+		
+		String organizationId = ((User)httpSession.getAttribute("user")).getOrganizationId();
+		Map<String, String> compMap = compSecureService.getCompliances(organizationId);
+		
+		Gson gson = new Gson();
+		String json =  gson.toJson(compMap);
+		
+		System.out.println(json);
+		
+		return json;
+	}
+	
+	@RequestMapping(value="/getComplianceDefinitionDetails")
+	public @ResponseBody String getComplianceDefinitionDetails(@RequestParam("complianceName") String complianceName, HttpSession httpSession) {
+
+		List<Entry<String, Domain>> domainDetailsList = null;
+		
+		
+//		complianceId = (String)httpSession.getAttribute("complianceDesc");
+		
+		System.out.println("Compliance Id :" + complianceName);
+		
+		domainDetailsList = compSecureService.getComplianceDefinitionDetails(complianceName);
+		
+		List<Domain> domainList = new ArrayList<Domain>();
+
+		for (Iterator iterator = domainDetailsList.iterator(); iterator.hasNext();) {
+			Entry<String, Domain> entry = (Entry<String, Domain>) iterator.next();
+			domainList.add(entry.getValue());
+		}
+
+		Gson gson = new Gson();
+		String json = gson.toJson(domainList);
+
+		return json;
+	}
 
 }

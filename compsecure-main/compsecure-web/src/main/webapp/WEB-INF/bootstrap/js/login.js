@@ -39,9 +39,9 @@ $(document).ready(function () {
 				
 				localStorage.setItem("userId",userId);
 				localStorage.setItem("roleId",roleId);
-				
+				console.log(role);
 				if (role === "admin") {
-					window.location.href = "self-assessment_1";
+					window.location.href = "home";
 				} else {
 					window.location.href = "self-assessment_1";
 				}

@@ -9,7 +9,10 @@ public class ComplianceHeader {
 	private String complianceCode;
 	private String complianceName;
 	private String complianceDescription;
-	private List<LevelHeader> subdomain;
+	
+	private List<Domain> domains;
+//	private List<Subdomain> subdomain;
+	
 
 	private String regulatorId;
 	private Integer noOfLevels;
@@ -39,12 +42,6 @@ public class ComplianceHeader {
 	public void setComplianceDescription(String complianceDescription) {
 		this.complianceDescription = complianceDescription;
 	}
-	public List<LevelHeader> getSubdomain() {
-		return subdomain;
-	}
-	public void setSubdomain(List<LevelHeader> subdomain) {
-		this.subdomain = subdomain;
-	}
 	public String getRegulatorId() {
 		return regulatorId;
 	}
@@ -56,6 +53,18 @@ public class ComplianceHeader {
 	}
 	public void setNoOfLevels(Integer noOfLevels) {
 		this.noOfLevels = noOfLevels;
+	}
+//	public List<Subdomain> getSubdomain() {
+//		return subdomain;
+//	}
+//	public void setSubdomain(List<Subdomain> subdomain) {
+//		this.subdomain = subdomain;
+//	}
+	public List<Domain> getDomains() {
+		return domains;
+	}
+	public void setDomains(List<Domain> domains) {
+		this.domains = domains;
 	}
 	
 }

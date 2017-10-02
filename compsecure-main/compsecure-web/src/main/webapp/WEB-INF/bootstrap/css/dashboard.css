@@ -316,3 +316,7 @@ background:#fff;
 #button-add-control,#button-delete-control{
 	background-color: #31b0d5;
 }
+
+#qControlLabel{
+	border:none;
+}

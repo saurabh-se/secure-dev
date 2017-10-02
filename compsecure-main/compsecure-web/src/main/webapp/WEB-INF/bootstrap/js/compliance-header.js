@@ -6,6 +6,42 @@
 
 $(document).ready(function () {
    
+	var selectedOption = localStorage.getItem("selectedOption");
+	console.log("selectedOption",selectedOption);
+	var ddata="";
+	
+	if(selectedOption==="existing"){
+		$.ajax({
+			url : "/compsecure-web/getCompliances"
+		}).then(function(data){
+			console.log(data);
+			ddata = $.parseJSON(data);
+			$("#compliance-name-div").html("<select class='form-control' id='compliance_name'><option>Please Select</option></select>");
+			$.each(ddata, function (val, text) {
+        		$('#compliance_name').append($('<option></option>').val(text).html(val))
+        	});
+		});
+	}
+});
+
+$(document).on("change", "#compliance_name", function (event) {
+	var selectedOption = localStorage.getItem("selectedOption");
+	console.log("In the compliance header page - value changed!!");
+	if(selectedOption === "existing"){
+		var selectedComplianceText = $("#compliance_name :selected").text();
+		console.log("in the compliance header page : " + selectedComplianceText);
+		$("#compliance_description").val($("#compliance_name :selected").val());
+		localStorage.setItem("complianceName",$("#compliance_name :selected").text());
+		alert($("#compliance_name :selected").text());
+		$.ajax({
+			url		:"/compsecure-web/getComplianceDetails",
+			data 	: {"selectedCompliance" : selectedComplianceText}
+		}).then(function(data){
+			localStorage.setItem("assessmentId",data);
+		});
+	}else{
+		
+	}
 });
 
 $("#button-cancel").click(function(){
@@ -13,7 +49,9 @@ $("#button-cancel").click(function(){
 });
 
 $("#button-save").click(function(){
-	doSave();
+	doSave().done(function(){
+		console.log("The Data has been saved");
+	});
 });
 
 $("#button-next").click(function(){
@@ -23,6 +61,7 @@ $("#button-next").click(function(){
 function doSave(){
 	console.log("In the doSave method");
 	var complianceName 	= $("#compliance_name").val();
+	console.log("in the doSave method .. complianceName " + complianceName);
 	var complianceDescription 	= $("#compliance_description").val();
 	var regulatorId		= $("#regulator_name :selected").val();
 	
@@ -31,15 +70,13 @@ function doSave(){
 	
 	console.log(JSON.stringify(compliance));
 	
-	 $.ajax({
+	localStorage.setItem("complianceName",complianceName);
+	
+	 return $.ajax({
 	        type: "POST",	
 		 	url	: "/compsecure-web/enterComplianceDetails",
 		 	contentType:"application/json",
 	        data: JSON.stringify(compliance),
-	    }).then(function (data) {
-	        console.log("Inside the doSave method");
-	        console.log(data);
-	        var ddata = $.parseJSON(data);
 	    });
 }
 
@@ -51,5 +88,14 @@ function ComplianceObj(complianceName,complianceDescription,regulatorId){
 
 function doNext(){
 	console.log("In the doNext method");
-	doSave();
+	var selectedOption = localStorage.getItem("selectedOption");
+	if(selectedOption==="existing"){
+		console.log("moving to the next page without saving");
+		window.location="compliance_definition_add";
+	}else{
+		doSave().done(function(){
+			console.log("moving to the next page after saving");
+			window.location="compliance_definition_add";
+		});
+	}
 }

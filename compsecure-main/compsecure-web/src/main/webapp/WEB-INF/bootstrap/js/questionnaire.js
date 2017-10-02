@@ -7,9 +7,10 @@
 $(document).ready(function () {
     var complianceId = localStorage.complianceId;
     var assessmentId = localStorage.assessmentId;
+    var complianceName = localStorage.complianceName;
     var selfAssessmentOption = localStorage.selfAssessmentOption;
-    alert(complianceId);
-    alert(assessmentId);
+//    alert(complianceId);
+//    alert(assessmentId);
     if(assessmentId === undefined){
     	console.log("In Questionnaire - no assessmentId");
     	assessmentId = "";
@@ -23,7 +24,7 @@ $(document).ready(function () {
    $.ajax({
         url: "/compsecure-web/getQuestionnaireDetails",
         data : {
-        		 complianceId: complianceId,
+        		 complianceId: complianceName,
         		 assessmentId : assessmentId
         	   }
     }).then(function (data) {

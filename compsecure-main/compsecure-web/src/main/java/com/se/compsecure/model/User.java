@@ -5,8 +5,9 @@ public class User {
 	private Integer userId;
 	private String username;
 	private String password;
-	private Boolean authenticated;
 	private UserRoles role;
+	private String organizationId;
+	private Boolean authenticated;
 	
 	public Integer getUserId() {
 		return userId;
@@ -37,5 +38,11 @@ public class User {
 	}
 	public void setRole(UserRoles role) {
 		this.role = role;
+	}
+	public String getOrganizationId() {
+		return organizationId;
+	}
+	public void setOrganizationId(String organizationId) {
+		this.organizationId = organizationId;
 	}
 }

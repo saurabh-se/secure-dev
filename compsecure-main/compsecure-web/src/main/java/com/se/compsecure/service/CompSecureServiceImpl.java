@@ -23,6 +23,7 @@ import com.se.compsecure.model.OrganizationDetails;
 import com.se.compsecure.model.Questionnaire;
 import com.se.compsecure.model.Questions;
 import com.se.compsecure.model.QuestionsResponse;
+import com.se.compsecure.model.Subdomain;
 import com.se.compsecure.model.UploadFile;
 import com.se.compsecure.model.User;
 import com.se.compsecure.model.UserRoles;
@@ -98,42 +99,7 @@ public class CompSecureServiceImpl implements CompSecureService {
 		List<Entry<String , Domain>> domainDetailsList = new ArrayList<Map.Entry<String,Domain>>();
 		
 		domainDetailsList = compSecureDAO.getDomainDetails(assessmentId,complianceId);
-		
-//		for (Iterator iterator = domainDetailsList.iterator(); iterator.hasNext();) {
-//			Domain domain = (Domain) iterator.next();
-//			System.out.println(domain.getDomainCode());
-//			System.out.println(domain.getSubdomain());
-//			System.out.println(domain.getSubdomain().getControl());
-//		}
-//		
-//		
-//		Map<String, Domain> domainMap = new HashMap<String, Domain>();
-//		Map<String, Control> subdomainMap = new HashMap<String, Control>();
-//		
-//		
-//		for(Domain domain : domainDetailsList) {
-//			domainMap.put(domain.getDomainCode(), domain);
-//		}
-//		
-//		for (Iterator iterator = domainDetailsList.iterator(); iterator.hasNext();) {
-//			Domain domain = (Domain)iterator.next();
-//			Subdomain subdomain = domain.getSubdomain();
-//			subdomainMap.put(subdomain.getSubdomainCode(), subdomain.getControl());
-//		}
-//		
-//		System.out.println("// for domains");
-//		for (Map.Entry<String, Domain> entry : domainMap.entrySet()) {
-//			System.out.println("Key : " + entry.getKey() + " Value : " + entry.getValue());
-//			
-//		}
-//		
-//		
-//		System.out.println("// for subdomains");
-//		for (Map.Entry<String, Control> entry : subdomainMap.entrySet()) {
-//			System.out.println("Key : " + entry.getKey() + " Value : " + entry.getValue().getControlCode());
-//			
-//		}
-		
+				
 		return domainDetailsList;
 	}
 
@@ -220,6 +186,64 @@ public class CompSecureServiceImpl implements CompSecureService {
 		return compSecureDAO.getComplianceQuestionsForExistingAssessment(assessmentId);
 	}
 
-	
+	public List<Entry<String, Domain>> getCompleteDetails(String assessmentId, String complianceId) {
+		return compSecureDAO.getCompleteDetails(assessmentId,complianceId);
+	}
 
+	public List<ControlEffectiveness> getControlEffectivenessDetails(String assessmentId, String complianceDesc) {
+		return compSecureDAO.getControlEffectivenessDetails(assessmentId, complianceDesc);
+	}
+
+	public String getComplianceId(String complianceDescription) {
+		return compSecureDAO.getComplianceId(complianceDescription);
+	}
+
+	// Add domain details
+	// add subdomain details
+	// add control details
+	public void saveComplianceDefinitionData(ComplianceHeader complianceHeader) {
+		List<Domain> domains = complianceHeader.getDomains();
+		System.out.println(domains);
+		for (Iterator iterator = domains.iterator(); iterator.hasNext();) {
+			Domain domain = (Domain) iterator.next();
+			String domainId = compSecureDAO.addDomain(domain,complianceHeader.getComplianceId());
+			List<Subdomain> subdomains = domain.getSubdomain();
+			for (Iterator iterator2 = subdomains.iterator(); iterator2.hasNext();) {
+				Subdomain subdomain = (Subdomain) iterator2.next();
+				String subdomainId = compSecureDAO.addSubdomain(subdomain,domainId);
+				List<Control> controls = subdomain.getControl();
+				for (Iterator iterator3 = controls.iterator(); iterator3.hasNext();) {
+					Control control = (Control) iterator3.next();
+					compSecureDAO.addControl(control,subdomainId);
+				}
+			}
+		}
+		compSecureDAO.saveComplianceDefinitionData(complianceHeader);
+	}
+
+	public Map<String, String> getCompliances(String organizationId) {
+		return compSecureDAO.getCompliances(organizationId);
+	}
+
+	public String getAssessmentId(String complianceDesc) {
+		return compSecureDAO.getAssessmentId(complianceDesc);
+	}
+
+	public List<Entry<String, Domain>> getComplianceDefinitionDetails(String complianceName) {
+		
+		return compSecureDAO.getComlianceDefinitionDetails(complianceName);
+	}
+
+	public List<Control> getControls(String complianceName) {
+		return compSecureDAO.getControlsForQuestions(complianceName);
+	}
+
+	public void saveQuestions(List<Questions> questionsList) {
+		compSecureDAO.saveQuestions(questionsList);
+		
+	}
+
+	public void saveQuestions(String controlLabel, String questionCode, String question) {
+		compSecureDAO.saveQuestions(controlLabel,questionCode,question);
+	}
 }

@@ -5,23 +5,29 @@
  */
 
 $(document).ready(function () {
-//    $("#ce-button-next").click(function () {
-//        window.location.href = "maturity-effectiveness.html";
-//    })
-
+	
     var assessmentId = localStorage.getItem("assessmentId");
     var complianceId = localStorage.getItem("complianceId");
+    
     $.ajax({
-        url: "/compsecure-web/getDomainDetails",
+        url: "/compsecure-web/getCompleteDetails",
         data: {
         		"assessmentId": assessmentId,
         		"complianceId": complianceId
         }
     }).then(function (data) {
         console.log("Completed....");
+        
         console.log(data);
         var obj = $.parseJSON(data);
 
+        //get the control effectiveness data if available
+        var test  = getDetails(assessmentId,complianceId).done(function(value) {
+        	var controlEffDetails = JSON.parse(value);
+        	console.log(controlEffDetails);
+        	console.log(" Length : " + controlEffDetails.length);
+        	
+       
         var i = 0;
         var strTable = "<table id='control_effectiveness-list3' class='table table-sm table-bordered'> <thead> <tr> <th>#</th> <th>Control Code</th> <th>Control Name</th> <th>Doc Effectiveness(C/NC/PC)</th> <th>Doc Effectiveness Evidence</th> <th>Remarks</th> <th>Implementation Effectiveness (C/NC/PC)</th> <th>Implementation Effectiveness Evidence </th> <th>Record Effectiveness (C/NC/PC)</th> <th>Record Effectiveness Evidence</th> <th>Record Effectiveness Remarks</th> </tr> </thead> <tbody> \n\
                         <tr id='ce-controlTableTR'>  </tbody> </table>";
@@ -45,6 +51,8 @@ $(document).ready(function () {
                 var principle = value["principle"];
                 var objective = value["objective"];
                 var cntrlHtml = "";
+                console.log(" i : " + i);
+                console.log(" count : " + count);
                 var subdomainDetTable = "<table id='ce-subdomainDetTableId' class='table table-sm table-bordered'><thead><tr><th>Subdomain Code</th> <th>Principle</th> <th>Objective</th>  </tr> </thead> <tbody> \n\
                         <tr><td>" + subdomainCode + "</td><td>" + principle + "</td><td>" + objective + "</td></tbody> </table>";
 
@@ -64,34 +72,32 @@ $(document).ready(function () {
                                     var controlCode = cntrlValue["controlCode"];
                                   
                                     count++;
-                                    //alert(controlValue);
-
-//                                         cntrlHtml = cntrlHtml +"<label'>"+controlValue+"</label>"+"<br>"})+"</script>"
+                                    for(n=0;n<controlEffDetails.length;n++){
                                     cntrlHtml = cntrlHtml + "\n\
                                                                 <tr><td>" + count + "</td><td><div style='display:inline-table;width:150px;'><input type='text' readonly='readonly' style='width:50px;border:none' id='controlId' name='controlCode' value='" + controlCode + "'></input>\n\
                                                                     <button type='button' title='Click for Questions' class='btn btn-info ce-qBtn' name='" + count + "' id='qBtn" + count + "' value='" + controlCode + "'>Display Questions</button></div></td> \n\
                                                                 <td><div id='controlValue' class='text-left' style='width:300px;'>" + controlValue + "</div></td>\n\
-                                                                <td><select name='ceSelectDocEffectiveness' id='ceSelectDocEffectiveness'><options><option>Select</option><option>Compliant</option><option>Non Compliant</option><option>Partially Compliant</option></options></select></td> \n\
+                                                                <td>"+controlEffDetails[n]["docEffectiveness"]+"</td> \n\
                                                                 <td ><input type='file' id='upload-file'>" +
                                                                 	"<button class='btn btn-info btnUpload' id='docEff' name="+controlCode+">Upload</button></td> \n\
-                                                                <td><textarea name='ce-remarksTA' id='ce-remarksTA' rows='2'></textarea></td>\n\
-                                                                <td><select name='ceSelectImplEffectiveness' id='ceSelectImplEffectiveness'><options><option>Select</option><option>Compliant</option><option>Non Compliant</option><option>Partially Compliant</option></options></select></td>\n\
+                                                                <td>"+controlEffDetails[n]["docEffRemarks"]+"</td>\n\
+                                                                <td>"+controlEffDetails["implEffectiveness"]+"</td>\n\
                                                                 <td><input name='upload-implEffectiveness' type='file' id='upload-implEffectiveness'>" +
                                                                 	"<button class='btn btn-info btnUpload' id='implEff'>Upload</button></td>\n\
-                                                                <td><textarea name='ce-remarksImplEff' id='ce-remarksImplEff' rows='2'></textarea></td>\n\
-                                                                <td><select name='ceSelectRecEffectiveness' id='ceSelectRecEffectiveness'><options><option>Select</option><option>Compliant</option><option>Non Compliant</option><option>Partially Compliant</option></options></select></td>\n\
+                                                                <td>"+controlEffDetails[n]["implEffRemarks"]+"</td>\n\
+                                                                <td>"+controlEffDetails[n]["recEffectiveness"]+"</td>\n\
                                                                 <td><input name='upload-recEffectiveness' type='file' id='upload-recEffectiveness'>" +
                                                                 "<button class='btn btn-info btnUpload' id='recEff'>Upload</button></td>\n\
-                                                                <td><textarea name='ce-remarksRE' id='ce-remarksRE' rows='2'></textarea></td> " +
+                                                                <td>"+ controlEffDetails[n]["recEffRemarks"]+"</td> " +
                                                                 "<td><select class='form-control' id='maturityEffSelector'><option>1</option><option>2</option><option>3</option></select></td></tr>\n\
 \n\<tr id='qDisplay'><td colspan='12' style='display:none;' id='tdQuestions"+count+"'><div id='demo" + count + "' class='collapse'>Questions</div></td></tr>\
-                                                              "
-                                }) + "</script>"
-//                                         $("#ce-controlTableTR").after("<tr> <th scope='row'>1</th> <td><div id='controlId'>"+controlCode+"<div></td> <td><div id='controlValue'>"+controlValue+"</div></td> <td> </td> <td><input type='file' id='upload-file'></td> <td> </td> <td> </td> <td><input type='file' id='upload-file'></td> <td> </td> <td> </td> <td> </td> </tr>")}) +"</script>"    
+                                                             "
+                                    }}) + "</script>"
                                 ).append("<div id='subdomaincollapse" + i + "' class='panel-collapse collapse'><div class='panel-body'><div>" + subdomainDetTable + "<br>\n\
                                         <table id='control_effectiveness-list3' class='table table-sm table-bordered'> <thead> <tr> <th>#</th><th style='width:35%;'>Control Code</th><th>Control</th><th>Doc Effectiveness(C/NC/PC)</th> <th>Doc Effectiveness Evidence</th> <th>Remarks</th> <th>Implementation Effectiveness (C/NC/PC)</th> <th>Implementation Effectiveness Evidence </th><th>Implementation Effectiveness Remarks </th> <th>Record Effectiveness (C/NC/PC)</th> <th>Record Effectiveness Evidence</th> <th>Record Effectiveness Remarks</th><th>Maturity Level</th></tr> </thead> <tbody> \n\
                                         <tr id='ce-controlTableTR'>" + cntrlHtml + "</tbody> </table>" +
                         "</div></div></div>");
+                                
                 //                              alert(cntrlHtml);
 
                 i++;
@@ -100,108 +106,18 @@ $(document).ready(function () {
             });
         });
     });
-    
-    
-    $(document).on("click", ".btnUpload", function (event) {
-    	
-    	event.preventDefault();
-    	
-//    	alert("AssessmentId - " + assessmentId);
-//    	alert("ControlCode - " + $(this).attr('name'));
-    	
-    	var controlCode = $(this).attr('name');
-    	
-    	var file_data = "";
-    	
-//    	alert("Upload Button Clicked");
-//    	alert($(this).attr('id'));
-    	if($(this).attr('id')==='docEff'){
-//    		fileSelect = $("#upload-file").val();
-    		file_data = $("#upload-file").prop("files")[0];
-    	}else if($(this).attr('id')==='implEff'){
-    		file_data = $("#upload-implEffectiveness").prop("files")[0];
-    	}else{
-    		file_data = $("#upload-recEffectiveness").prop("files")[0];
-    	}
-//    		alert(file_data);
-    		var form_data = new FormData();
-    		form_data.append("file", file_data) 
-    		              // Adding extra parameters to form_data
-    		$.ajax({
-                    url: "/compsecure-web/doUpload/"+$(this).attr('id')+"/"+assessmentId+"/"+ controlCode,
-                    dataType: 'script',
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    data: form_data,                         // Setting the data attribute of ajax with file_data
-                    type: 'post'
-    		});
-    	
-    });
-    
-    $("#ce-button-next").on("click", function (event) {
-    	var count =0;
-        event.preventDefault();
-//        alert("clicked!!");
-        var t = $("#controlEffectiveForm").serializeArray();
-        console.log($("#controlEffectiveForm").serialize());
-        console.log(JSON.stringify(t));
-        
-        var table = document.getElementById('control_effectiveness-list3');
-        // count of the number of rows
-        var rowLength = table.rows.length;
-//        alert(rowLength);
-        
-        var controlEffectiveness= [];
-        
-        $("#controlEffectiveForm tr").each(function() {
-//        	console.log($(this).find("input[name='controlCode']").val());
-//        	console.log($(this).find("select[name='ceSelectDocEffectiveness']").val());
-//        	console.log($(this).find("textarea[name='ce-remarksTA']").val());
-//        	console.log($(this).find("select[name='ceSelectImplEffectiveness']").val());
-//        	console.log($(this).find("textarea[name='ce-remarksImplEff']").val());
-//        	console.log($(this).find("select[name='ceSelectRecEffectiveness']").val());
-//        	console.log($(this).find("textarea[name='ce-remarksRE']").val());
-        	
-        	var controlCode = $(this).find("input[name='controlCode']").val();
-        	var selDocEff 	= $(this).find("select[name='ceSelectDocEffectiveness']").val();
-        	var remDocEff 	= $(this).find("textarea[name='ce-remarksTA']").val();
-        	var selImplEff 	= $(this).find("select[name='ceSelectImplEffectiveness']").val();
-        	var remImplEff	= $(this).find("textarea[name='ce-remarksImplEff']").val()
-        	var selRecEff 	= $(this).find("select[name='ceSelectRecEffectiveness']").val();
-        	var remRecEff 	= $(this).find("textarea[name='ce-remarksRE']").val();
-        	
-        	 var ceObj = new CEObj(controlCode,selDocEff,remDocEff,selImplEff,remImplEff,selRecEff,remRecEff);
-        	 controlEffectiveness.push(ceObj);
-        	
-         })
-         console.log(JSON.stringify(controlEffectiveness));
-        $.ajax({
-            url: "/compsecure-web/saveControlEffectiveness",
-            type: "POST",
-            contentType:"application/json",
-            dataType: "JSON",
-            data:JSON.stringify(controlEffectiveness)
-    }).then(function(data){
-//    	alert(data);
-        console.log(data);
-        window.location="control-effectiveness";
-    });
-//        window.location="maturity-effectiveness";
     });
 });
 
-	function CEObj(controlCode,selDocEff,remDocEff,selImplEff,remImplEff,selRecEff,remRecEff){
-		if(controlCode !='undefined'){
-			this.controlCode = controlCode; 
-			this.docEffectiveness = selDocEff; 
-			this.docEffRemarks = remDocEff;
-			this.implEffectiveness = selImplEff;
-			this.implEffRemarks = remImplEff;
-			this.recEffectiveness = selRecEff;
-			this.recEffRemarks = remRecEff;
-		}
-	}
+function getDetails(assessmentId,complianceId){
+	return $.ajax({
+        url: "/compsecure-web/getControlEffectivenessDetails",
+        data: {
+        		"assessmentId": assessmentId,
+        		"complianceId": complianceId
+        }
+    });
+}
 
 /**
  * This method is used to display the questions with details 

@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -26,7 +28,10 @@ private static final Logger LOGGER = Logger.getLogger(ControlEffectivenessContro
 	private CompSecureService compSecureService;
 	
 	@RequestMapping(value="/saveControlEffectiveness",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public String saveControlEffectivenessDetails(@RequestBody List<ControlEffectiveness> controlEffectiveness) {
+	public String saveControlEffectivenessDetails(@RequestBody List<ControlEffectiveness> controlEffectiveness, HttpSession httpSession) {
+		
+		String assessment_option = (String)httpSession.getAttribute("self_assessment_option");
+		LOGGER.info(" ** INSIDE CONTROL EFFECTIVENESS CONTROLLER : OPTION SELECTED : - " + assessment_option );
 		
 		for (Iterator iterator = controlEffectiveness.iterator(); iterator.hasNext();) {
 			ControlEffectiveness controlEffectiveness2 = (ControlEffectiveness) iterator.next();
@@ -41,7 +46,14 @@ private static final Logger LOGGER = Logger.getLogger(ControlEffectivenessContro
 				LOGGER.info("Control Code : " + controlEffectiveness2.getRecEffectiveness());
 				LOGGER.info("Control Code : " + controlEffectiveness2.getRecEffRemarks());
 				LOGGER.info(" ************************ ");
-				compSecureService.saveControlEffectivenessDetails(controlEffectiveness2);
+				
+				if(assessment_option.equals("new")){
+					compSecureService.saveControlEffectivenessDetails(controlEffectiveness2);
+				}
+				else{
+					System.out.println(" TODO : ALTER THE TABLE ");
+					LOGGER.info("TODO :  ALTER THE TABLE ");
+				}
 			}
 		}
 		return "maturity-effectiveness";

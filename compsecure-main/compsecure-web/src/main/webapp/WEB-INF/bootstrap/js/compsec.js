@@ -7,6 +7,7 @@
 $(document).ready(function () {
     var assessmentSelectedObj = "";
     var complianceSelected="";
+    var complianceFromDB = "";
     var complianceId = "";   
     var selfAssessmentOption = localStorage.getItem("option");
     var i=1;
@@ -86,9 +87,9 @@ $("#organization").change(function () {
             console.log(data);
             var ddata = $.parseJSON(data);
             console.log(ddata);
-            $.each(ddata, function (val, text) {
-                $('#compliance-selector').append($('<option></option>').val(text).html(val))
-            });
+           	$.each(ddata, function (val, text) {
+            		$('#compliance-selector').append($('<option></option>').val(text).html(val));
+            	});
         });
     }
 });
@@ -122,29 +123,48 @@ $("#assessment-selector").change(function () {
         console.log(data);
         var ddata = $.parseJSON(data);
         console.log(ddata);
-        $.each(ddata, function (val, text) {
-            $('#compliance-selector').append($('<option></option>').val(text).html(val))
-        });
+        var optionSelected = localStorage.getItem("option");
+        alert("optionSelected " + optionSelected);
+        if(optionSelected==="new"){
+        	$.each(ddata, function (val, text) {
+        		$('#compliance-selector').append($('<option></option>').val(text).html(val))
+        	});
+        }else{
+        	var key = "";
+        	$.each(ddata, function (val, text) {
+        		$('#compliance-selector').append($('<option></option>').val(text).html(val));
+        		key = text;
+        	});
+        	$('#compliance-selector').val(key);
+        	updateComplianceDesc();
+        }
+        
     });
 });
 
 $("#compliance-selector").change(function () {
-    var selectedText = $("#compliance-selector :selected").text();
-    var selectedVal = $("#compliance-selector :selected").val();
-    console.log(selectedText);
-    console.log(selectedVal);
-    $("#comp-description").val(selectedVal);
-    complianceSelected  = selectedVal;
-    complianceId = selectedText;
-    localStorage.setItem("complianceId",selectedVal);
+	updateComplianceDesc();
 });
 
+function updateComplianceDesc(){
+	alert("inside uCD");
+	 var selectedText = $("#compliance-selector :selected").text();
+	    var selectedVal = $("#compliance-selector :selected").val();
+	    console.log(selectedText);
+	    console.log(selectedVal);
+	    $("#comp-description").val(selectedVal);
+	    complianceSelected  = selectedVal;
+	    complianceId = selectedText;
+	    localStorage.setItem("complianceId",selectedVal);
+	    localStorage.setItem("complianceName",selectedText);
+}
+
 $("#button-start").click(function(){
-   alert("Start Clicked");
+//   alert("Start Clicked");
    var optionSelected = localStorage.getItem("option");
-   alert(optionSelected);
+//   alert(optionSelected);
    if(optionSelected==="new"){
-	doSave();
+	   doSave();
    }else{
 	   window.location.href="questionnaire.html";
    }
@@ -152,7 +172,7 @@ $("#button-start").click(function(){
 
 function doSave(){
    
-	alert("in dosave");
+//	alert("in dosave");
 	
 	var organizationId = $("#organization :selected").val();
 	var assessmentName = $("#assessment_name").val();

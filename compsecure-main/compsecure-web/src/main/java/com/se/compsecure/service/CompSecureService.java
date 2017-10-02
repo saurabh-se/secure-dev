@@ -77,4 +77,24 @@ public interface CompSecureService {
 	void saveAssessmentDetails(AssessmentDetails assessmentDetails);
 
 	List<Questions> getComplianceQuestionsForExistingAssessment(String assessmentId);
+
+	List<Entry<String, Domain>> getCompleteDetails(String assessmentId, String complianceId);
+
+	List<ControlEffectiveness> getControlEffectivenessDetails(String assessmentId, String complianceId);
+
+	String getComplianceId(String complianceDescription);
+
+	void saveComplianceDefinitionData(ComplianceHeader complianceHeader);
+
+	Map<String, String> getCompliances(String organizationId);
+
+	String getAssessmentId(String selectedVal);
+
+	List<Entry<String, Domain>> getComplianceDefinitionDetails(String complianceName);
+
+	List<Control> getControls(String complianceName);
+
+	void saveQuestions(List<Questions> questionsList);
+
+	void saveQuestions(String controlLabel, String questionCode, String question);
 }

@@ -47,12 +47,20 @@ public class CompSecureController {
         return "login";
     }
 	
-	@RequestMapping(value={"/self-assessment_1","/home"})
+	@RequestMapping(value={"/self-assessment_1"})
     public String getSelfAssessment(@ModelAttribute User user) {
 		
 		System.out.println(user.getUsername());
         
         return "self-assessment_1";
+    }
+	
+	@RequestMapping(value={"/home"})
+    public String home(@ModelAttribute User user) {
+		
+		System.out.println(user.getUsername());
+        
+        return "home";
     }
 	
 	@RequestMapping("/self-assessment")
@@ -152,6 +160,12 @@ public class CompSecureController {
     public String getMaturityEffPage(Model model) {
 		
 		return "maturity-effectiveness";
+	
+    }
+	
+	@RequestMapping("/questions_add")
+    public String getQuestionsPage(Model model) {
+		return "questions_add";
 	
     }
 	

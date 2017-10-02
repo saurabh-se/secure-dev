@@ -155,13 +155,6 @@ $(document).ready(function () {
         var controlEffectiveness= [];
         
         $("#controlEffectiveForm tr").each(function() {
-//        	console.log($(this).find("input[name='controlCode']").val());
-//        	console.log($(this).find("select[name='ceSelectDocEffectiveness']").val());
-//        	console.log($(this).find("textarea[name='ce-remarksTA']").val());
-//        	console.log($(this).find("select[name='ceSelectImplEffectiveness']").val());
-//        	console.log($(this).find("textarea[name='ce-remarksImplEff']").val());
-//        	console.log($(this).find("select[name='ceSelectRecEffectiveness']").val());
-//        	console.log($(this).find("textarea[name='ce-remarksRE']").val());
         	
         	var controlCode = $(this).find("input[name='controlCode']").val();
         	var selDocEff 	= $(this).find("select[name='ceSelectDocEffectiveness']").val();
@@ -182,12 +175,8 @@ $(document).ready(function () {
             contentType:"application/json",
             dataType: "JSON",
             data:JSON.stringify(controlEffectiveness)
-    }).then(function(data){
-//    	alert(data);
-        console.log(data);
-        window.location="control-effectiveness";
-    });
-//        window.location="maturity-effectiveness";
+        });
+        window.location="maturity-effectiveness";
     });
 });
 

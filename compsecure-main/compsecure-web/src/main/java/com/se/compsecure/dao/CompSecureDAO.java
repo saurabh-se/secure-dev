@@ -1,6 +1,7 @@
 package com.se.compsecure.dao;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -16,6 +17,7 @@ import com.se.compsecure.model.Questionnaire;
 import com.se.compsecure.model.Questions;
 import com.se.compsecure.model.QuestionsResponse;
 import com.se.compsecure.model.Regulator;
+import com.se.compsecure.model.Subdomain;
 import com.se.compsecure.model.UploadFile;
 import com.se.compsecure.model.User;
 import com.se.compsecure.model.UserRoles;
@@ -65,5 +67,31 @@ public interface CompSecureDAO {
 	void saveAssessmentDetails(AssessmentDetails assessmentDetails);
 
 	List<Questions> getComplianceQuestionsForExistingAssessment(String assessmentId);
+	
+	List<Entry<String , Domain>> getCompleteDetails(String assessmentId,String complianceDesc);
+
+	List<ControlEffectiveness> getControlEffectivenessDetails(String assessmentId, String complianceDesc);
+
+	String getComplianceId(String complianceDescription);
+
+	void saveComplianceDefinitionData(ComplianceHeader complianceHeader);
+
+	String addDomain(Domain domain, Integer complianceId);
+
+	String addSubdomain(Subdomain subdomain, String domainCode);
+
+	void addControl(Control control, String subdomainCode);
+
+	Map<String, String> getCompliances(String organizationId);
+
+	String getAssessmentId(String complianceDesc);
+
+	List<Entry<String, Domain>> getComlianceDefinitionDetails(String complianceName);
+
+	List<Control> getControlsForQuestions(String complianceName);
+
+	void saveQuestions(List<Questions> questionsList);
+
+	void saveQuestions(String controlLabel, String questionCode, String question);
 
 }
