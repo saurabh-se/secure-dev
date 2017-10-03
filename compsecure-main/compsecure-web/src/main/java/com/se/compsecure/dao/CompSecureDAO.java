@@ -42,7 +42,7 @@ public interface CompSecureDAO {
 
 	List<Questions> getComplianceQuestions(String complianceName, String assessmentId);
 
-	Integer saveComplianceQuestionsResponse(List<QuestionsResponse> questRes);
+	Integer saveComplianceQuestionsResponse(List<QuestionsResponse> questRes,String assessmentId);
 
 	User authenticateUser(User user);
 
@@ -64,7 +64,7 @@ public interface CompSecureDAO {
 
 	void createCompliance(ComplianceHeader complianceHeader);
 
-	void saveAssessmentDetails(AssessmentDetails assessmentDetails);
+	String saveAssessmentDetails(AssessmentDetails assessmentDetails);
 
 	List<Questions> getComplianceQuestionsForExistingAssessment(String assessmentId);
 	

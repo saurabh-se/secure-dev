@@ -36,6 +36,8 @@ import com.se.compsecure.model.Questions;
 import com.se.compsecure.model.QuestionsResponse;
 import com.se.compsecure.model.User;
 import com.se.compsecure.service.CompSecureService;
+import com.se.compsecure.utility.CompSecureUtil;
+import com.se.compsecure.utility.QuestionsUtil;
 
 @Controller
 @SessionAttributes("complianceId")
@@ -177,8 +179,12 @@ public class TestController {
 	
 	@RequestMapping("/getQuestionResponse")
 	@ResponseBody
-	public String getQuestionResponses(@RequestParam(value = "controlCode") String controlCode,@RequestParam(value="assessmentId") String assessmentId) {
+	public String getQuestionResponses(@RequestParam(value = "controlCode") String controlCode,@RequestParam(value="assessmentId") String assessmentId,HttpSession httpSession) {
 
+		if(assessmentId.equals(null)||assessmentId.isEmpty()){
+			assessmentId = (String)httpSession.getAttribute("assessmentId");
+		}
+		
 		List<Questions> questionsList = compSecureService.getQuestions(controlCode,assessmentId);
 		
 		LOGGER.info(" Control Code " + controlCode);
@@ -200,7 +206,7 @@ public class TestController {
 			@RequestParam(value="assessmentId") String assessmentId, HttpSession httpSession ) {
 
 		List<Questions> complianceQuestionsList = new ArrayList<Questions>();
-		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option");
+		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option")==null?assessmentId:(String)httpSession.getAttribute("self_assessment_option");
 		
 		httpSession.setAttribute("assessmentId",assessmentId);
 		httpSession.setAttribute("complianceDesc", complianceName);
@@ -224,15 +230,21 @@ public class TestController {
 	}
 
 	@RequestMapping(value = "/saveComplianceQuestionsResponse", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody String saveComplianceQuestionsResponse(@RequestBody List<QuestionsResponse> questRes) {
+	public @ResponseBody String saveComplianceQuestionsResponse(@RequestBody List<QuestionsResponse> questRes,HttpSession httpSession) {
 
+		String assessmentId = (String)httpSession.getAttribute("assessmentId");
+		
+		if(assessmentId==null){
+			return "Some problem exists with the Assessment. Please create a new assess";
+		}
+		
 		for (Iterator iterator = questRes.iterator(); iterator.hasNext();) {
 			QuestionsResponse questionsResponse = (QuestionsResponse) iterator.next();
 			LOGGER.info(questionsResponse.getControlCode());
 			LOGGER.info(questionsResponse.getQuestionResponse());
 			LOGGER.info(questionsResponse.getQuestionRemarks());
 		}
-		compSecureService.saveComplianceQuestionsResponse(questRes);
+		compSecureService.saveComplianceQuestionsResponse(questRes,assessmentId);
 		return "saved";
 	}
 
@@ -247,46 +259,21 @@ public class TestController {
 	
 	@RequestMapping(value = "/saveQuestions")
 	public @ResponseBody String saveQuestions(@RequestParam("details") String questions) {
-		LOGGER.info(questions.toString());
-		String questionCode = "";
-		String question = "";
-		String controlLabel="";
-		List<Questions>  questionsList = new ArrayList<Questions>();
 		
-		Gson gson = new Gson();
-		System.out.println(gson.toJson(questions));
+		LOGGER.info(" In the saveQuestions method : " + questions.toString());
+		Gson gson = new Gson();	
 		
-		String [] array = questions.split("&");
-		System.out.println(array.toString());
+		CompSecureUtil compSecureUtil = new CompSecureUtil();
 		
-		for (int i = 0; i < array.length; i++) {
-			    if(i%3==0){
-			    	controlLabel=getValue(array[i]);
-			    	questionCode=getValue(array[i+1]);
-			    	question = getValue(array[i+2]);
-//			    	createObject(questionCode,question,questionsList);
-			    	compSecureService.saveQuestions(controlLabel,questionCode,question);
-			    }
+		List<QuestionsUtil> quesUtil = compSecureUtil.getKeyValuePair(questions); 
+
+		for (Iterator iterator = quesUtil.iterator(); iterator.hasNext();) {
+			QuestionsUtil questionsUtil = (QuestionsUtil) iterator.next();
+			compSecureService.saveQuestions(questionsUtil.getqControlLabel(), questionsUtil.getControlQuestionCode(), questionsUtil.getControlQuestion());
 		}
 		
-//		compSecureService.saveQuestions(questionsList);
 		String json = gson.toJson("success");
 		return json;
-	}
-
-	private String getValue(String string) {
-		String [] splitValue = string.split("=");
-		return splitValue[1];
-	}
-
-
-	private void createObject(String questionCode,String question,List<Questions> questionsList) {
-		Questions questions = new Questions();
-		String [] codeArray = questionCode.split("=");
-		questions.setQuestionCode(codeArray[1]);
-		String [] questionArray = question.split("=");
-		questions.setQuestion(questionArray[1]);
-		questionsList.add(questions);
 	}
 
 
@@ -320,7 +307,6 @@ public class TestController {
 		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option");
 		complianceId = (String)httpSession.getAttribute("complianceDesc");
 		
-		
 		if(self_assessment_option.equals("new")){
 			domainDetailsList = compSecureService.getDomainDetailsForCompliance(complianceId);
 		}
@@ -350,11 +336,13 @@ public class TestController {
 
 	@RequestMapping(value = "/handleJson", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody String handleJson(@RequestBody List<QuestionsResponse> questionResponseList,
-			BindingResult bindingResult) {
+			BindingResult bindingResult,HttpSession httpSession) {
 
 		String response = "";
 		JsonResponse json = new JsonResponse();
 
+		String assessmentId = (String)httpSession.getAttribute("assessmentId");
+		
 		for (Iterator iterator = questionResponseList.iterator(); iterator.hasNext();) {
 
 			QuestionsResponse questionsResponse = (QuestionsResponse) iterator.next();
@@ -363,7 +351,7 @@ public class TestController {
 			LOGGER.info("Remarks : " + questionsResponse.getQuestionRemarks());
 		}
 
-		Integer count = compSecureService.saveComplianceQuestionsResponse(questionResponseList);
+		Integer count = compSecureService.saveComplianceQuestionsResponse(questionResponseList,assessmentId);
 
 		String countUpdated = "recordsUpdated " + count;
 		json.setResult(countUpdated);
@@ -411,10 +399,11 @@ public class TestController {
 				
 		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option");
 		
-		if(self_assessment_option.equals("existing")){
-			compSecureService.saveAssessmentDetails(assessmentDetails);
-		}
+//		if(self_assessment_option.equals("existing")){
+			String assessmentID = compSecureService.saveAssessmentDetails(assessmentDetails);
+//		}
 		
+		httpSession.setAttribute("assessmentId", assessmentID);
 		System.out.println(assessmentDetails.getAssessmentName());
 		System.out.println(assessmentDetails.getAssessmentDesc());
 				
@@ -431,6 +420,7 @@ public class TestController {
 //		complianceId = (String)httpSession.getAttribute("complianceDesc");
 		
 		System.out.println("Compliance Id " + complianceId);
+		assessmentId = (String)httpSession.getAttribute("assessmentId");
 		
 		domainDetailsList = compSecureService.getCompleteDetails(assessmentId,complianceId);
 		

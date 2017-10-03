@@ -52,7 +52,7 @@ public interface CompSecureService {
 
 	List<Questions> getComplianceQuestions(String complianceName, String assessmentId);
 
-	Integer saveComplianceQuestionsResponse(List<QuestionsResponse> questRes);
+	Integer saveComplianceQuestionsResponse(List<QuestionsResponse> questRes,String assessmentId);
 
 	User authenticate(User user);
 
@@ -74,7 +74,7 @@ public interface CompSecureService {
 
 	void createCompliance(ComplianceHeader complianceHeader);
 
-	void saveAssessmentDetails(AssessmentDetails assessmentDetails);
+	String saveAssessmentDetails(AssessmentDetails assessmentDetails);
 
 	List<Questions> getComplianceQuestionsForExistingAssessment(String assessmentId);
 

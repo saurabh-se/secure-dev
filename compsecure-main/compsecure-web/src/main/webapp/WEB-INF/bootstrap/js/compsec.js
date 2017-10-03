@@ -30,7 +30,8 @@ $(document).ready(function () {
     //alert(roleId);
     
     $.ajax({
-        url: "/compsecure-web/getOrgDetails/"+userId+"/"+roleId
+        url: "/compsecure-web/getOrgDetails/"+userId+"/"+roleId,
+        data:{"self_assessment_option":selfAssessmentOption}
     }).then(function (data) {
         console.log("Inside compsec js");
         $("#organization").empty();
@@ -114,6 +115,8 @@ $("#assessment-selector").change(function () {
             $("#assessment-to").val(value["assessmentToDate"]);
         }
     });
+    
+    console.log("Selected Assessment :" + selectedVal);
 
     $.ajax({
         url: "/compsecure-web/getComplianceDetails",
@@ -124,7 +127,8 @@ $("#assessment-selector").change(function () {
         var ddata = $.parseJSON(data);
         console.log(ddata);
         var optionSelected = localStorage.getItem("option");
-        alert("optionSelected " + optionSelected);
+//        alert("optionSelected " + optionSelected);
+        console.log("CompSec-optionSelected " + optionSelected);
         if(optionSelected==="new"){
         	$.each(ddata, function (val, text) {
         		$('#compliance-selector').append($('<option></option>').val(text).html(val))
@@ -147,7 +151,6 @@ $("#compliance-selector").change(function () {
 });
 
 function updateComplianceDesc(){
-	alert("inside uCD");
 	 var selectedText = $("#compliance-selector :selected").text();
 	    var selectedVal = $("#compliance-selector :selected").val();
 	    console.log(selectedText);
@@ -179,7 +182,7 @@ function doSave(){
 	var assessmentDesc = $("#assessment-description").val();
 	var assessmentFromDate = $("#assessment-from").val();
 	var assessmentToDate = $("#assessment-to").val();
-	var complianceId = $("#compliance-selector :selected").val();
+	var complianceId = $("#compliance-selector :selected").text();
 	var compDesc = $("#comp-description").val();
 	
 	var assessmentObj = new AssessmentObject(organizationId,assessmentName,assessmentDesc,assessmentFromDate,assessmentToDate,complianceId,compDesc);

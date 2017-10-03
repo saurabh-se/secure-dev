@@ -113,9 +113,9 @@ public class CompSecureServiceImpl implements CompSecureService {
 		return complianceQuestionsList;
 	}
 
-	public Integer saveComplianceQuestionsResponse(List<QuestionsResponse> questRes) {
+	public Integer saveComplianceQuestionsResponse(List<QuestionsResponse> questRes,String assessmentId) {
 
-		return compSecureDAO.saveComplianceQuestionsResponse(questRes);
+		return compSecureDAO.saveComplianceQuestionsResponse(questRes,assessmentId);
 	}
 
 	public User authenticate(User user) {
@@ -178,8 +178,8 @@ public class CompSecureServiceImpl implements CompSecureService {
 		 compSecureDAO.createCompliance(complianceHeader);		
 	}
 
-	public void saveAssessmentDetails(AssessmentDetails assessmentDetails) {
-		compSecureDAO.saveAssessmentDetails(assessmentDetails);
+	public String saveAssessmentDetails(AssessmentDetails assessmentDetails) {
+		return compSecureDAO.saveAssessmentDetails(assessmentDetails);
 	}
 
 	public List<Questions> getComplianceQuestionsForExistingAssessment(String assessmentId) {

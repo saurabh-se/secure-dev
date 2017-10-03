@@ -32,7 +32,7 @@ public class ComplianceController {
 		LOGGER.info(complianceHeader.getComplianceCode() + complianceHeader.getComplianceDescription());
 		
 		User user = (User)httpSession.getAttribute("user");
-		
+		//TODO : Add provision to update the correct organization id.
 		compSecureService.createCompliance(complianceHeader);
 		
         return "compliance_definition_add";

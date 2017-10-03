@@ -125,11 +125,15 @@ public class CompSecureController {
 	
 	@RequestMapping("/getOrgDetails/{userId}/{roleId}")
 	@ResponseBody
-    public String getOrgDetails(Model model,@PathVariable String userId,@PathVariable String roleId, HttpSession httpSession) {
+    public String getOrgDetails(Model model,@PathVariable String userId,@PathVariable String roleId, 
+    							@RequestParam(value="self_assessment_option") String selfAssessmentOption,HttpSession httpSession) {
 		
 		LOGGER.info("in the getOrgDetails, userId " + userId);
 		
 		User user = (User)httpSession.getAttribute("user");
+		
+		httpSession.setAttribute("self_assessment_option", selfAssessmentOption);
+		
 		if(!user.equals(null)){
 			System.out.println(user.getUsername() + " " + user.getUserId());
 		}

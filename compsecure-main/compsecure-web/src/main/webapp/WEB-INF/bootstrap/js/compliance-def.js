@@ -103,7 +103,6 @@ $(document).ready(function () {
     function doSave(){
     	console.log("In the doSave method");
     	console.log(JSON.stringify($("#complianceDefForm").serialize()));
-    	console.log(JSON.stringify($("#complianceDefForm").serialize()));
     	var complianceName 	= $("#comp_name").text();
 //    	var compliance_text 	= $("#comp_name :selected").text();
     	

@@ -9,6 +9,9 @@ $(document).ready(function () {
     var assessmentId = localStorage.getItem("assessmentId");
     var complianceId = localStorage.getItem("complianceId");
     
+    console.log("In Maturity Effectiveness - assessmentId " + assessmentId );
+    console.log("In Maturity Effectiveness - complianceId " + complianceId );
+    
     $.ajax({
         url: "/compsecure-web/getCompleteDetails",
         data: {
@@ -157,5 +160,13 @@ $(document).on("click", ".ce-qBtn", function (event) {
         console.log(value["question"]);
         console.log(value["questionResponse"]);
     });
+});
+
+$("#button-home").click(function(data){
+	window.location="home";
+});
+
+$("#button-logout").click(function(data){
+	window.location="logout";
 });
 
