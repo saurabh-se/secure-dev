@@ -163,5 +163,9 @@ $(document).ready(function () {
             this.questionRemarks = value;
         }
     }
+    
+    $("#qn-button-cancel").click(function(){
+    	window.location="home";
+    })
 });
 

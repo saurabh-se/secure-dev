@@ -167,6 +167,6 @@ $("#button-home").click(function(data){
 });
 
 $("#button-logout").click(function(data){
-	window.location="logout";
+	window.location="logout.html";
 });
 

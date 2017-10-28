@@ -1,5 +1,6 @@
 package com.se.compsecure.controller;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpSession;
@@ -11,10 +12,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.se.compsecure.model.ComplianceHeader;
+import com.se.compsecure.model.Domain;
 import com.se.compsecure.model.User;
 import com.se.compsecure.service.CompSecureService;
+import com.se.compsecure.utility.ComplianceDefUtil;
 
 @Controller
 public class ComplianceController {
@@ -38,24 +44,58 @@ public class ComplianceController {
         return "compliance_definition_add";
     }
 	
-	@RequestMapping(value="/saveComplianceDefData", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public String saveComplianceDefData(Model model,HttpSession httpSession,
-    					@RequestBody ComplianceHeader complianceHeader) {
+	
+	
+//	@RequestMapping(value="/saveComplianceDefData", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+//    public String saveComplianceDefData(Model model,HttpSession httpSession,
+//    					@RequestBody ComplianceHeader complianceHeader) {
+//		       
+//		LOGGER.info("***************** INSIDE saveComplianceDefData **********************");
+//		LOGGER.info(complianceHeader.getComplianceCode() + complianceHeader.getComplianceDescription());
+//		
+//		LOGGER.info("Getting the compliance id from the compliance description");
+//		String complianceId = compSecureService.getComplianceId(complianceHeader.getComplianceName());
+//		
+//		User user = (User)httpSession.getAttribute("user");
+//		
+//		// map the compliance name with the id for matching in the database
+//		complianceHeader.setComplianceId(Integer.valueOf(complianceId));
+//		
+//		compSecureService.saveComplianceDefinitionData(complianceHeader);
+//		
+//        return "questions_add";
+//    }
+	
+	@RequestMapping(value="/saveComplianceDefData", method = RequestMethod.POST)
+    public String saveComplianceDefData(@RequestParam(value="complianceName") String complianceName,
+    							@RequestParam(value="formData") String domainDetails,HttpSession httpSession) {
 		       
 		LOGGER.info("***************** INSIDE saveComplianceDefData **********************");
-		LOGGER.info(complianceHeader.getComplianceCode() + complianceHeader.getComplianceDescription());
+		LOGGER.info("***************** COMPLIANCE NAME :  ********************** : " + complianceName.toUpperCase());
 		
-		LOGGER.info("Getting the compliance id from the compliance description");
-		String complianceId = compSecureService.getComplianceId(complianceHeader.getComplianceName());
+		Gson gson = new Gson();
 		
-		User user = (User)httpSession.getAttribute("user");
+		String domainJson = ComplianceDefUtil.generateKeyValPair(domainDetails);
 		
-		// map the compliance name with the id for matching in the database
-		complianceHeader.setComplianceId(Integer.valueOf(complianceId));
 		
-		compSecureService.saveComplianceDefinitionData(complianceHeader);
+		List<Domain> domains = gson.fromJson(domainJson, new TypeToken<List<Domain>>(){}.getType());
+		
+		compSecureService.saveComplianceDefinitionData(complianceName,domains);
+			
+		System.out.println(domains.size());
+		
+//		LOGGER.info(complianceHeader.getComplianceCode() + complianceHeader.getComplianceDescription());
+//		
+//		LOGGER.info("Getting the compliance id from the compliance description");
+//		String complianceId = compSecureService.getComplianceId(complianceHeader.getComplianceName());
+//		
+//		User user = (User)httpSession.getAttribute("user");
+//		
+//		// map the compliance name with the id for matching in the database
+//		complianceHeader.setComplianceId(Integer.valueOf(complianceId));
+//		
+//		compSecureService.saveComplianceDefinitionData(complianceHeader);
 		
         return "questions_add";
     }
-	
 }

@@ -2,6 +2,8 @@ package com.se.compsecure.controller;
 
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,10 +29,12 @@ public class FileUploadController {
 	private UploadFile uploadFile;
 	
 	
-	@RequestMapping(value = "/doUpload/{docUploadType}/{assessmentId}/{controlCode}", method = RequestMethod.POST)
+	@RequestMapping(value = "/doUpload/{docUploadType}/{controlCode}", method = RequestMethod.POST)
     public @ResponseBody String handleFileUpload(@RequestParam("file") MultipartFile fileUpload,@PathVariable String docUploadType,
-    		@PathVariable Integer assessmentId,@PathVariable String controlCode) throws Exception {
-                  
+    		@PathVariable String controlCode,HttpSession httpSession) throws Exception {
+        
+				String assessmentId = (String)httpSession.getAttribute("assessmentId");
+		
                 LOGGER.info("Name: " + fileUpload.getOriginalFilename().toString());
                 LOGGER.info("Content-Type: " + fileUpload.getContentType());
                 LOGGER.info("Saving file: " + fileUpload.getBytes());

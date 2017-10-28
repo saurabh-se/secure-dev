@@ -139,14 +139,18 @@ public class CompSecureServiceImpl implements CompSecureService {
 		return null;
 	}
 
-	public void save(MultipartFile uploadFile,String docToUpload,Integer assessmentId,String controlCode) throws IOException {
+	public void save(MultipartFile uploadFile,String docToUpload,String assessmentId,String controlCode) throws IOException {
 		
 		UploadFile file = new UploadFile();
 		file.setFileName(uploadFile.getOriginalFilename());
 		file.setData(uploadFile.getBytes());
 		
+		String contentType = "txt";
+		
 	      String fileName = uploadFile.getOriginalFilename().toString();
-          String contentType = fileName.substring(fileName.indexOf("."));
+	      if(fileName.contains(".")){
+	    	  contentType = fileName.substring(fileName.indexOf("."));
+	      }
           
           LOGGER.info("********************************");
           LOGGER.info(contentType);
@@ -158,8 +162,8 @@ public class CompSecureServiceImpl implements CompSecureService {
 		compSecureDAO.uploadFile(file,docToUpload);
 	}
 
-	public void saveControlEffectivenessDetails(ControlEffectiveness controlEffectiveness2) {
-			compSecureDAO.saveControlEffectivenessDetails(controlEffectiveness2);
+	public void saveControlEffectivenessDetails(ControlEffectiveness controlEffectiveness2,String assessmentId) {
+			compSecureDAO.saveControlEffectivenessDetails(controlEffectiveness2,assessmentId);
 	}
 
 	public List<Questions> getQuestions(String controlCode, String assessmentId) {
@@ -245,5 +249,21 @@ public class CompSecureServiceImpl implements CompSecureService {
 
 	public void saveQuestions(String controlLabel, String questionCode, String question) {
 		compSecureDAO.saveQuestions(controlLabel,questionCode,question);
+	}
+
+	public void saveComplianceDefinitionData(String complianceName,List<Domain> domains) {
+		compSecureDAO.saveComplianceDefinitionData(complianceName,domains);
+	}
+
+	public Boolean isExistsAssessmentId(String assessmentId) {
+		return compSecureDAO.doesAssessmentIdExist(assessmentId);
+	}
+
+	public Integer updateControlEffectivenessDetails(ControlEffectiveness controlEffectiveness2, String assessmentId) {
+		return compSecureDAO.updateControlEffectivenessDetails(controlEffectiveness2, assessmentId);
+	}
+
+	public ControlEffectiveness geControlEffectivenessDataForControl(String controlCode, String assessmentId) {
+		return compSecureDAO.geControlEffectivenessDataForControl(controlCode,assessmentId);
 	}
 }

@@ -60,9 +60,9 @@ public interface CompSecureService {
 
 	List<OrganizationDetails> getOrganizationList(String userId);
 
-	void save(MultipartFile fileUpload, String docUploadType,Integer assessmentId,String controlCode) throws IOException;
+	void save(MultipartFile fileUpload, String docUploadType,String assessmentId,String controlCode) throws IOException;
 
-	void saveControlEffectivenessDetails(ControlEffectiveness controlEffectiveness2);
+	void saveControlEffectivenessDetails(ControlEffectiveness controlEffectiveness2, String assessmentId);
 
 	List<Questions> getQuestions(String controlCode, String assessmentId);
 
@@ -97,4 +97,12 @@ public interface CompSecureService {
 	void saveQuestions(List<Questions> questionsList);
 
 	void saveQuestions(String controlLabel, String questionCode, String question);
+
+	void saveComplianceDefinitionData(String complianceName, List<Domain> domains);
+
+	Boolean isExistsAssessmentId(String assessmentId);
+
+	Integer updateControlEffectivenessDetails(ControlEffectiveness controlEffectiveness2, String assessmentId);
+
+	ControlEffectiveness geControlEffectivenessDataForControl(String controlCode, String assessmentId);
 }

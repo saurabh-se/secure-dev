@@ -31,6 +31,9 @@ private static final Logger LOGGER = Logger.getLogger(ControlEffectivenessContro
 	public String saveControlEffectivenessDetails(@RequestBody List<ControlEffectiveness> controlEffectiveness, HttpSession httpSession) {
 		
 		String assessment_option = (String)httpSession.getAttribute("self_assessment_option");
+		
+		String assessmentId = (String)httpSession.getAttribute("assessmentId");
+		
 		LOGGER.info(" ** INSIDE CONTROL EFFECTIVENESS CONTROLLER : OPTION SELECTED : - " + assessment_option );
 		
 		for (Iterator iterator = controlEffectiveness.iterator(); iterator.hasNext();) {
@@ -48,14 +51,31 @@ private static final Logger LOGGER = Logger.getLogger(ControlEffectivenessContro
 				LOGGER.info(" ************************ ");
 				
 				if(assessment_option.equals("new")){
-					compSecureService.saveControlEffectivenessDetails(controlEffectiveness2);
+					executeCreate(controlEffectiveness2,assessmentId);
 				}
 				else{
-					System.out.println(" TODO : ALTER THE TABLE ");
-					LOGGER.info("TODO :  ALTER THE TABLE ");
+					executeAlterTable(controlEffectiveness2,assessmentId);
 				}
 			}
 		}
 		return "maturity-effectiveness";
+	}
+
+	private void executeAlterTable(ControlEffectiveness controlEffectiveness2, String assessmentId) {
+		
+		Boolean doesAssessmentIdExist = compSecureService.isExistsAssessmentId(assessmentId);
+		if(doesAssessmentIdExist){
+			executeUpdate(controlEffectiveness2,assessmentId);
+		}else{
+			executeCreate(controlEffectiveness2,assessmentId);	
+		}
+	}
+
+	private void executeCreate(ControlEffectiveness controlEffectiveness2, String assessmentId) {
+		compSecureService.saveControlEffectivenessDetails(controlEffectiveness2,assessmentId);
+	}
+
+	private void executeUpdate(ControlEffectiveness controlEffectiveness2, String assessmentId) {
+		compSecureService.updateControlEffectivenessDetails(controlEffectiveness2,assessmentId);
 	}
 }

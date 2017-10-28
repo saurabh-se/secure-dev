@@ -173,6 +173,11 @@ $("#button-start").click(function(){
    }
 });
 
+
+$("#button-cancel").click(function(){
+	window.location="home";
+})
+
 function doSave(){
    
 //	alert("in dosave");

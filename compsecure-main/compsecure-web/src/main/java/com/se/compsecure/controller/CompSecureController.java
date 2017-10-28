@@ -56,11 +56,22 @@ public class CompSecureController {
     }
 	
 	@RequestMapping(value={"/home"})
-    public String home(@ModelAttribute User user) {
+    public String home(@ModelAttribute User user,HttpSession httpSession) {
 		
-		System.out.println(user.getUsername());
-        
-        return "home";
+		String return_location = "";
+		
+		if(httpSession!=null){
+			User user2 = (User)httpSession.getAttribute("user");
+			Integer roleId = user2.getRole().getRoleId();
+			if(roleId==2){
+				return_location =  "self-assessment_1";
+			}
+		}
+		else{
+            return_location = "home";
+		}
+		
+		return return_location;
     }
 	
 	@RequestMapping("/self-assessment")
@@ -104,9 +115,16 @@ public class CompSecureController {
     }
 	
 	@RequestMapping("/compliance-header")
-    public String getComplianceHeader(Model model) {
-		return "compliance-header";
+    public String getComplianceHeader(Model model,HttpSession httpSession) {
+		String res = authenticateUser(httpSession);
+		return res==null?"home":"compliance-header";
     }
+	private String authenticateUser(HttpSession httpSession) {
+		User user = (User)httpSession.getAttribute("user");
+		
+		return user==null?null:user.getRole().getRoleId().toString();
+	}
+
 	@RequestMapping("/compliance_definition_add")
     public String getComplianceDefinitionAdd(Model model) {
 		return "compliance_definition_add";

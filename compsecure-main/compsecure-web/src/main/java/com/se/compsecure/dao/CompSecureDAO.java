@@ -52,7 +52,7 @@ public interface CompSecureDAO {
 
 	void uploadFile(UploadFile uploadFile, String docToUpload);
 
-	void saveControlEffectivenessDetails(ControlEffectiveness controlEffectiveness2);
+	void saveControlEffectivenessDetails(ControlEffectiveness controlEffectiveness2, String assessmentId);
 
 	List<Questions> getQuestions(String controlCode, String assessmentId);
 
@@ -93,5 +93,13 @@ public interface CompSecureDAO {
 	void saveQuestions(List<Questions> questionsList);
 
 	void saveQuestions(String controlLabel, String questionCode, String question);
+
+	void saveComplianceDefinitionData(String complianceName, List<Domain> domains);
+
+	Boolean doesAssessmentIdExist(String assessmentId);
+
+	Integer updateControlEffectivenessDetails(ControlEffectiveness controlEffectiveness2, String assessmentId);
+
+	ControlEffectiveness geControlEffectivenessDataForControl(String controlCode, String assessmentId);
 
 }

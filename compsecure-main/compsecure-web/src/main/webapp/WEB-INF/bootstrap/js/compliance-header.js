@@ -5,6 +5,10 @@
  */
 
 $(document).ready(function () {
+	
+	$.ajax({
+		url:"/compsecure-web/authenticateRole"		
+	})
    
 	var selectedOption = localStorage.getItem("selectedOption");
 	console.log("selectedOption",selectedOption);
@@ -32,7 +36,7 @@ $(document).on("change", "#compliance_name", function (event) {
 		console.log("in the compliance header page : " + selectedComplianceText);
 		$("#compliance_description").val($("#compliance_name :selected").val());
 		localStorage.setItem("complianceName",$("#compliance_name :selected").text());
-		alert($("#compliance_name :selected").text());
+		//alert($("#compliance_name :selected").text());
 		$.ajax({
 			url		:"/compsecure-web/getComplianceDetails",
 			data 	: {"selectedCompliance" : selectedComplianceText}
@@ -45,7 +49,7 @@ $(document).on("change", "#compliance_name", function (event) {
 });
 
 $("#button-cancel").click(function(){
-	window.location.href="welcome";
+	window.location="welcome";
 });
 
 $("#button-save").click(function(){

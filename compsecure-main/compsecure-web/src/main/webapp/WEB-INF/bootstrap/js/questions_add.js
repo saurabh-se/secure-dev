@@ -43,9 +43,9 @@ $(document).ready(function () {
 //    });
 });
 $(document).on('click','.qb',function(){
-        alert("clicked");
-        alert($(this).attr("id"));
-        alert($(this).closest("label[name='qControlLabel']").text());
+//        alert("clicked");
+//        alert($(this).attr("id"));
+//        alert($(this).closest("label[name='qControlLabel']").text());
          var quesSpan = "<div class='input-group' div='questionDiv'><span class='input-group-addon'>Question Code</span>\n\
                                 <input id='controlQuestionCode' style='width: inherit;' type='text' class='form-control' name='controlQuestionCode' placeholder='Question Code'/></div><br>\n\
                                 \n\<div class='input-group'><span class='input-group-addon'>Question</span>\n\
@@ -54,9 +54,9 @@ $(document).on('click','.qb',function(){
     });
     
 $("#button-save").click(function () {
-        alert("Inside the buttonsave");
+//        alert("Inside the buttonsave");
         var x = $("#questionForm").serialize();
-        alert($("#qControlLabel").text());
+//        alert($("#qControlLabel").text());
         console.log(JSON.stringify(x));
         $.ajax({
             type: "POST",

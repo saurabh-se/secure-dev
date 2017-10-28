@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -31,7 +32,6 @@ import com.se.compsecure.model.ComplianceHeader;
 import com.se.compsecure.model.Control;
 import com.se.compsecure.model.ControlEffectiveness;
 import com.se.compsecure.model.Domain;
-import com.se.compsecure.model.Questionnaire;
 import com.se.compsecure.model.Questions;
 import com.se.compsecure.model.QuestionsResponse;
 import com.se.compsecure.model.User;
@@ -207,7 +207,10 @@ public class TestController {
 
 		List<Questions> complianceQuestionsList = new ArrayList<Questions>();
 		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option")==null?assessmentId:(String)httpSession.getAttribute("self_assessment_option");
-		
+				
+		if(assessmentId==null || assessmentId.isEmpty()){
+			assessmentId = (String)httpSession.getAttribute("assessmentId");
+		}
 		httpSession.setAttribute("assessmentId",assessmentId);
 		httpSession.setAttribute("complianceDesc", complianceName);
 		
@@ -306,33 +309,51 @@ public class TestController {
 		
 		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option");
 		complianceId = (String)httpSession.getAttribute("complianceDesc");
+		String json = null;
 		
-		if(self_assessment_option.equals("new")){
-			domainDetailsList = compSecureService.getDomainDetailsForCompliance(complianceId);
-		}
-		else{
+//		if(self_assessment_option.equals("new")){
+//			domainDetailsList = compSecureService.getDomainDetailsForCompliance(complianceId);
 			domainDetailsList = compSecureService.getDomainDetails(assessmentId,complianceId);
-		}
-		List<Domain> domainList = new ArrayList<Domain>();
+			
+			List<Domain> domainList = new ArrayList<Domain>();
 
-		for (Iterator iterator = domainDetailsList.iterator(); iterator.hasNext();) {
-			Entry<String, Domain> entry = (Entry<String, Domain>) iterator.next();
-			domainList.add(entry.getValue());
-		}
-
-		Gson gson = new Gson();
-		String json = gson.toJson(domainList);
-
+			for (Iterator iterator = domainDetailsList.iterator(); iterator.hasNext();) {
+				Entry<String, Domain> entry = (Entry<String, Domain>) iterator.next();
+				domainList.add(entry.getValue());
+			}
+			
+			Gson gson = new Gson();
+			json = gson.toJson(domainList);
+//		}
+//		else{
+//		}
 		return json;
 	}
-
+	
+	
 	/**
-	 * TEST
-	 * 
-	 * @param s
+	 * Method to be used for getting the control-effective details of an existing compliance form.
+	 * @param controlCode
+	 * @param assessmentId
+	 * @param httpSession
 	 * @return
 	 */
-
+	@RequestMapping(value="/geControlEffectivenessDataForControl")
+	public @ResponseBody String geControlEffectivenessDataForControl(@RequestParam("controlCode") String controlCode,
+			@RequestParam("assessmentId") String assessmentId, HttpSession httpSession) {
+		
+//		List<ControlEffectiveness> ceList 
+		ControlEffectiveness controlEffectiveness = compSecureService.geControlEffectivenessDataForControl(controlCode,assessmentId);
+		Gson gson = new Gson();
+		if(controlEffectiveness!=null){
+			return gson.toJson(controlEffectiveness);
+		}else{
+			String retValue = gson.toJson("empty");
+			System.out.println("Return Value " + retValue);
+			return retValue;
+		}
+	}
+	
 
 	@RequestMapping(value = "/handleJson", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody String handleJson(@RequestBody List<QuestionsResponse> questionResponseList,
@@ -342,6 +363,11 @@ public class TestController {
 		JsonResponse json = new JsonResponse();
 
 		String assessmentId = (String)httpSession.getAttribute("assessmentId");
+		String complianceName = (String)httpSession.getAttribute("complianceDesc");
+		
+		if(assessmentId.isEmpty()){
+			assessmentId = compSecureService.getAssessmentId(complianceName);
+		}
 		
 		for (Iterator iterator = questionResponseList.iterator(); iterator.hasNext();) {
 
@@ -399,9 +425,7 @@ public class TestController {
 				
 		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option");
 		
-//		if(self_assessment_option.equals("existing")){
-			String assessmentID = compSecureService.saveAssessmentDetails(assessmentDetails);
-//		}
+		String assessmentID = compSecureService.saveAssessmentDetails(assessmentDetails);
 		
 		httpSession.setAttribute("assessmentId", assessmentID);
 		System.out.println(assessmentDetails.getAssessmentName());
@@ -453,19 +477,39 @@ public class TestController {
 		return json;
 	}
 	
+	@RequestMapping(value = "/authenticateRole")
+	public String getRole(HttpSession httpSession){
+		User user = (User)httpSession.getAttribute("user");
+		if(user!=null){
+			String role = user.getRole().getRoleId().toString();
+			httpSession.setAttribute("role", role);
+			return "";
+		}else{
+			return "home";
+		}
+	}
+	
+	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/getCompliances")
 	public @ResponseBody String getCompliances(HttpSession httpSession){
 		
-		String organizationId = ((User)httpSession.getAttribute("user")).getOrganizationId();
-		Map<String, String> compMap = compSecureService.getCompliances(organizationId);
+		User user = (User)httpSession.getAttribute("user");
 		
-		Gson gson = new Gson();
-		String json =  gson.toJson(compMap);
+		String organizationId = user.getOrganizationId();
+		Integer role = user.getRole().getRoleId();
 		
-		System.out.println(json);
+		//String organizationId = ((User)httpSession.getAttribute("user")).getOrganizationId();
 		
-		return json;
+		if(organizationId.equals("0")){
+			Map<String, String> compMap = compSecureService.getCompliances(organizationId);
+			Gson gson = new Gson();
+			String json =  gson.toJson(compMap);
+			System.out.println(json);
+			return json;
+		}else{
+			return "self-assessment1";
+		}
 	}
 	
 	@RequestMapping(value="/getComplianceDefinitionDetails")
@@ -473,6 +517,8 @@ public class TestController {
 
 		List<Entry<String, Domain>> domainDetailsList = null;
 		
+		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option");
+		String assessmentId = (String)httpSession.getAttribute("assessment_id");
 		
 //		complianceId = (String)httpSession.getAttribute("complianceDesc");
 		

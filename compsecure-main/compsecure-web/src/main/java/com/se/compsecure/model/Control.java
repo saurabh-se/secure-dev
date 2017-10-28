@@ -15,6 +15,8 @@ public class Control {
 	
 	private String subdomainId;
 	
+	private ControlEffectiveness controlEffectiveness;
+	
 //	@Autowired
 //	Questions questions;
 	
@@ -62,5 +64,11 @@ public class Control {
 	}
 	public void setControlQuestions(List<Questions> controlQuestions) {
 		this.controlQuestions = controlQuestions;
+	}
+	public ControlEffectiveness getControlEffectiveness() {
+		return controlEffectiveness;
+	}
+	public void setControlEffectiveness(ControlEffectiveness controlEffectiveness) {
+		this.controlEffectiveness = controlEffectiveness;
 	}
 }

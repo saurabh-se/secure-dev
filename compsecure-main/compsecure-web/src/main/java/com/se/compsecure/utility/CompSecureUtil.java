@@ -1,4 +1,5 @@
 package com.se.compsecure.utility;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +25,7 @@ public class CompSecureUtil {
 		QuestionsUtil newObj = null;
 		String qControlLabel = "";
 		
-		String [] splitString = str.split("&");
+		String [] splitString = str.replace("\"", "").split("&");
 		for (int i = 0; i < splitString.length; i++) {
 			System.out.println(splitString[i]);
 			
@@ -37,12 +38,12 @@ public class CompSecureUtil {
 			if(keyValue[0].equals("controlQuestionCode")){
 				if(newObj==null){
 					newObj = new QuestionsUtil();
-					newObj.setqControlLabel(qControlLabel);
+					newObj.setqControlLabel(decode(qControlLabel));
 				}
-				newObj.setControlQuestionCode(keyValue[1]);
+				newObj.setControlQuestionCode(decode(keyValue[1]));
 			}
 			if(keyValue[0].equals("controlQuestion")){
-				newObj.setControlQuestion(keyValue[1]);
+				newObj.setControlQuestion(decode(keyValue[1]));
 			}
 			if(newObj!=null){
 				if(newObj.getqControlLabel()!=null & newObj.getControlQuestionCode()!=null & newObj.getControlQuestion()!=null){
@@ -53,5 +54,9 @@ public class CompSecureUtil {
 		}
 		
 		return list;
+	}
+
+	private String decode(String string) {
+		return URLDecoder.decode(string);
 	}
 }

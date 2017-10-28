@@ -8,7 +8,7 @@ public class UploadFile {
 	private long id;
 	private String fileName;
 	private byte[] data;
-	private Integer assessmentId;
+	private String assessmentId;
 	private String controlCode;
 	private String contentType;
 	
@@ -30,10 +30,10 @@ public class UploadFile {
 	public void setData(byte[] data) {
 		this.data = data;
 	}
-	public Integer getAssessmentId() {
+	public String getAssessmentId() {
 		return assessmentId;
 	}
-	public void setAssessmentId(Integer assessmentId) {
+	public void setAssessmentId(String assessmentId) {
 		this.assessmentId = assessmentId;
 	}
 	public String getControlCode() {
