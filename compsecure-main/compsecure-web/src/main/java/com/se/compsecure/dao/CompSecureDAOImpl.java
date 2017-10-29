@@ -250,12 +250,15 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 		System.out.println("Inside getDomainDetails for assessmentId and ComplianceId ");
 		
 		List<Domain> domainList = new ArrayList<Domain>();		
-		String sql = "select c.control_code,c.control_value,sd.subdomain_code,sd.subdomain_name,ab.domain_name,ab.domain_code,po.principle,po.objective "
+		String sql = "select c.control_code,c.control_value,sd.subdomain_code,sd.subdomain_name,ab.domain_name,ab.domain_code"
+				//+ ",po.principle,po.objective "
 				+ " from 			compsecure_sama.subdomain sd, compsecure_sama.controls c,compsecure_sama.principle_objective po "
 				+ " left join		(select domain_id,domain_code,domain_name from 	compsecure_sama.domain d "
 				+ " inner join 		compsecure_sama.compliance_header ch "
 				+ " on 				ch.compliance_id = d.compliance_id join assessment_details ad on ad.compliance_id = ch.compliance_id where ad.assessment_id='"+assessmentId+"' and ch.compliance_name = '" + complianceDesc +"') ab "
-				+ " on 				ab.domain_id where ab.domain_id= sd.domain_id and c.subdomain_id = sd.subdomain_id and po.subdomain_id = sd.subdomain_id group by c.control_id";
+				+ " on 				ab.domain_id where ab.domain_id= sd.domain_id and c.subdomain_id = sd.subdomain_id "
+				//+ "and po.subdomain_id = sd.subdomain_id "
+				+ "group by c.control_id";
 		System.out.println(sql);
 		
 		return listDomainDetails(sql,assessmentId);
@@ -265,13 +268,16 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 		System.out.println("Inside getDomainDetailsForCompliance");
 		
 		List<Domain> domainList = new ArrayList<Domain>();		
-		String sql = "select c.control_code,c.control_value,sd.subdomain_code,sd.subdomain_name,ab.domain_name,ab.domain_code,po.principle,po.objective "
+		String sql = "select c.control_code,c.control_value,sd.subdomain_code,sd.subdomain_name,ab.domain_name,ab.domain_code"
+				//+ ",po.principle,po.objective "
 				+ " from 			compsecure_sama.subdomain sd, compsecure_sama.controls c,compsecure_sama.principle_objective po "
 				+ " left join		(select domain_id,domain_code,domain_name from 	compsecure_sama.domain d "
 				+ " inner join 		compsecure_sama.compliance_header ch "
 				+ " on 				ch.compliance_id = d.compliance_id " + " where 	ch.compliance_name='"+complianceDesc.trim()+"') ab "
-				+ " on 				ab.domain_id where ab.domain_id= sd.domain_id and c.subdomain_id = sd.subdomain_id and po.subdomain_id = sd.subdomain_id group by c.control_id";
-		
+				+ " on 				ab.domain_id where ab.domain_id= sd.domain_id and c.subdomain_id = sd.subdomain_id and "
+//				+ "po.subdomain_id = sd.subdomain_id "
+				+ "group by c.control_id";
+		System.out.println(sql);
 //	    SqlRowSet srs = jdbcTemplate.queryForRowSet(sql);
 		
 		return listDomainDetails(sql,null);
