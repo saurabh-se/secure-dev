@@ -11,7 +11,14 @@ public class UploadFile {
 	private String assessmentId;
 	private String controlCode;
 	private String contentType;
+	private String evidenceTypeName;
 	
+	public String getEvidenceTypeName() {
+		return evidenceTypeName;
+	}
+	public void setEvidenceTypeName(String evidenceTypeName) {
+		this.evidenceTypeName = evidenceTypeName;
+	}
 	public long getId() {
 		return id;
 	}

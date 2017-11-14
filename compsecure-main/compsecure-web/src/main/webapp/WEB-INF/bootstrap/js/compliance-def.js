@@ -9,6 +9,7 @@ $(document).ready(function () {
 	var selectedOption 	= localStorage.getItem("selectedOption");
 	var assessmentId 	= localStorage.getItem("assessmentId");
 	var complianceName	= localStorage.getItem("complianceName");
+	var saved = "false";
 	
 	console.log("assessmentId in compliance-def page" + assessmentId);
 	console.log("complianceId in compliance-def page" + complianceName);
@@ -137,7 +138,6 @@ $(document).ready(function () {
     });
     
     
-
     $(document).on('click', '#button-add-control-domain', function () {
         //alert("clicked");
         i++;
@@ -173,6 +173,7 @@ $(document).ready(function () {
     
     function doSave(){
     	console.log("In the doSave method");
+    	alert(saved);
     	console.log(JSON.stringify($("#complianceDefForm").serialize()));
     	var complianceDefFormData = JSON.stringify($("#complianceDefForm").serialize());
     	var complianceName 	= $("#comp_name").text();
@@ -216,8 +217,10 @@ $(document).ready(function () {
             	   		"complianceName" : complianceName,
             	   		"formData" : complianceDefFormData
             	   }
-    	   }).then(function(data){
-    		   window.location="questions_add";
+    	   }).done(function(data){
+    		   saved = "true";
+    		   localStorage.setItem("saved",saved);
+    		   //window.location="questions_add";
     	   });
     }
     
@@ -267,8 +270,14 @@ $("#button-next").click(function(){
 });
 
 function doNext(){
-	//alert("In the doNext method");
-		window.location ="questions_add.html";
+	var saved = localStorage.getItem("saved");
+	alert(saved);
+	if(saved==='true'){
+	window.location ="questions_add.html";
+	}else{
+		alert("Please save the data before proceeding");
+		return false;
+	}
 }
 
 $("#button-cancel").click(function(){

@@ -9,6 +9,11 @@ $(document).ready(function () {
     var assessmentId = localStorage.getItem("assessmentId");
     var complianceId = localStorage.getItem("complianceId");
     
+    
+    $("#complianceNameLabelValue").text(localStorage.getItem("complianceName"));
+    $("#assessmentNameLabelValue").text(localStorage.getItem("assessmentName"));
+    $("#orgNameLabelValue").text(localStorage.getItem("organizationName"));
+    
     console.log("In Maturity Effectiveness - assessmentId " + assessmentId );
     console.log("In Maturity Effectiveness - complianceId " + complianceId );
     

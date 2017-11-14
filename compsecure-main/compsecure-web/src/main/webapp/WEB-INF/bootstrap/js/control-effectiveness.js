@@ -11,6 +11,11 @@ $(document).ready(function () {
 
     var assessmentId = localStorage.getItem("assessmentId");
     var complianceId = localStorage.getItem("complianceId");
+    
+    $("#complianceNameLabelValue").text(localStorage.getItem("complianceName"));
+    $("#assessmentNameLabelValue").text(localStorage.getItem("assessmentName"));
+    $("#orgNameLabelValue").text(localStorage.getItem("organizationName"));
+    
     $.ajax({
         url: "/compsecure-web/getDomainDetails",
         data: {
@@ -73,6 +78,9 @@ $(document).ready(function () {
                                     var implEffRemarks = "";
                                     var recEffectiveness = "";
                                     var recEffRemarks = "";
+                                    var docEffEvidences = "";
+                                    var implEffEvidences = "";
+                                    var recEffEvidences = "";
                                     
                                     if(cntrlValue["controlEffectiveness"]!=undefined){
                                     	 docEffectiveness = cntrlValue["controlEffectiveness"]["docEffectiveness"];
@@ -81,6 +89,9 @@ $(document).ready(function () {
                                     	 implEffRemarks = cntrlValue["controlEffectiveness"]["implEffRemarks"];
                                     	 recEffectiveness = cntrlValue["controlEffectiveness"]["recEffectiveness"];
                                     	 recEffRemarks = cntrlValue["controlEffectiveness"]["recEffRemarks"];
+                                    	 docEffEvidences = cntrlValue["controlEffectiveness"]["docEffEvidences"];
+                                    	 implEffEvidences = cntrlValue["controlEffectiveness"]["implEffEvidences"];
+                                    	 recEffEvidences = cntrlValue["controlEffectiveness"]["recEffEvidences"];
                                     }
                                     
 //                                    $("#ceSelectDocEffectiveness").val(docEffectiveness);
@@ -93,16 +104,17 @@ $(document).ready(function () {
                                                                 <td><div id='controlValue' class='text-left' style='width:300px;'>" + controlValue + "</div></td>\n\
                                                                 <td><select name='ceSelectDocEffectiveness' id='ceSelectDocEffectiveness'><options><option>Please Select</option><option>Compliant</option><option>Non Compliant</option><option>Partially Compliant</option></options></select></td>\n\
                                                                 " + setSel('ceSelectDocEffectiveness',docEffectiveness)+
-                                                                		"<td ><input type='file' id='upload-file'>" +
-                                                                	"<button class='btn btn-info btnUpload' id='docEff' name="+controlCode+">Upload</button></td> \n\
+                                                                "<td>"+getUploadedFiles(docEffEvidences)+"<input type='file' id='upload-file'>" +
+                                                                "<button class='btn btn-info btnUpload' id='docEff' name="+controlCode+">Upload</button></td> \n\
                                                                 <td><textarea name='ce-remarksTA' id='ce-remarksTA' rows='2'>"+check(docEffRemarks)+"</textarea></td>\n\
                                                                 <td><select name='ceSelectImplEffectiveness' id='ceSelectImplEffectiveness'><options><option>Please Select</option><option>Compliant</option><option>Non Compliant</option><option>Partially Compliant</option></options></select></td>\n\
-                                                                <td><input name='upload-implEffectiveness' type='file' id='upload-implEffectiveness'>" +
-                                                                	"<button class='btn btn-info btnUpload' id='implEff'>Upload</button></td>\n\
+                                                                 " + setSel('ceSelectDocEffectiveness',implEffectiveness)+
+                                                                "<td><input name='upload-implEffectiveness' type='file' id='upload-implEffectiveness'>" +
+                                                                "<button class='btn btn-info btnUpload' id='implEff' name="+controlCode+">Upload</button></td>\n\
                                                                 <td><textarea name='ce-remarksImplEff' id='ce-remarksImplEff' rows='2'>"+check(implEffRemarks)+"</textarea></td>\n\
                                                                 <td><select name='ceSelectRecEffectiveness' id='ceSelectRecEffectiveness'><options><option>Please Select</option><option>Compliant</option><option>Non Compliant</option><option>Partially Compliant</option></options></select></td>\n\
                                                                 <td><input name='upload-recEffectiveness' type='file' id='upload-recEffectiveness'>" +
-                                                                "<button class='btn btn-info btnUpload' id='recEff'>Upload</button></td>\n\
+                                                                "<button class='btn btn-info btnUpload' id='recEff' name="+controlCode+">Upload</button></td>\n\
                                                                 <td><textarea name='ce-remarksRE' id='ce-remarksRE' rows='2'>"+check(recEffRemarks)+"</textarea></td> " +
                                                                 "<td><select class='form-control' id='maturityEffSelector'><option>1</option><option>2</option><option>3</option></select></td></tr>\n\
 \n\<tr id='qDisplay'><td colspan='12' style='display:none;' id='tdQuestions"+count+"'><div id='demo" + count + "' class='collapse'>Questions</div></td></tr>\
@@ -164,7 +176,7 @@ $(document).ready(function () {
     function setSel(selectedValue,value){
 //    	alert(selectedValue + " " + value );
 //    	alert("in setSel");
-    	alert("\"#"+selectedValue+"\"");
+//    	alert("\"#"+selectedValue+"\"");
     	$("#ceSelectDocEffectiveness").val("Compliant");
 //    	$("\"#"+selectedValue+"\"").val(value);
     }
@@ -178,6 +190,16 @@ $(document).ready(function () {
     	}
     }
     
+    function getUploadedFiles(filesList){
+    	console.log(filesList.size);
+    	var filesHtml="";
+    	$.each(filesList,function(index,value){
+    		filesHtml = filesHtml + "<a id='filesList' href='" + value + "'>"+value+"</a><br>";
+    	});
+    	console.log(filesHtml);
+    	return filesHtml;
+    }
+    
     $(document).on("click", ".btnUpload", function (event) {
     	
     	event.preventDefault();
@@ -189,8 +211,8 @@ $(document).ready(function () {
     	
     	var file_data = "";
     	
-//    	alert("Upload Button Clicked");
-//    	alert($(this).attr('id'));
+    	alert("Upload Button Clicked");
+    	alert($(this).attr('id'));
     	if($(this).attr('id')==='docEff'){
 //    		fileSelect = $("#upload-file").val();
     		file_data = $("#upload-file").prop("files")[0];
@@ -218,7 +240,7 @@ $(document).ready(function () {
     $("#ce-button-next").on("click", function (event) {
     	var count =0;
         event.preventDefault();
-        alert("clicked!!");
+//        alert("clicked!!");
         var t = $("#controlEffectiveForm").serializeArray();
         console.log($("#controlEffectiveForm").serialize());
         console.log(t);
@@ -252,7 +274,7 @@ $(document).ready(function () {
             contentType:"application/json",
             dataType: "JSON",
             data:JSON.stringify(controlEffectiveness)
-        }).then(function(data){
+        }).done(function(data){
         	window.location="maturity-effectiveness";
         });
 //        

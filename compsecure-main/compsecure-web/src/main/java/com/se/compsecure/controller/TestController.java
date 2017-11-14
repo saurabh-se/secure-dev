@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -145,7 +147,9 @@ public class TestController {
 			model.addAttribute("complianceId", complianceDetail.getComplianceId());
 
 		}
-
+		
+		SortedMap<String, String> sortedMap = new TreeMap<String, String>();
+		
 		Gson gson = new Gson();
 		String complianceDetailsList = gson.toJson(complianceDetailsKV);
 
@@ -307,13 +311,20 @@ public class TestController {
 
 		List<Entry<String, Domain>> domainDetailsList = null;
 		
+		if(httpSession.isNew()){
+			System.out.println("Session Expired");
+		}
+		
 		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option");
 		complianceId = (String)httpSession.getAttribute("complianceDesc");
 		String json = null;
 		
-//		if(self_assessment_option.equals("new")){
-//			domainDetailsList = compSecureService.getDomainDetailsForCompliance(complianceId);
+		if(self_assessment_option.equals("new")){
+			domainDetailsList = compSecureService.getDomainDetailsForCompliance(complianceId);
+		}
+		else{
 			domainDetailsList = compSecureService.getDomainDetails(assessmentId,complianceId);
+		}
 			
 			List<Domain> domainList = new ArrayList<Domain>();
 
@@ -539,4 +550,9 @@ public class TestController {
 		return json;
 	}
 
+//	private String checkForSessionAlive(HttpSession httpSession) {
+//		if(httpSession==null){
+//			return "login";
+//		}
+//	}
 }

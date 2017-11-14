@@ -320,3 +320,22 @@ background:#fff;
 #qControlLabel{
 	border:none;
 }
+
+#filesList{
+	font-size: small;
+	font-weight: bold;
+}
+
+#complianceNameLabel,
+#assessmentNameLabel,
+#orgNameLabel{
+    font-size: small;
+    color: #2b669a;
+}
+
+#complianceNameLabelValue,
+#assessmentNameLabelValue,
+#orgNameLabelValue{
+    font-size: smaller;
+    color: #428bca;
+}

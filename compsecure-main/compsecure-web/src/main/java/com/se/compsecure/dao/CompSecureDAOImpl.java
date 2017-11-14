@@ -41,6 +41,7 @@ import com.se.compsecure.model.Subdomain;
 import com.se.compsecure.model.UploadFile;
 import com.se.compsecure.model.User;
 import com.se.compsecure.model.UserRoles;
+import com.se.compsecure.utility.CompSecureConstants;
 
 @Component
 public class CompSecureDAOImpl implements CompSecureDAO {
@@ -250,33 +251,46 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 		System.out.println("Inside getDomainDetails for assessmentId and ComplianceId ");
 		
 		List<Domain> domainList = new ArrayList<Domain>();		
-		String sql = "select c.control_code,c.control_value,sd.subdomain_code,sd.subdomain_name,ab.domain_name,ab.domain_code"
-				//+ ",po.principle,po.objective "
-				+ " from 			compsecure_sama.subdomain sd, compsecure_sama.controls c,compsecure_sama.principle_objective po "
-				+ " left join		(select domain_id,domain_code,domain_name from 	compsecure_sama.domain d "
-				+ " inner join 		compsecure_sama.compliance_header ch "
-				+ " on 				ch.compliance_id = d.compliance_id join assessment_details ad on ad.compliance_id = ch.compliance_id where ad.assessment_id='"+assessmentId+"' and ch.compliance_name = '" + complianceDesc +"') ab "
-				+ " on 				ab.domain_id where ab.domain_id= sd.domain_id and c.subdomain_id = sd.subdomain_id "
-				//+ "and po.subdomain_id = sd.subdomain_id "
-				+ "group by c.control_id";
+//		String sql = "select c.control_code,c.control_value,sd.subdomain_code,sd.subdomain_name,ab.domain_name,ab.domain_code"
+//				+ ",po.principle,po.objective "
+//				+ " from 			compsecure_sama.subdomain sd, compsecure_sama.controls c,compsecure_sama.principle_objective po "
+//				+ " left join		(select domain_id,domain_code,domain_name from 	compsecure_sama.domain d "
+//				+ " inner join 		compsecure_sama.compliance_header ch "
+//				+ " on 				ch.compliance_id = d.compliance_id join assessment_details ad on ad.compliance_id = ch.compliance_id where ad.assessment_id='"+assessmentId+"' and ch.compliance_name = '" + complianceDesc +"') ab "
+//				+ " on 				ab.domain_id where ab.domain_id= sd.domain_id and c.subdomain_id = sd.subdomain_id "
+//				+ " and 			po.subdomain_id = sd.subdomain_id "
+//				+ "group by c.control_id";
+		
+		String sql = " SELECT c.control_code, c.control_value, sd.subdomain_code, sd.subdomain_name, d.domain_name, d.domain_code, "
+				+ "	po.principle, po.objective FROM controls c, subdomain sd LEFT JOIN principle_objective po "
+				+ "	ON sd.subdomain_id = po.subdomain_id JOIN domain d ON d.domain_id = sd.domain_id JOIN compliance_header ch "
+				+ "	ON ch.compliance_id = d.compliance_id JOIN assessment_details ad on ad.compliance_id = ch.compliance_id "
+				+ "	WHERE ch.compliance_name = 'NCT-29Oct8' and ad.assessment_id='37' AND c.subdomain_id = sd.subdomain_id "
+				+ "	ORDER By c.control_code";
+		
 		System.out.println(sql);
 		
 		return listDomainDetails(sql,assessmentId);
 	}
 	
-	public List<Entry<String, Domain>> getDomainDetailsForCompliance(String complianceDesc) {
+	public List<Entry<String, Domain>> getDomainDetailsForCompliance(String complianceName) {
 		System.out.println("Inside getDomainDetailsForCompliance");
 		
 		List<Domain> domainList = new ArrayList<Domain>();		
-		String sql = "select c.control_code,c.control_value,sd.subdomain_code,sd.subdomain_name,ab.domain_name,ab.domain_code"
-				//+ ",po.principle,po.objective "
-				+ " from 			compsecure_sama.subdomain sd, compsecure_sama.controls c,compsecure_sama.principle_objective po "
-				+ " left join		(select domain_id,domain_code,domain_name from 	compsecure_sama.domain d "
-				+ " inner join 		compsecure_sama.compliance_header ch "
-				+ " on 				ch.compliance_id = d.compliance_id " + " where 	ch.compliance_name='"+complianceDesc.trim()+"') ab "
-				+ " on 				ab.domain_id where ab.domain_id= sd.domain_id and c.subdomain_id = sd.subdomain_id and "
+//		String sql = "select c.control_code,c.control_value,sd.subdomain_code,sd.subdomain_name,ab.domain_name,ab.domain_code"
+//				+ ",po.principle,po.objective "
+//				+ " from 			compsecure_sama.subdomain sd, compsecure_sama.controls c,compsecure_sama.principle_objective po "
+//				+ " left join		(select domain_id,domain_code,domain_name from 	compsecure_sama.domain d "
+//				+ " inner join 		compsecure_sama.compliance_header ch "
+//				+ " on 				ch.compliance_id = d.compliance_id " + " where 	ch.compliance_name='"+complianceDesc.trim()+"') ab "
+//				+ " on 				ab.domain_id where ab.domain_id= sd.domain_id and c.subdomain_id = sd.subdomain_id "
 //				+ "po.subdomain_id = sd.subdomain_id "
-				+ "group by c.control_id";
+//				+ "group by c.control_id";
+		String sql = "SELECT c.control_code, c.control_value, sd.subdomain_code, sd.subdomain_name, d.domain_name, d.domain_code, "
+				+ "	po.principle, po.objective FROM controls c, subdomain sd LEFT JOIN principle_objective po ON "
+				+ "	sd.subdomain_id = po.subdomain_id JOIN domain d ON d.domain_id = sd.domain_id JOIN compliance_header ch ON "
+				+ "	ch.compliance_id = d.compliance_id WHERE ch.compliance_name = '"+ complianceName +"' AND c.subdomain_id = sd.subdomain_id "
+				+ "	order by c.control_code";
 		System.out.println(sql);
 //	    SqlRowSet srs = jdbcTemplate.queryForRowSet(sql);
 		
@@ -398,25 +412,28 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 	public List<Questions> getComplianceQuestions(String complianceDescription,String assessmentId) {
 		
 		List<Questions> complianceQuestionsList = new ArrayList<Questions>();
-		String sql = "";
 		
-		if (StringUtils.isNullOrEmpty(assessmentId)) {
-			sql = " select distinct question_code,question from compsecure_sama.questionnaire_master qm join "
-					+ " (select control_code,control_id from compsecure_sama.controls c join "
-					+ " compsecure_sama.subdomain sd on c.subdomain_id = sd.subdomain_id join compsecure_sama.domain d on sd.domain_id = d.domain_id"
-					+ " join compsecure_sama.compliance_header ch on ch.compliance_id = d.compliance_id join compsecure_sama.assessment_details ad on ad.assessment_id"
-					+ " = ch.assessment_id " + " where ch.compliance_name='" + complianceDescription.trim() + "') "
-					+ "abc on abc.control_id = qm.control_id ";
-		} else if(StringUtils.isNullOrEmpty(complianceDescription)){
-			sql = "select distinct qm.question_code, qm.question, qr.question_response, qr.question_remarks FROM compsecure_sama.questionnaire_master qm join "
-					+ "(select c.control_id,c.control_code from controls c join subdomain sd on sd.subdomain_id = c.subdomain_id join domain d on d.domain_id = sd.domain_id "
-					+ " join compliance_header ch on d.compliance_id = ch.compliance_id where ch.compliance_id = (select ch.compliance_id from compliance_header ch "
-					+ " join assessment_details ad on ad.compliance_id = ch.compliance_id where 	ad.assessment_id= "+ assessmentId +")) abc on abc.control_id = qm.control_id "
-					+ " join question_response qr ON qm.question_code = qr.question_code";
-		}
-		else{	
-			sql = getSQLQueryForQuestionnaire(complianceDescription,assessmentId);
-		}
+		 String sql = "select qm.question_code,qm.question from questionnaire_master qm join controls c on c.control_id = qm.control_id join subdomain sd "
+				+ "	on sd.subdomain_id = c.subdomain_id join domain d on d.domain_id = sd.domain_id join compliance_header ch on ch.compliance_id = d.compliance_id "
+				+ "	where ch.compliance_name =  '"+ complianceDescription +"'";
+		
+//		if (StringUtils.isNullOrEmpty(assessmentId)) {
+//			sql = " select distinct question_code,question from compsecure_sama.questionnaire_master qm join "
+//					+ " (select control_code,control_id from compsecure_sama.controls c join "
+//					+ " compsecure_sama.subdomain sd on c.subdomain_id = sd.subdomain_id join compsecure_sama.domain d on sd.domain_id = d.domain_id"
+//					+ " join compsecure_sama.compliance_header ch on ch.compliance_id = d.compliance_id join compsecure_sama.assessment_details ad on ad.assessment_id"
+//					+ " = ch.assessment_id " + " where ch.compliance_name='" + complianceDescription.trim() + "') "
+//					+ "abc on abc.control_id = qm.control_id ";
+//		} else if(StringUtils.isNullOrEmpty(complianceDescription)){
+//			sql = "select distinct qm.question_code, qm.question, qr.question_response, qr.question_remarks FROM compsecure_sama.questionnaire_master qm join "
+//					+ "(select c.control_id,c.control_code from controls c join subdomain sd on sd.subdomain_id = c.subdomain_id join domain d on d.domain_id = sd.domain_id "
+//					+ " join compliance_header ch on d.compliance_id = ch.compliance_id where ch.compliance_id = (select ch.compliance_id from compliance_header ch "
+//					+ " join assessment_details ad on ad.compliance_id = ch.compliance_id where 	ad.assessment_id= "+ assessmentId +")) abc on abc.control_id = qm.control_id "
+//					+ " join question_response qr ON qm.question_code = qr.question_code";
+//		}
+//		else{	
+//			sql = getSQLQueryForQuestionnaire(complianceDescription,assessmentId);
+//		}
 		
 		LOGGER.info(" Get Compliance Questions :" + sql);
 		
@@ -433,29 +450,31 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 		return complianceQuestionsList;
 	}
 
-
+/**
+ * REDUNDANT CODE
+ */
 	
-	private String getSQLQueryForQuestionnaire(String complianceDescription, String assessmentId) {
-//		String sql = "SELECT DISTINCT  qm.question_code,   qm.question,    qr.question_response,    qr.question_remarks "
-//				+ " FROM    compsecure_sama.questionnaire_master qm        JOIN"
-//				+ "    (SELECT control_code, control_id,ad.assessment_id   FROM        compsecure_sama.controls c    JOIN compsecure_sama.subdomain sd ON c.subdomain_id"
-//				+ "    JOIN compsecure_sama.domain d ON sd.domain_id    JOIN compsecure_sama.compliance_header ch ON ch.compliance_id"
-//				+ "    JOIN compsecure_sama.assessment_details ad ON ad.assessment_id    WHERE        ad.assessment_id = ch.assessment_id"
-//				+ "    AND ch.compliance_id = d.compliance_id            AND sd.subdomain_id = c.subdomain_id"
-//				+ "    AND ch.compliance_name = '"+ complianceDescription.trim() +"' AND ad.assessment_id = '"+ assessmentId +"') abc ON abc.control_id = qm.control_id"
-//				+ "   JOIN    compsecure_sama.question_response qr ON qm.question_code = qr.question_code and abc.assessment_id = qr.assessment_id";
-		
-		String sql = "SELECT DISTINCT  qm.question_code,   qm.question,    qr.question_response,    qr.question_remarks  "
-				+ "FROM    compsecure_sama.questionnaire_master qm JOIN    "
-				+ "(SELECT control_code, control_id   FROM        compsecure_sama.controls c    "
-				+ "JOIN compsecure_sama.subdomain sd ON c.subdomain_id = sd.subdomain_id "
-				+ "JOIN compsecure_sama.domain d ON sd.domain_id =d.domain_id "
-				+ "JOIN compsecure_sama.compliance_header ch ON ch.compliance_id =d.compliance_id "
-				+ "JOIN compsecure_sama.assessment_details ad ON ad.compliance_id = ch.compliance_id AND sd.subdomain_id = c.subdomain_id    "
-				+ "AND ch.compliance_name = '"+ complianceDescription.trim() +"' AND ad.assessment_id = '"+ assessmentId  +"') abc ON abc.control_id = qm.control_id  left JOIN compsecure_sama.question_response qr ON qm.question_code = qr.question_code";
-		
-		return sql;
-	}
+//	private String getSQLQueryForQuestionnaire(String complianceDescription, String assessmentId) {
+////		String sql = "SELECT DISTINCT  qm.question_code,   qm.question,    qr.question_response,    qr.question_remarks "
+////				+ " FROM    compsecure_sama.questionnaire_master qm        JOIN"
+////				+ "    (SELECT control_code, control_id,ad.assessment_id   FROM        compsecure_sama.controls c    JOIN compsecure_sama.subdomain sd ON c.subdomain_id"
+////				+ "    JOIN compsecure_sama.domain d ON sd.domain_id    JOIN compsecure_sama.compliance_header ch ON ch.compliance_id"
+////				+ "    JOIN compsecure_sama.assessment_details ad ON ad.assessment_id    WHERE        ad.assessment_id = ch.assessment_id"
+////				+ "    AND ch.compliance_id = d.compliance_id            AND sd.subdomain_id = c.subdomain_id"
+////				+ "    AND ch.compliance_name = '"+ complianceDescription.trim() +"' AND ad.assessment_id = '"+ assessmentId +"') abc ON abc.control_id = qm.control_id"
+////				+ "   JOIN    compsecure_sama.question_response qr ON qm.question_code = qr.question_code and abc.assessment_id = qr.assessment_id";
+//		
+//		String sql = "SELECT DISTINCT  qm.question_code,   qm.question,    qr.question_response,    qr.question_remarks  "
+//				+ "FROM    compsecure_sama.questionnaire_master qm JOIN    "
+//				+ "(SELECT control_code, control_id   FROM        compsecure_sama.controls c    "
+//				+ "JOIN compsecure_sama.subdomain sd ON c.subdomain_id = sd.subdomain_id "
+//				+ "JOIN compsecure_sama.domain d ON sd.domain_id =d.domain_id "
+//				+ "JOIN compsecure_sama.compliance_header ch ON ch.compliance_id =d.compliance_id "
+//				+ "JOIN compsecure_sama.assessment_details ad ON ad.compliance_id = ch.compliance_id AND sd.subdomain_id = c.subdomain_id    "
+//				+ "AND ch.compliance_name = '"+ complianceDescription.trim() +"' AND ad.assessment_id = '"+ assessmentId  +"') abc ON abc.control_id = qm.control_id  left JOIN compsecure_sama.question_response qr ON qm.question_code = qr.question_code";
+//		
+//		return sql;
+//	}
 
 	public Integer saveComplianceQuestionsResponse(List<QuestionsResponse> questRes,String assessmentId) {
 		
@@ -485,6 +504,7 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 	public User authenticateUser(User user) {
 		
 		User authenticatedUser = null;
+		try{
 		String sql = "select password from login_details where username = ?";
 		
 		String password = jdbcTemplate.queryForObject(sql,new Object[]{user.getUsername()},String.class);
@@ -493,11 +513,12 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 			String sqlForUser = "select * from login_details where username = ? and password = ?";
 			authenticatedUser = (User)jdbcTemplate.queryForObject(sqlForUser, new Object[]{user.getUsername(),user.getPassword()},new BeanPropertyRowMapper(User.class));
 		}
-		
 		else{
 			return null;
 		}
-		
+		}catch(Exception ex){
+			LOGGER.info(ex.getMessage());
+		}
 		return authenticatedUser;
 	}
 
@@ -540,15 +561,17 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 	public void uploadFile(final UploadFile uploadFile,final String docToUpload) {
 		String columnName = "";
 		
-		 if(docToUpload.equals("docEff")){
+		 if(docToUpload.equals(CompSecureConstants.DOC_EFFECTIVE)){
          	columnName = "doc_eff_evidence";
          }
-         else if(docToUpload.equals("implEff")){
+         else if(docToUpload.equals(CompSecureConstants.IMPL_EFFECTIVE)){
         	 columnName = "impl_eff_evidence";
          }else{
         	 columnName = "rec_eff_evidence";
          }
-		final String sql = "insert into evidences (assessment_id,control_code,"+ columnName + ",file_name,content_type) values (?,?,?,?,?)";
+		 
+		final String evidenceTypeName = docToUpload; 
+		final String sql = "insert into evidences (assessment_id,control_code,"+ columnName + ",file_name,content_type,evidence_type_name) values (?,?,?,?,?,?)";
 		
 	        try {
 	            synchronized(this) {
@@ -561,6 +584,7 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 	                        statement.setBytes(3, uploadFile.getData());
 	                        statement.setString(4, uploadFile.getFileName());
 	                        statement.setString(5, uploadFile.getContentType());
+	                        statement.setString(6, evidenceTypeName);
 //	                        statement.setBytes(4, null);
 //	                        statement.setBytes(5, null);
 	                        return statement;
@@ -692,6 +716,17 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 		return updatedRows;
 	}
 	
+	
+	public Boolean checkIfControlExists(String controlCode){
+		String countQuery = "select count(*) from control_effectiveness where control_code = '" + controlCode + "'";
+		String count = jdbcTemplate.queryForObject(countQuery,String.class);
+		
+		if(count.equals("0")){
+			return false;
+		}else{
+			return true;
+		}
+	}
 
 	public Integer alterComplianceQuestionsResponse(List<QuestionsResponse> questionResponseList) {
 		// TODO Auto-generated method stub
@@ -1218,10 +1253,42 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 			}
 		if(controlEffList.size()>0){
 			ControlEffectiveness controlEffectiveness2 = controlEffList.get(0);
-			System.out.println(controlEffectiveness2.getDocEffectiveness());
+			addEvidences(controlEffectiveness2,controlCode,assessmentId);
 			return controlEffectiveness2;
 		}else{
 			return null;
+		}
+	}
+
+	private void addEvidences(ControlEffectiveness controlEffectiveness2,String controlCode, String assessmentId) {
+		
+		List<String> docEffEvidenceList = new ArrayList<String>();
+		List<String> implEffEvidenceList = new ArrayList<String>();
+		List<String> recEffEvidenceList = new ArrayList<String>();
+		
+		
+		String sql = "select * from evidences where control_code = ? and assessment_id = ?";
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql,controlCode,assessmentId);
+
+		try{
+			for(Map row : rows){
+				String evidenceName = (String)row.get("file_name");
+				String nameOfEvidenceTypeUploaded = (String)row.get("evidence_type_name");
+				if(nameOfEvidenceTypeUploaded.equals(CompSecureConstants.DOC_EFFECTIVE)){
+					docEffEvidenceList.add(evidenceName);
+				}else if(nameOfEvidenceTypeUploaded.equals(CompSecureConstants.IMPL_EFFECTIVE)){
+					implEffEvidenceList.add(evidenceName);
+				}else{
+					recEffEvidenceList.add(evidenceName);
+				}
+			}
+			
+			controlEffectiveness2.setDocEffEvidences(docEffEvidenceList);
+			controlEffectiveness2.setImplEffEvidences(implEffEvidenceList);
+			controlEffectiveness2.setRecEffEvidences(recEffEvidenceList);
+			
+		}catch(Exception ex){
+			LOGGER.info(ex.getMessage());
 		}
 	}
 

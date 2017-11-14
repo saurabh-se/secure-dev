@@ -1,5 +1,7 @@
 package com.se.compsecure.model;
 
+import java.util.List;
+
 public class ControlEffectiveness {
 	
 	private String controlCode;
@@ -12,6 +14,10 @@ public class ControlEffectiveness {
 	private String docEffEvidenceId;
 	private String implEffEvidenceId;
 	private String recEffEvidenceId;
+	
+	private List<String> docEffEvidences;
+	private List<String> implEffEvidences;
+	private List<String> recEffEvidences;
 	
 	public String getControlCode() {
 		return controlCode;
@@ -73,5 +79,22 @@ public class ControlEffectiveness {
 	public void setRecEffEvidenceId(String recEffEvidenceId) {
 		this.recEffEvidenceId = recEffEvidenceId;
 	}
-	
+	public List<String> getDocEffEvidences() {
+		return docEffEvidences;
+	}
+	public void setDocEffEvidences(List<String> docEffEvidences) {
+		this.docEffEvidences = docEffEvidences;
+	}
+	public List<String> getImplEffEvidences() {
+		return implEffEvidences;
+	}
+	public void setImplEffEvidences(List<String> implEffEvidences) {
+		this.implEffEvidences = implEffEvidences;
+	}
+	public List<String> getRecEffEvidences() {
+		return recEffEvidences;
+	}
+	public void setRecEffEvidences(List<String> recEffEvidences) {
+		this.recEffEvidences = recEffEvidences;
+	}
 }

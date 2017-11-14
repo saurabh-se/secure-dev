@@ -63,6 +63,10 @@ $("#organization").change(function () {
     var selectedVal = $("#organization :selected").val();
     var selfAssessmentOption = localStorage.getItem("selfAssessmentOption");
     
+    //for display on the page header
+    $("#orgNameLabelValue").text(selectedText);
+    localStorage.setItem("organizationName",selectedText);
+    
     console.log(selectedText);
     console.log(selectedVal);
     console.log(selfAssessmentOption);
@@ -101,6 +105,10 @@ $("#assessment-selector").change(function () {
     var selectedVal = $("#assessment-selector :selected").val();
     console.log(" Selected Text :" + selectedText);
     console.log(" Selected Value :" + selectedVal);
+    
+    //for display on the page header
+    $("#assessmentNameLabelValue").text(selectedText);
+    localStorage.setItem("assessmentName",selectedText);
     
     // to be used for future computations
     localStorage.setItem("assessmentId",selectedVal);
@@ -160,6 +168,11 @@ function updateComplianceDesc(){
 	    complianceId = selectedText;
 	    localStorage.setItem("complianceId",selectedVal);
 	    localStorage.setItem("complianceName",selectedText);
+	    
+	  //for display on the page header
+	    $("#complianceNameLabelValue").text(selectedText);
+	    localStorage.setItem("complianceName",selectedText);
+//	    alert(selectedText);
 }
 
 $("#button-start").click(function(){

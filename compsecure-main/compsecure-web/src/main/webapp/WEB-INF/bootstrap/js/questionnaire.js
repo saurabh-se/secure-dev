@@ -9,6 +9,13 @@ $(document).ready(function () {
     var assessmentId = localStorage.assessmentId;
     var complianceName = localStorage.complianceName;
     var selfAssessmentOption = localStorage.selfAssessmentOption;
+    var saved = false;
+    
+    $("#complianceNameLabelValue").text(localStorage.getItem("complianceName"));
+    $("#assessmentNameLabelValue").text(localStorage.getItem("assessmentName"));
+    $("#orgNameLabelValue").text(localStorage.getItem("organizationName"));
+    
+    
 //    alert(complianceId);
 //    alert(assessmentId);
     if(assessmentId === undefined){
@@ -102,9 +109,9 @@ $(document).ready(function () {
    }
    
     // to check if the assessment selected is an existing one or a new one
-//   alert(selfAssessmentOption);
+   //  alert(selfAssessmentOption);
     
-    $("#qn-button-next").click(function () {
+    $("#qn-button-save").click(function () {
     	
     	var selfAssessmentOption = localStorage.getItem("selfAssessmentOption");
     	console.log("SelfAssessmentOption : " + selfAssessmentOption);
@@ -119,7 +126,7 @@ $(document).ready(function () {
     	localStorage.setItem("complianceId",complianceId);
         var questionResponse = [];
         console.log($("#questionForm").serialize());
-         var trDetails = [];
+        var trDetails = [];
         
        $('#questionForm tr').each(function(i,v) {
            //alert($(this).find("#questionCode").val());
@@ -137,10 +144,11 @@ $(document).ready(function () {
                 contentType:"application/json",
                 dataType: "JSON",
                 data:JSON.stringify(trDetails),
-        }).then(function(data){
+        }).done(function(data){
 //        	alert(data);
+        	saved = true;
             console.log(data);
-            window.location="control-effectiveness";
+           
         });
     });
     
@@ -164,8 +172,18 @@ $(document).ready(function () {
         }
     }
     
+    $("#qn-button-next").click(function () {
+    	alert(saved);
+    	if(saved===true){
+    	 window.location="control-effectiveness";
+    	}else{
+    		alert("Please save the form");
+    		return false;
+    	}
+    });
+    
     $("#qn-button-cancel").click(function(){
     	window.location="home";
-    })
+    });
 });
 

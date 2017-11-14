@@ -65,12 +65,10 @@ public class CompSecureController {
 			Integer roleId = user2.getRole().getRoleId();
 			if(roleId==2){
 				return_location =  "self-assessment_1";
+			}else{
+	            return_location = "home";
 			}
 		}
-		else{
-            return_location = "home";
-		}
-		
 		return return_location;
     }
 	

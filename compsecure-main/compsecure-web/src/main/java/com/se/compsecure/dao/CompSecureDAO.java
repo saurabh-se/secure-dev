@@ -102,4 +102,6 @@ public interface CompSecureDAO {
 
 	ControlEffectiveness geControlEffectivenessDataForControl(String controlCode, String assessmentId);
 
+	Boolean checkIfControlExists(String controlCode);
+
 }

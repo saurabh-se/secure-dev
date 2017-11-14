@@ -105,4 +105,6 @@ public interface CompSecureService {
 	Integer updateControlEffectivenessDetails(ControlEffectiveness controlEffectiveness2, String assessmentId);
 
 	ControlEffectiveness geControlEffectivenessDataForControl(String controlCode, String assessmentId);
+
+	Boolean checkIfControlExists(String controlCode);
 }

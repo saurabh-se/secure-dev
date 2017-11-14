@@ -50,11 +50,14 @@ private static final Logger LOGGER = Logger.getLogger(ControlEffectivenessContro
 				LOGGER.info("Control Code : " + controlEffectiveness2.getRecEffRemarks());
 				LOGGER.info(" ************************ ");
 				
-				if(assessment_option.equals("new")){
-					executeCreate(controlEffectiveness2,assessmentId);
+				Boolean controlExists = compSecureService.checkIfControlExists(controlEffectiveness2.getControlCode());
+				
+//				if(assessment_option.equals("new")){
+				if(controlExists){
+					executeAlterTable(controlEffectiveness2,assessmentId);
 				}
 				else{
-					executeAlterTable(controlEffectiveness2,assessmentId);
+					executeCreate(controlEffectiveness2,assessmentId);
 				}
 			}
 		}

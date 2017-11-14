@@ -266,4 +266,8 @@ public class CompSecureServiceImpl implements CompSecureService {
 	public ControlEffectiveness geControlEffectivenessDataForControl(String controlCode, String assessmentId) {
 		return compSecureDAO.geControlEffectivenessDataForControl(controlCode,assessmentId);
 	}
+
+	public Boolean checkIfControlExists(String controlCode) {
+		return compSecureDAO.checkIfControlExists(controlCode);
+	}
 }
