@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -67,6 +68,7 @@ public class ComplianceController {
 //    }
 	
 	@RequestMapping(value="/saveComplianceDefData", method = RequestMethod.POST)
+	@ResponseBody
     public String saveComplianceDefData(@RequestParam(value="complianceName") String complianceName,
     							@RequestParam(value="formData") String domainDetails,HttpSession httpSession) {
 		       
@@ -80,7 +82,7 @@ public class ComplianceController {
 		
 		List<Domain> domains = gson.fromJson(domainJson, new TypeToken<List<Domain>>(){}.getType());
 		
-		compSecureService.saveComplianceDefinitionData(complianceName,domains);
+		String outcome = compSecureService.saveComplianceDefinitionData(complianceName,domains);
 			
 		System.out.println(domains.size());
 		
@@ -96,6 +98,7 @@ public class ComplianceController {
 //		
 //		compSecureService.saveComplianceDefinitionData(complianceHeader);
 		
-        return "questions_add";
+		
+        return gson.toJson(outcome);
     }
 }

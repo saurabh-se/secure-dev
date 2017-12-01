@@ -6,9 +6,10 @@
 
 $(document).ready(function () {
 	
+	
     var assessmentId = localStorage.getItem("assessmentId");
     var complianceId = localStorage.getItem("complianceId");
-    
+    var complianceName = localStorage.getItem("complianceName");
     
     $("#complianceNameLabelValue").text(localStorage.getItem("complianceName"));
     $("#assessmentNameLabelValue").text(localStorage.getItem("assessmentName"));
@@ -21,19 +22,20 @@ $(document).ready(function () {
         url: "/compsecure-web/getCompleteDetails",
         data: {
         		"assessmentId": assessmentId,
-        		"complianceId": complianceId
+        		"complianceId": complianceName
         }
     }).then(function (data) {
+    	$("#loading").hide();
         console.log("Completed....");
         
         console.log(data);
         var obj = $.parseJSON(data);
 
         //get the control effectiveness data if available
-        var test  = getDetails(assessmentId,complianceId).done(function(value) {
-        	var controlEffDetails = JSON.parse(value);
-        	console.log(controlEffDetails);
-        	console.log(" Length : " + controlEffDetails.length);
+//        var test  = getDetails(assessmentId,complianceName).done(function(value) {
+//        	var controlEffDetails = $.parseJSON(value);
+//        	console.log(controlEffDetails);
+//        	console.log(" Length : " + controlEffDetails.length);
         	
        
         var i = 0;
@@ -47,6 +49,8 @@ $(document).ready(function () {
             var domainName = value["domainName"];
             var domainCode = value["domainCode"];
             var subdomData = value["subdomain"];
+            
+            console.log("DOMAIN NAME : " + domainName );
             
             var domainDetTable = "<table id='ce-subdomainDetTableId' class='table table-sm table-bordered'><thead><tr><th>Domain Name</th> <th>Domain Code</th></tr> </thead> <tbody> \n\
                         <tr><td>" + domainName + "</td><td>" + domainCode + "</td></tbody> </table>";
@@ -78,29 +82,45 @@ $(document).ready(function () {
                                 $.each(controlData, function (controlKey, cntrlValue) {
                                     var controlValue = cntrlValue["controlValue"];
                                     var controlCode = cntrlValue["controlCode"];
-                                  
+                                    
+                                    var effectivenessDetails;
+                                    getDetails(assessmentId,controlCode,function(data){
+                                    	effectivenessDetails = data;
+                                    	console.log("effectivenessDetails inside " + effectivenessDetails);
+                                    	var controlEffDetails;
+                                    	if(effectivenessDetails.length===0){
+                                    		effectivenessDetails = "{\"controlCode\":\"\",\"docEffectiveness\":\"\",\"docEffRemarks\":\"\",\"implEffectiveness\":\"\",\"implEffRemarks\":\"\",\"recEffectiveness\":\"\",\"recEffRemarks\":\"\"}";
+                                    	}
+                                    	
+                                    	 controlEffDetails = $.parseJSON(effectivenessDetails);
+                                    	console.log(controlEffDetails["docEffectiveness"]);
+//                                    });
                                     count++;
-                                    for(n=0;n<controlEffDetails.length;n++){
+                                    
+                                    //                                    	$.each($.parseJSON(contrlEffData),function(key,value;){
+                                    		console.log("ControlEff : " + controlEffDetails["docEffectiveness"]);
+                                    	
                                     cntrlHtml = cntrlHtml + "\n\
                                                                 <tr><td>" + count + "</td><td><div style='display:inline-table;width:150px;'><input type='text' readonly='readonly' style='width:50px;border:none' id='controlId' name='controlCode' value='" + controlCode + "'></input>\n\
                                                                     <button type='button' title='Click for Questions' class='btn btn-info ce-qBtn' name='" + count + "' id='qBtn" + count + "' value='" + controlCode + "'>Display Questions</button></div></td> \n\
                                                                 <td><div id='controlValue' class='text-left' style='width:300px;'>" + controlValue + "</div></td>\n\
-                                                                <td>"+controlEffDetails[n]["docEffectiveness"]+"</td> \n\
-                                                                <td ><input type='file' id='upload-file'>" +
-                                                                	"<button class='btn btn-info btnUpload' id='docEff' name="+controlCode+">Upload</button></td> \n\
-                                                                <td>"+controlEffDetails[n]["docEffRemarks"]+"</td>\n\
+                                                                <td>"+controlEffDetails["docEffectiveness"]+"</td> \n\
+                                                                <td>"+displayFiles(controlEffDetails["docEffEvidences"])+"</a></td> \n\
+                                                                <td>"+controlEffDetails["docEffRemarks"]+"</td>\n\
                                                                 <td>"+controlEffDetails["implEffectiveness"]+"</td>\n\
                                                                 <td><input name='upload-implEffectiveness' type='file' id='upload-implEffectiveness'>" +
                                                                 	"<button class='btn btn-info btnUpload' id='implEff'>Upload</button></td>\n\
-                                                                <td>"+controlEffDetails[n]["implEffRemarks"]+"</td>\n\
-                                                                <td>"+controlEffDetails[n]["recEffectiveness"]+"</td>\n\
+                                                                <td>"+controlEffDetails["implEffRemarks"]+"</td>\n\
+                                                                <td>"+controlEffDetails["recEffectiveness"]+"</td>\n\
                                                                 <td><input name='upload-recEffectiveness' type='file' id='upload-recEffectiveness'>" +
                                                                 "<button class='btn btn-info btnUpload' id='recEff'>Upload</button></td>\n\
-                                                                <td>"+ controlEffDetails[n]["recEffRemarks"]+"</td> " +
+                                                                <td>"+ controlEffDetails["recEffRemarks"]+"</td> " +
                                                                 "<td><select class='form-control' id='maturityEffSelector'><option>1</option><option>2</option><option>3</option></select></td></tr>\n\
 \n\<tr id='qDisplay'><td colspan='12' style='display:none;' id='tdQuestions"+count+"'><div id='demo" + count + "' class='collapse'>Questions</div></td></tr>\
                                                              "
-                                    }}) + "</script>"
+//                                    });
+                                        });
+                                    }) + "</script>"
                                 ).append("<div id='subdomaincollapse" + i + "' class='panel-collapse collapse'><div class='panel-body'><div>" + subdomainDetTable + "<br>\n\
                                         <table id='control_effectiveness-list3' class='table table-sm table-bordered'> <thead> <tr> <th>#</th><th style='width:35%;'>Control Code</th><th>Control</th><th>Doc Effectiveness(C/NC/PC)</th> <th>Doc Effectiveness Evidence</th> <th>Remarks</th> <th>Implementation Effectiveness (C/NC/PC)</th> <th>Implementation Effectiveness Evidence </th><th>Implementation Effectiveness Remarks </th> <th>Record Effectiveness (C/NC/PC)</th> <th>Record Effectiveness Evidence</th> <th>Record Effectiveness Remarks</th><th>Maturity Level</th></tr> </thead> <tbody> \n\
                                         <tr id='ce-controlTableTR'>" + cntrlHtml + "</tbody> </table>" +
@@ -113,20 +133,33 @@ $(document).ready(function () {
 
             });
         });
-    });
+//    });
     });
 });
 
-function getDetails(assessmentId,complianceId){
+function getDetails(assessmentId,controlCode,fn){
+	console.log("Inside the getDetails page");
 	return $.ajax({
+		async:false,
         url: "/compsecure-web/getControlEffectivenessDetails",
         data: {
         		"assessmentId": assessmentId,
-        		"complianceId": complianceId
+        		"complianceId": controlCode
+        },
+        success:function(data){
+        	fn(data);
         }
     });
 }
 
+function displayFiles(files){
+	var fileHtml = "";
+	for(n=0;n<files.length;n++){
+		var num = parseInt(n)+1;
+		fileHtml = fileHtml + "<a href='getFile?filename="+files[n]+"' id='filesList'>"+num+". "+files[n]+"</a><br>";
+	}
+	return fileHtml;
+}
 /**
  * This method is used to display the questions with details 
  * when the user clicks on the "DisplayQuestions" button
@@ -165,6 +198,39 @@ $(document).on("click", ".ce-qBtn", function (event) {
         console.log(value["question"]);
         console.log(value["questionResponse"]);
     });
+});
+
+$("#exportToExcel").click(function(event){
+	event.preventDefault();
+	 var assessmentId = localStorage.getItem("assessmentId");
+	    var complianceId = localStorage.getItem("complianceId");
+	    var complianceName = localStorage.getItem("complianceName");
+	
+//	alert("Export Clicked!!" + assessmentId +"  "+ complianceId);
+	$.ajax({
+		url:"/compsecure-web/exportToExcel",
+		async:false,
+		data:{
+			"assessmentId": assessmentId,
+    		"complianceName": complianceName,
+    		"complianceId":complianceId
+		}
+	}).done(function(data){
+		var fileName = $.parseJSON(data);
+		console.log(fileName);
+		$("p#fileExportLocation").text(fileName);
+		 $("#dialog-export").dialog({
+			 modal: true,
+             title :"Export",
+             dialogClass :"dialogStyle",
+             width: 400,
+            buttons : {
+                Ok: function() {
+                    $(this).dialog("close"); //closing on Ok click
+                }
+            },
+		});
+	});	
 });
 
 $("#button-home").click(function(data){

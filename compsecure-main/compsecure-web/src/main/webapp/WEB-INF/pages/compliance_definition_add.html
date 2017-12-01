@@ -16,7 +16,7 @@
 
         <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
         <link href="bootstrap/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
-
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <!-- Custom styles for this template -->
         <link href="bootstrap/css/dashboard.css" rel="stylesheet">
 
@@ -32,6 +32,9 @@
     </head>
 
     <body>
+    <div id="loading">
+  		<img id="loading-image" src="bootstrap/images/ajax-loading.gif" alt="Loading..." />
+	</div>
         <nav class="navbar navbar-inverse navbar-fixed-top">
             <div class="container-fluid">
                 <div class="navbar-header">
@@ -55,8 +58,8 @@
                         <li><a href="#">Help</a></li>
                         <li id="logo"><img src="bootstrap/images/se-logo-4.jpg"></li>
                     </ul>
-
                 </div>
+	       		<hr>
             </div>
         </nav>
         <form method="post" id="complianceDefForm">
@@ -73,11 +76,12 @@
                     </ul>
                     <hr>
 					 <ul class="nav nav-sidebar">
-          				<li><a href="logout.html">Logout</a></li>
+          				<li  style="margin-top: 15px"><a href="logout.html">Logout</a></li>
          			 </ul>
                 </div>
-               
-                <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+               <hr>
+                <!-- <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">  -->
+                <div class="container">
                     <h2 class="sub-header">Compliance Details</h2>
 
                     <div class="input-group">
@@ -89,77 +93,90 @@
                     </div>
                     <br>
                     <br>
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a data-toggle="collapse" class="input-group" href="#collapse1">Control Domain</a>
-                            </h4>
-                        </div>
-                        <div id="collapse1" class="panel-collapse collapse">
-                            <div class="panel-body">
-                                <div class="input-group">
-                                    <span class="input-group-addon">Domain Name</span>
-                                    <input id="domain_code" type="text" class="form-control " name="domain_code" placeholder="Control Domain Code">
-                                    <input id="domain_value" type="text" class="form-control gap" name="domain_value" placeholder="Control Domain Value">
-                                </div>
-                                <br>
-                                <div id="subdomain-group" class="col-sm-12" style="padding: 0">
-                                <br>
-                                <div class="input-group">
-                                    <span class="input-group-addon" id="subdomainId">Subdomain</span>
-                                    <input id="sub_code" type="text" class="form-control" name="sub_code" placeholder="Subdomain Code">
-                                    <input id="subdomain_value" type="text" class="form-control gap" name="subdomain_value" placeholder="Subdomain Value">
-                                    <textarea id="principle" class="form-control gap" name="principle" placeholder="Principle" rows="2"></textarea>
-                                    <textarea id="objective" class="form-control gap" name="objective" placeholder="Objective" rows="2"></textarea>
-                                </div>
-                                <br>
-                                <div>
-                                    <label class="input-group">Controls</label>
-                                 </div>
-                                <br>
-                                <div class="row">
-                                 <div class="col-lg-12">
-                                    <table class="table" id="subdomainTable">
-                                        <thead>
-                                            <tr>
-                                                <th>Select</th>
-                                                <th>Control Code</th>
-                                                <th>Control Detail</th>
-                                            </tr>                                             
-                                        </thead>
-                                        <tbody>
-                                            <tr id="cntrl0">
-                                                <td style="width:3%;align-content: center"><input type='checkbox' name='control_no'></td>
-                                                <td style="width: 20%"><input id="control_code" type="text" class="form-control gap" name="control_code" placeholder="Control Code"></td>
-                                                <td style="width: 77%"><input id="control_value" type="text" class="form-control gap" name="control_value" placeholder="Control Details"></td>
-                                                <!--<td style="width: 35%"><button id="button-save-control" type="button" class="btn btn-success gap">Add </button></td>-->
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    </div>
-                                </div>
-	                           	<div class="col-sm-6" align="right">
-	                               <button type="button" id="button-add-control" class="btn btn-success gap">Add Control</button>
-	                               <button type="button" id="button-delete-control" class="btn btn-success gap">Delete Control</button>
-	                           	<br>
-	                           </div>
-                                   <br>
-                                   </div>
-                                   <hr>
-                                <div class="row">
-                                	<div class="col-sm-3">
-                                		<button type="button" id="button-add-subdomain" class="btn btn-success gap">Add Subdomain</button>
-                                	</div>
-                                </div>
-                            </div>
-                        </div>
+                    <div id="domainDetails">
+	                    <div class="panel panel-default">
+	                        <div class="panel-heading">
+	                            <h4 class="panel-title">
+	                                <a data-toggle="collapse" class="input-group" href="#collapse1">Control Domain</a>
+	                            </h4>
+	                        </div>
+	                        <div id="collapse1" class="panel-collapse collapse">
+	                            <div class="panel-body">
+	                                <div class="input-group">
+	                                    <span class="input-group-addon">Domain Name</span>
+	                                    <input id="domain_code" type="text" class="form-control " name="domain_code" placeholder="Control Domain Code">
+	                                    <input id="domain_value" type="text" class="form-control gap" name="domain_value" placeholder="Control Domain Value">
+	                                </div>
+	                                <br>
+	                                <div id="subdomain-group" class="col-sm-12" style="padding: 0">
+	                                <br>
+	                                <div class="row">
+	                                <div class="col-lg-10">
+	                                <div class="input-group">
+	                                    <span class="input-group-addon" id="subdomainId">Subdomain</span>
+	                                    <input id="sub_code" type="text" class="form-control" name="sub_code" placeholder="Subdomain Code">
+	                                    <input id="subdomain_value" type="text" class="form-control gap" name="subdomain_value" placeholder="Subdomain Value">
+	                                    <textarea style="widht:100%" id="principle" class="form-control gap" name="principle" placeholder="Principle" rows="2"></textarea>
+	                                    <textarea style="widht:100%" id="objective" class="form-control gap" name="objective" placeholder="Objective" rows="2"></textarea>
+	                                </div>
+	                                </div>
+	                                </div>
+	                                <br>
+	                                <div>
+	                                    <label class="input-group">Controls</label>
+	                                 </div>
+	                                <br>
+	                                <div class="row">
+	                                 <div class="col-lg-10">
+	                                    <table class="table" id="subdomainTable">
+	                                        <thead>
+	                                            <tr>
+	                                                <th>Select</th>
+	                                                <th>Control Code</th>
+	                                                <th>Control Detail</th>
+	                                            </tr>                                             
+	                                        </thead>
+	                                        <tbody>
+	                                            <tr id="cntrl0">
+	                                                <td style="width:3%;align-content: center"><input type='checkbox' name='control_no'></td>
+	                                                <td style="width:20%;"><input id="control_code" type="text" class="form-control gap" name="control_code" placeholder="Control Code"></td>
+	                                                <td><textarea style="width:100%;" id="control_value" rows="2" class="form-control gap" name="control_value" placeholder="Control Details"></textarea></td>
+	                                                <!--<td style="width: 35%"><button id="button-save-control" type="button" class="btn btn-success gap">Add </button></td>-->
+	                                            </tr>
+	                                        </tbody>
+	                                    </table>
+	                                    </div>
+	                                </div>
+		                           	<div class="col-sm-6" align="right">
+		                               <button type="button" id="button-add-control" class="btn btn-success gap">Add Control</button>
+		                               <button type="button" id="button-delete-control" class="btn btn-success gap">Delete Control</button>
+		                           	<br>
+		                           </div>
+	                                   <br>
+	                                   </div>
+	                                   <hr>
+	                                <div class="row">
+	                                	<div class="col-sm-3">
+	                                		<button type="button" id="button-add-subdomain" class="btn btn-success gap">Add Subdomain</button>
+	                                	</div>
+	                                </div>
+	                            </div>
+	                        </div>
+	                    </div>
                     </div>
                     <div>
                         <button type="button" id="button-add-control-domain" class="btn btn-success">Add Control Domain</button>
                     </div>
                     </div>
+                    <!-- </div> -->
                         <br>
                         <br>
+                         <div id="dialog" title="Compliance" hidden="false">
+          					<p>The compliance has been created.</p>
+          				</div>
+          				<div id="dialog-fail" title="Compliance" hidden="false">
+          					<p>There was a problem while saving the data. Please try again or contact the admin</p>
+          				</div>
                         <div class="button-box" align="center">
                             <button type="button" id="button-cancel" class="btn btn-success">Cancel</button>
                             <button type="button" id="button-save" class="btn btn-success">Save</button>
@@ -182,6 +199,8 @@
             <script src="bootstrap/assets/js/vendor/holder.min.js"></script>
             <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
             <script src="bootstrap/assets/js/ie10-viewport-bug-workaround.js"></script>
+            <script src="bootstrap/assets/js/vendor/jquery-ui.js"></script>
+            
             <script src="bootstrap/js/menu.js"></script>
             <script src="bootstrap/js/compliance-def.js"></script>  
              

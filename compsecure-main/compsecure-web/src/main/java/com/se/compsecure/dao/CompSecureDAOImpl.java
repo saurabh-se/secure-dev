@@ -13,6 +13,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,6 +28,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
+import com.mysql.jdbc.Blob;
 import com.mysql.jdbc.StringUtils;
 import com.se.compsecure.model.AssessmentDetails;
 import com.se.compsecure.model.ComplianceHeader;
@@ -109,8 +111,10 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 	 * 
 	 */
 	public List<ComplianceHeader> getComplianceDetails(String assessmentId) {
-
-		String sql = "select * from compliance_header ch join assessment_details ad on ch.compliance_id = ad.compliance_id and ad.assessment_id = '" + assessmentId +"'";
+		
+		LOGGER.info("inside getComplianceDetails method : assessmentId " + assessmentId);
+		
+		String sql = "select * from compliance_header ch join assessment_details ad on ch.compliance_id = ad.compliance_id and ad.assessment_id = '" + assessmentId +"' order by ch.creation_date";
 //		String sql = " select * from compsecure_sama.compliance_header ch join compsecure_sama.assessment_details ad "
 //				+ "on ch.compliance_id = ad.compliance_id where ad.assessment_id= " + assessmentId;
 		
@@ -143,7 +147,7 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 	 *  Return a list of compliance based on organization
 	 */
 	public List<ComplianceHeader> getComplianceDetailsForOrg(String organizationId) {
-		String sql = "select * from compliance_header where organization_id=" + organizationId;
+		String sql = "select * from compliance_header where organization_id=" + organizationId + " order by creation_date";
 
 		List<ComplianceHeader> complianceDetailsList = new ArrayList<ComplianceHeader>();
 
@@ -192,7 +196,7 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 		for (Map row : rows) {
 		
 				Questions question = new Questions();
-				question.setQuestionCode(String.valueOf((Integer)row.get("questionnaire_id")));
+				question.setQuestionCode((String)row.get("question_code"));
 				question.setQuestion((String)row.get("question"));
 				questionsList.add(question);
 			}
@@ -265,7 +269,7 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 				+ "	po.principle, po.objective FROM controls c, subdomain sd LEFT JOIN principle_objective po "
 				+ "	ON sd.subdomain_id = po.subdomain_id JOIN domain d ON d.domain_id = sd.domain_id JOIN compliance_header ch "
 				+ "	ON ch.compliance_id = d.compliance_id JOIN assessment_details ad on ad.compliance_id = ch.compliance_id "
-				+ "	WHERE ch.compliance_name = 'NCT-29Oct8' and ad.assessment_id='37' AND c.subdomain_id = sd.subdomain_id "
+				+ "	WHERE ch.compliance_name = '"+complianceDesc+"' and ad.assessment_id='"+assessmentId+"' AND c.subdomain_id = sd.subdomain_id "
 				+ "	ORDER By c.control_code";
 		
 		System.out.println(sql);
@@ -302,12 +306,20 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 		System.out.println("Inside getCompleteDetails for assessmentId and ComplianceId ");
 		
 		List<Domain> domainList = new ArrayList<Domain>();		
-		String sql = "select c.control_code,c.control_value,sd.subdomain_code,sd.subdomain_name,ab.domain_name,ab.domain_code,po.principle,po.objective "
-				+ " from 			compsecure_sama.subdomain sd, compsecure_sama.controls c,compsecure_sama.principle_objective po "
-				+ " left join		(select domain_id,domain_code,domain_name from 	compsecure_sama.domain d "
-				+ " inner join 		compsecure_sama.compliance_header ch "
-				+ " on 				ch.compliance_id = d.compliance_id join assessment_details ad on ad.compliance_id = ch.compliance_id where ad.assessment_id='"+assessmentId+"' and ch.compliance_description = '" + complianceDesc +"') ab "
-				+ " on 				ab.domain_id where ab.domain_id= sd.domain_id and c.subdomain_id = sd.subdomain_id and po.subdomain_id = sd.subdomain_id group by c.control_id";
+//		String sql = "select c.control_code,c.control_value,sd.subdomain_code,sd.subdomain_name,ab.domain_name,ab.domain_code,po.principle,po.objective "
+//				+ " from 			compsecure_sama.subdomain sd, compsecure_sama.controls c,compsecure_sama.principle_objective po "
+//				+ " left join		(select domain_id,domain_code,domain_name from 	compsecure_sama.domain d "
+//				+ " inner join 		compsecure_sama.compliance_header ch "
+//				+ " on 				ch.compliance_id = d.compliance_id join assessment_details ad on ad.compliance_id = ch.compliance_id where ad.assessment_id='"+assessmentId+"' and ch.compliance_description = '" + complianceDesc +"') ab "
+//				+ " on 				ab.domain_id where ab.domain_id= sd.domain_id and c.subdomain_id = sd.subdomain_id and po.subdomain_id = sd.subdomain_id group by c.control_id";
+		
+		String sql = " SELECT c.control_code, c.control_value, sd.subdomain_code, sd.subdomain_name, d.domain_name, d.domain_code, "
+				+ "	po.principle, po.objective FROM controls c, subdomain sd LEFT JOIN principle_objective po "
+				+ "	ON sd.subdomain_id = po.subdomain_id JOIN domain d ON d.domain_id = sd.domain_id JOIN compliance_header ch "
+				+ "	ON ch.compliance_id = d.compliance_id JOIN assessment_details ad on ad.compliance_id = ch.compliance_id "
+				+ "	WHERE ch.compliance_name = '"+complianceDesc+"' and ad.assessment_id='"+assessmentId+"' AND c.subdomain_id = sd.subdomain_id "
+				+ "	ORDER By c.control_code";
+		
 		System.out.println(sql);
 		
 		return listDomainDetails(sql,assessmentId);
@@ -717,8 +729,8 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 	}
 	
 	
-	public Boolean checkIfControlExists(String controlCode){
-		String countQuery = "select count(*) from control_effectiveness where control_code = '" + controlCode + "'";
+	public Boolean checkIfControlExists(String controlCode, String assessmentId){
+		String countQuery = "select count(*) from control_effectiveness where control_code = '" + controlCode + "' and assessment_id = '" + assessmentId +"'";
 		String count = jdbcTemplate.queryForObject(countQuery,String.class);
 		
 		if(count.equals("0")){
@@ -734,47 +746,56 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 	}
 
 	public void createCompliance(final ComplianceHeader complianceHeader) {
-		final String sql = "insert into compliance_header (compliance_name,regulator_id,compliance_description,"
-				+ "number_of_levels,assessment_id,organization_id) values (?,?,?,?,?,?)";
 		
-        try {
-            synchronized(this) {
-                jdbcTemplate.update(new PreparedStatementCreator() {
- 
-                    public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                        PreparedStatement statement = con.prepareStatement(sql);
-                        statement.setString(1, complianceHeader.getComplianceName());
-                        statement.setString(2, complianceHeader.getRegulatorId());
-                        statement.setString(3, complianceHeader.getComplianceDescription());
-                        statement.setInt(4, 0);
-                        statement.setString(5, "1");
-                        statement.setString(6, "1");
-//                        statement.setBytes(4, null);
-//                        statement.setBytes(5, null);
-                        return statement;
-                    }
-                });
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+		String countQuery = "select count(compliance_name) from compliance_header where compliance_name = '" + 
+							complianceHeader.getComplianceName() +"'";
+		String count = jdbcTemplate.queryForObject(countQuery,String.class);
 		
+		if(count.equals("0")){
+			final String sql = "insert into compliance_header (compliance_name,regulator_id,compliance_description,"
+					+ "number_of_levels,assessment_id,organization_id) values (?,?,?,?,?,?)";
+					
+	        try {
+	            synchronized(this) {
+	                jdbcTemplate.update(new PreparedStatementCreator() {
+	 
+	                    public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+	                        PreparedStatement statement = con.prepareStatement(sql);
+	                        statement.setString(1, complianceHeader.getComplianceName());
+	                        statement.setString(2, complianceHeader.getRegulatorId());
+	                        statement.setString(3, complianceHeader.getComplianceDescription());
+	                        statement.setInt(4, 0);
+	                        statement.setString(5, "1");
+	                        statement.setString(6, "1");
+	//                        statement.setBytes(4, null);
+	//                        statement.setBytes(5, null);
+	                        return statement;
+	                    }
+	                });
+	            }
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	        }
+		}
 	}
 
-	public String saveAssessmentDetails(final AssessmentDetails assessmentDetails) {
+	public String saveAssessmentDetails(final AssessmentDetails assessmentDetails,String self_assessment_option) {
 		
 		
+	String count = "0";
 	final String complianceId = getComplianceId(assessmentDetails.getComplianceId());	
 	LOGGER.info(" Inside saveAssessmentDetails. \t Compliance ID " + complianceId);
 	
 	String countQuery = "select count(assessment_id) from assessment_details where organization_id= " + assessmentDetails.getOrganizationId() + 
 			 " and compliance_id = " + complianceId;
 	
-	String assessmentIdSQL = "select assessment_id from assessment_details where organization_id= " + assessmentDetails.getOrganizationId() + 
+	String assessmentIdSQL = "select max(assessment_id) from assessment_details where organization_id= " + assessmentDetails.getOrganizationId() + 
 			 " and compliance_id = " + complianceId;
 	
-	String count = jdbcTemplate.queryForObject(countQuery,String.class);
-	
+	if(!self_assessment_option.equals(CompSecureConstants.NEW)){
+		 count = jdbcTemplate.queryForObject(countQuery,String.class);
+	}
+		
 	if(count.equals("0")){		
 		final String sql = "insert into assessment_details (organization_id,assessment_status,remarks,assessment_start_date,assessment_to_date,assessment_name,compliance_id) values (?,?,?,?,?,?,?)";
 		
@@ -825,11 +846,11 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 		return complianceQuestionsList;
 	}
 
-	public List<ControlEffectiveness> getControlEffectivenessDetails(String assessmentId, String complianceDesc) {
+	public List<ControlEffectiveness> getControlEffectivenessDetails(String assessmentId, String controlCode) {
 		
 		List<ControlEffectiveness> controlEffectivenessesList = new ArrayList<ControlEffectiveness>();
 		
-		String sql = "select * from control_effectiveness where assessment_id =" + assessmentId;
+		String sql = "select * from control_effectiveness where assessment_id ='" + assessmentId+"' and control_code='" + controlCode +"'";
 		
 		LOGGER.info(" In getControlEffectivenessDetails :" + sql);
 		
@@ -847,10 +868,58 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 			controlEffectiveness.setRecEffectiveness((String)row.get("rec_effectiveness"));
 			controlEffectiveness.setRecEffEvidenceId((String)row.get("rec_eff_evidence_id"));
 			controlEffectiveness.setRecEffRemarks((String)row.get("rec_eff_remarks"));
+			List<String> docEffectiveEvidenceFileNames = getDocEffectiveFileNames((String)row.get("control_code"),assessmentId);
+			List<String> recEffectiveEvidenceFileNames = getRecEffectiveFileNames((String)row.get("control_code"),assessmentId);
+			List<String> implEffectiveEvidenceFileNames = getImplEffectiveFileNames((String)row.get("control_code"),assessmentId);
+			controlEffectiveness.setDocEffEvidences(docEffectiveEvidenceFileNames);
+			controlEffectiveness.setRecEffEvidences(recEffectiveEvidenceFileNames);
+			controlEffectiveness.setImplEffEvidences(implEffectiveEvidenceFileNames);
 			controlEffectivenessesList.add(controlEffectiveness);
 		}
 		LOGGER.info(" Control Effectiveness Details " + controlEffectivenessesList.toString());
 		return controlEffectivenessesList;
+	}
+
+	private List<String> getDocEffectiveFileNames(String controlCode,String assessmentId) {
+		
+		List<String> docEffectiveEvidenceFileNames = new ArrayList<String>();
+		String sql = "select * from evidences where assessment_id ='" + assessmentId+"' and control_code='" + controlCode +"' and evidence_type_name='docEff'";
+		LOGGER.info(" In getControlEffectivenessDetails :" + sql);
+		List<Map<String, Object>> rows = null; 
+				rows = jdbcTemplate.queryForList(sql);
+		for(Map row : rows){
+			String fileName = (String)row.get("file_name");
+			docEffectiveEvidenceFileNames.add(fileName);
+		}
+		return docEffectiveEvidenceFileNames;
+	}
+	
+	private List<String> getRecEffectiveFileNames(String controlCode,String assessmentId) {
+			
+			List<String> recEffectiveEvidenceFileNames = new ArrayList<String>();
+			String sql = "select * from evidences where assessment_id ='" + assessmentId+"' and control_code='" + controlCode +"' and evidence_type_name='recEff'";
+			LOGGER.info(" In getControlEffectivenessDetails :" + sql);
+			List<Map<String, Object>> rows = null; 
+					rows = jdbcTemplate.queryForList(sql);
+			for(Map row : rows){
+				String fileName = (String)row.get("file_name");
+				recEffectiveEvidenceFileNames.add(fileName);
+			}
+			return recEffectiveEvidenceFileNames;
+		}
+	
+	private List<String> getImplEffectiveFileNames(String controlCode,String assessmentId) {
+		
+		List<String> implEffectiveEvidenceFileNames = new ArrayList<String>();
+		String sql = "select * from evidences where assessment_id ='" + assessmentId+"' and control_code='" + controlCode +"' and evidence_type_name='implEff'";
+		LOGGER.info(" In getControlEffectivenessDetails :" + sql);
+		List<Map<String, Object>> rows = null; 
+				rows = jdbcTemplate.queryForList(sql);
+		for(Map row : rows){
+			String fileName = (String)row.get("file_name");
+			implEffectiveEvidenceFileNames.add(fileName);
+		}
+		return implEffectiveEvidenceFileNames;
 	}
 
 	public String getComplianceId(String complianceDescription) {
@@ -981,15 +1050,15 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 		List<Map<String, Object>> rows = null;
 		
 		if(organizationId.equals("0")){
-			sql = "select compliance_name,compliance_description from compliance_header";
+			sql = "select compliance_name,compliance_description from compliance_header order by creation_date";
 			rows = jdbcTemplate.queryForList(sql);
 		}else{
-			sql = "select compliance_name,compliance_description from compliance_header where organization_id = ?";
+			sql = "select compliance_name,compliance_description from compliance_header where organization_id = ? order by creation_date";
 			rows = jdbcTemplate.queryForList(sql,organizationId);
 		}
 		ComplianceHeader complianceHeader = null; 
 		
-		Map<String, String> compMap = new HashMap<String, String>();
+		Map<String, String> compMap = new LinkedHashMap<String, String>();
 		
 		try{
 			
@@ -1030,7 +1099,7 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 
 	public List<Control> getControlsForQuestions(String complianceName) {
 		
-		System.out.println("Inside getComlianceDefinitionDetails for Compliance Name ");
+		System.out.println("Inside getControlsForQuestions for Compliance Name " + complianceName);
 		
 		Control control = null;
 		List<Control> controlList = new ArrayList<Control>();
@@ -1038,6 +1107,8 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 		String sql = "select c.control_value,c.control_code from controls c join subdomain s "
 					+ " on c.subdomain_id = s.subdomain_id join domain d on s.domain_id = d.domain_id "
 					+ " join compliance_header ch on d.compliance_id=ch.compliance_id where ch.compliance_name = ?";
+		
+		LOGGER.info("SQL Query for getControlsForQuestions : " +sql);
 		
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql,complianceName);
 		try{
@@ -1083,17 +1154,20 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 
 	private String getControlId(String controlLabel) {
 		String sql = "select control_id from controls where control_code=?";
+		LOGGER.info("inside the getControlId method " + sql + controlLabel);
 		return jdbcTemplate.queryForObject(sql,new Object[]{controlLabel},String.class);
 	}
 
-	public void saveComplianceDefinitionData(String complianceName,List<Domain> domains) {
+	public String saveComplianceDefinitionData(String complianceName,List<Domain> domains) {
+		
+		String result = "success";
 		
 		System.out.println(this.getClass().getEnclosingMethod());
 		LOGGER.info("METHOD : inside the saveComplianceDefinitionData method");
 		
+		try{
 		String sqlForComplianceId = "select compliance_id from compliance_header where compliance_name=?";
 		final String complianceId = jdbcTemplate.queryForObject(sqlForComplianceId,new Object[]{complianceName},String.class);
-		
 		
 		for (Iterator iterator = domains.iterator(); iterator.hasNext();) {
 			final Domain domain = (Domain) iterator.next();
@@ -1102,6 +1176,7 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 			for (Iterator iterator2 = subdomains.iterator(); iterator2.hasNext();) {
 				Subdomain subdomain = (Subdomain) iterator2.next();
 				String subdomainId = saveSubdomainDetails(domainId,subdomain);
+				savePrincipleObjectiveDetails(subdomainId,subdomain);
 				List<Control> controls = subdomain.getControl();
 				for (Iterator iterator3 = controls.iterator(); iterator3.hasNext();) {
 					Control control = (Control) iterator3.next();
@@ -1109,6 +1184,12 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 				}
 			}
 		}
+		}catch(Exception ex){
+			result = "failed";
+			LOGGER.info(result);
+			
+		}
+		return result;
 	}
 	
 
@@ -1133,13 +1214,18 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 		        });
 		    }
 		} catch (Exception ex) {
-			LOGGER.info("Values in Controls have not been stored. There was some exception while saving data!!");
+			LOGGER.info("Values in saveDomainDetails have not been stored. There was some exception while saving data!!");
 		    ex.printStackTrace();
 		}
 		
 		if(noOfRecUpdated!=0){
-			String sqlForComplianceId = "select domain_id from domain where domain_name=?";
-			domainId = jdbcTemplate.queryForObject(sqlForComplianceId,new Object[]{domain.getDomainName()},String.class);
+			String sqlForComplianceId = "select max(domain_id) from domain where domain_name=? and compliance_id=?";
+			try{
+				domainId = jdbcTemplate.queryForObject(sqlForComplianceId,new Object[]{domain.getDomainName(),compliance_id},String.class);
+			}catch(Exception ex){
+				LOGGER.info("in the saveDomainDetails method - query for sqlForComplianceId failed " + sqlForComplianceId);
+				ex.printStackTrace();
+			}
 		}
 		
 		return domainId;
@@ -1164,17 +1250,46 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 		        });
 		    }
 		} catch (Exception ex) {
-			LOGGER.info("Values in Controls have not been stored. There was some exception while saving data!!");
+			LOGGER.info("Values in Subdomain -"+ subdomain.getSubdomainCode() +"- have not been stored. There was some exception while saving data!!");
 		    ex.printStackTrace();
 		}
 		
 		if(noOfRecUpdated!=0){
-			String sqlForComplianceId = "select subdomain_id from subdomain where subdomain_name=?";
-			subdomainId = jdbcTemplate.queryForObject(sqlForComplianceId,new Object[]{subdomain.getSubdomainValue()},String.class);
+			String sqlForComplianceId = "select subdomain_id from subdomain where subdomain_name=? and domain_id = ?";
+			try{
+				subdomainId = jdbcTemplate.queryForObject(sqlForComplianceId,new Object[]{subdomain.getSubdomainValue(), domainId},String.class);
+			}catch(Exception ex){
+				LOGGER.info("in the saveSubdomainDetails method - query for subdomainId failed " + sqlForComplianceId);
+				ex.printStackTrace();
+			}
 		}
 		
 		return subdomainId;
 	}
+	
+	
+	private void savePrincipleObjectiveDetails(final String subdomainId, final Subdomain subdomain) {
+		final String sql = "insert into principle_objective (principle,objective,subdomain_id) values (?,?,?)";
+		int noOfRecUpdated = 0;
+		try {
+		    synchronized(this) {
+		    	noOfRecUpdated = jdbcTemplate.update(new PreparedStatementCreator() {
+ 
+		            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+		                PreparedStatement statement = con.prepareStatement(sql);
+		                statement.setString(1, subdomain.getPrinciple());
+		                statement.setString(2, subdomain.getObjective());
+		                statement.setString(3, subdomainId);
+		                return statement;
+		            }
+		        });
+		    }
+		} catch (Exception ex) {
+			LOGGER.info("Values in Subdomain -"+ subdomain.getSubdomainCode() +"- have not been stored. There was some exception while saving data!!");
+		    ex.printStackTrace();
+		}
+	}
+	
 	
 	private void saveControlDetails(final String subdomainId, final Control control) {
 		
@@ -1290,6 +1405,45 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 		}catch(Exception ex){
 			LOGGER.info(ex.getMessage());
 		}
+	}
+
+	public List<Entry<String, Domain>> getExistingComplianceDetails(String complianceName) {
+	System.out.println("Inside getExistingDomainDetailsForCompliance");
+		
+		String sql = "SELECT c.control_code, c.control_value, sd.subdomain_code, sd.subdomain_name, d.domain_name, d.domain_code, "
+				+ "	po.principle, po.objective FROM controls c, subdomain sd LEFT JOIN principle_objective po ON "
+				+ "	sd.subdomain_id = po.subdomain_id JOIN domain d ON d.domain_id = sd.domain_id JOIN compliance_header ch ON "
+				+ "	ch.compliance_id = d.compliance_id WHERE ch.compliance_name = '"+ complianceName +"' AND c.subdomain_id = sd.subdomain_id "
+				+ " order by c.control_code";
+		System.out.println(sql);
+		
+		return listDomainDetails(sql,null);
+	}
+
+	public UploadFile getFile(String filename, String assessmentId) {
+		
+		
+		List<UploadFile> fileList = new ArrayList<UploadFile>();
+		
+		String sql = "select * from evidences where file_name = ? and assessment_id = ?";
+		
+		try{
+			
+			List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql,new Object[]{filename,assessmentId});
+			for (Map row : rows) {
+				UploadFile uploadedFile = new UploadFile();
+				uploadedFile.setAssessmentId((String)row.get("assessment_id").toString());
+				uploadedFile.setFileName((String)row.get("file_name"));
+				uploadedFile.setContentType((String)row.get("content_type"));
+				uploadedFile.setData((byte[])row.get("doc_eff_evidence"));
+				fileList.add(uploadedFile);
+			}
+			
+		}catch(Exception ex){
+			System.out.println("Error : " + ex.getMessage());
+		}
+		
+		return fileList.get(0);
 	}
 
 }

@@ -62,11 +62,16 @@ public class CompSecureController {
 		
 		if(httpSession!=null){
 			User user2 = (User)httpSession.getAttribute("user");
+			try{
 			Integer roleId = user2.getRole().getRoleId();
 			if(roleId==2){
 				return_location =  "self-assessment_1";
 			}else{
 	            return_location = "home";
+			}
+			}catch(Exception ex){
+				LOGGER.info(" Exception in the COMPSECURECONTROLLER class  " + ex.getMessage());
+				return_location = "login";
 			}
 		}
 		return return_location;
@@ -85,6 +90,11 @@ public class CompSecureController {
 	@RequestMapping("/self-assessment-existing")
     public String getSelfAssessmentExistingPage(Model model,HttpSession httpSession) {
         
+		String authenticated = authenticateUser(httpSession);
+		if(authenticated == null){
+			return "login";
+		}
+		
         System.out.println("Inside Self Assessment Existing");
         
         httpSession.setAttribute(SELF_ASSESSMENT_OPTION, SELF_ASSESSMENT_OPTION_EXISTING);
@@ -117,16 +127,30 @@ public class CompSecureController {
 		String res = authenticateUser(httpSession);
 		return res==null?"home":"compliance-header";
     }
+	
 	private String authenticateUser(HttpSession httpSession) {
 		User user = (User)httpSession.getAttribute("user");
-		
 		return user==null?null:user.getRole().getRoleId().toString();
 	}
+	
+	@RequestMapping("/checkForLoggedInUser")
+	@ResponseBody
+    public String checkForLoggedInUser(HttpSession httpSession) {
+		User user = (User)httpSession.getAttribute("user");
+		Gson gson = new Gson();
+		
+		if(user==null){
+			return gson.toJson("unauthenticated");
+		}else{
+			return gson.toJson("authenticated");
+		}
+    }
 
 	@RequestMapping("/compliance_definition_add")
     public String getComplianceDefinitionAdd(Model model) {
 		return "compliance_definition_add";
     }
+	
 	@RequestMapping("/maturity_definition_add")
     public String getMaturityDefinitionAdd(Model model) {
 		return "maturity_definition_add";
@@ -144,13 +168,14 @@ public class CompSecureController {
     public String getOrgDetails(Model model,@PathVariable String userId,@PathVariable String roleId, 
     							@RequestParam(value="self_assessment_option") String selfAssessmentOption,HttpSession httpSession) {
 		
+		
 		LOGGER.info("in the getOrgDetails, userId " + userId);
 		
 		User user = (User)httpSession.getAttribute("user");
 		
 		httpSession.setAttribute("self_assessment_option", selfAssessmentOption);
 		
-		if(!user.equals(null)){
+		if(user!=null){
 			System.out.println(user.getUsername() + " " + user.getUserId());
 		}
 		

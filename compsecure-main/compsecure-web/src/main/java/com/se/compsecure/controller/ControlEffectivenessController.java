@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.gson.Gson;
 import com.se.compsecure.model.ControlEffectiveness;
 import com.se.compsecure.service.CompSecureService;
 
@@ -28,6 +29,7 @@ private static final Logger LOGGER = Logger.getLogger(ControlEffectivenessContro
 	private CompSecureService compSecureService;
 	
 	@RequestMapping(value="/saveControlEffectiveness",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
 	public String saveControlEffectivenessDetails(@RequestBody List<ControlEffectiveness> controlEffectiveness, HttpSession httpSession) {
 		
 		String assessment_option = (String)httpSession.getAttribute("self_assessment_option");
@@ -50,9 +52,8 @@ private static final Logger LOGGER = Logger.getLogger(ControlEffectivenessContro
 				LOGGER.info("Control Code : " + controlEffectiveness2.getRecEffRemarks());
 				LOGGER.info(" ************************ ");
 				
-				Boolean controlExists = compSecureService.checkIfControlExists(controlEffectiveness2.getControlCode());
+				Boolean controlExists = compSecureService.checkIfControlExists(controlEffectiveness2.getControlCode(),assessmentId);
 				
-//				if(assessment_option.equals("new")){
 				if(controlExists){
 					executeAlterTable(controlEffectiveness2,assessmentId);
 				}
@@ -61,7 +62,10 @@ private static final Logger LOGGER = Logger.getLogger(ControlEffectivenessContro
 				}
 			}
 		}
-		return "maturity-effectiveness";
+		
+		Gson gson  = new Gson();
+		
+		return gson.toJson("maturity-effectiveness");
 	}
 
 	private void executeAlterTable(ControlEffectiveness controlEffectiveness2, String assessmentId) {
@@ -80,5 +84,25 @@ private static final Logger LOGGER = Logger.getLogger(ControlEffectivenessContro
 
 	private void executeUpdate(ControlEffectiveness controlEffectiveness2, String assessmentId) {
 		compSecureService.updateControlEffectivenessDetails(controlEffectiveness2,assessmentId);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/getControlEffectivenessDetails")
+	public @ResponseBody String getControlEffectivenessDetails(@RequestParam("assessmentId") String assessmentId,@RequestParam("complianceId") String complianceId, HttpSession httpSession) {
+
+		List<ControlEffectiveness> controlEffectivenessList = null;
+		
+//		complianceId = (String)httpSession.getAttribute("complianceDesc");
+		
+		controlEffectivenessList = compSecureService.getControlEffectivenessDetails(assessmentId,complianceId);
+		
+		Gson gson = new Gson();
+		String json ="";
+		
+		if(controlEffectivenessList.size()>0){
+		 json = gson.toJson(controlEffectivenessList.get(0));
+		}
+
+		return json;
 	}
 }

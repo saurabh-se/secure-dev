@@ -182,8 +182,8 @@ public class CompSecureServiceImpl implements CompSecureService {
 		 compSecureDAO.createCompliance(complianceHeader);		
 	}
 
-	public String saveAssessmentDetails(AssessmentDetails assessmentDetails) {
-		return compSecureDAO.saveAssessmentDetails(assessmentDetails);
+	public String saveAssessmentDetails(AssessmentDetails assessmentDetails,String self_assessment_option) {
+		return compSecureDAO.saveAssessmentDetails(assessmentDetails,self_assessment_option);
 	}
 
 	public List<Questions> getComplianceQuestionsForExistingAssessment(String assessmentId) {
@@ -251,8 +251,8 @@ public class CompSecureServiceImpl implements CompSecureService {
 		compSecureDAO.saveQuestions(controlLabel,questionCode,question);
 	}
 
-	public void saveComplianceDefinitionData(String complianceName,List<Domain> domains) {
-		compSecureDAO.saveComplianceDefinitionData(complianceName,domains);
+	public String saveComplianceDefinitionData(String complianceName,List<Domain> domains) {
+		return compSecureDAO.saveComplianceDefinitionData(complianceName,domains);
 	}
 
 	public Boolean isExistsAssessmentId(String assessmentId) {
@@ -267,7 +267,16 @@ public class CompSecureServiceImpl implements CompSecureService {
 		return compSecureDAO.geControlEffectivenessDataForControl(controlCode,assessmentId);
 	}
 
-	public Boolean checkIfControlExists(String controlCode) {
-		return compSecureDAO.checkIfControlExists(controlCode);
+	public Boolean checkIfControlExists(String controlCode,String assessmentId) {
+		return compSecureDAO.checkIfControlExists(controlCode,assessmentId);
+	}
+
+	public List<Entry<String, Domain>> getExistingComplianceDetails(String complianceName) {
+		return compSecureDAO.getExistingComplianceDetails(complianceName);
+	}
+
+	public UploadFile getUploadedFile(String filename, String assessmentId) {
+		
+		return compSecureDAO.getFile(filename,assessmentId);
 	}
 }

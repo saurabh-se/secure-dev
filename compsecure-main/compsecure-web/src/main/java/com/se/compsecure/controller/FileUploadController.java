@@ -1,9 +1,19 @@
 package com.se.compsecure.controller;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +39,7 @@ public class FileUploadController {
 	private UploadFile uploadFile;
 	
 	
-	@RequestMapping(value = "/doUpload/{docUploadType}/{controlCode}", method = RequestMethod.POST)
+	@RequestMapping(value = "/doUpload/{docUploadType}/{controlCode}/", method = RequestMethod.POST)
     public @ResponseBody String handleFileUpload(@RequestParam("file") MultipartFile fileUpload,@PathVariable String docUploadType,
     		@PathVariable String controlCode,HttpSession httpSession) throws Exception {
         
@@ -46,6 +56,44 @@ public class FileUploadController {
                 return gson.toJson("success");
   
     }   
+	
+	
+	@RequestMapping(value = "/getFile")
+	public @ResponseBody File getFile(@RequestParam("filename") String filename, HttpSession httpSession,HttpServletRequest request,
+			HttpServletResponse response) throws Exception{
+		
+		System.out.println("FILE to download : " + filename);
+		String assessmentId = (String)httpSession.getAttribute("assessmentId");
+		UploadFile uploadFile = compSecureService.getUploadedFile(filename,assessmentId);
+		
+		InputStream targetStream = new ByteArrayInputStream(uploadFile.getData());
+				
+		String fileType = FilenameUtils.getExtension(uploadFile.getFileName());
+		System.out.println("extn : " + fileType);
+		
+		String fileName = uploadFile.getFileName().replace("."+fileType, "");
+		System.out.println("FILENAME " + fileName);
+		
+		File tempFile = File.createTempFile(fileName, uploadFile.getContentType());
+	    tempFile.deleteOnExit();
+	    
+	    FileOutputStream out = new FileOutputStream(tempFile);
+	    
+	    
+	        response.setContentType(request.getServletContext().getMimeType(uploadFile.getFileName()));
+            response.addHeader("Content-Disposition", "attachment; filename="+ uploadFile.getFileName());
+            try
+            {
+            	response.getOutputStream().write(uploadFile.getData());
+                response.getOutputStream().flush();
+            }
+            catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        
+	    return null;
+        
+	}
 	
 	
 //	@RequestMapping(value = "/doUpload", method = RequestMethod.POST)

@@ -58,6 +58,7 @@ body {
   margin-right: -21px; /* 20px padding + 1px border */
   margin-bottom: 20px;
   margin-left: -20px;
+  margin-top : -10px;
 }
 .nav-sidebar > li > a {
   padding-right: 20px;
@@ -108,13 +109,11 @@ body {
   border-radius: 50%;
 }
 
-.input-group-addon{
-   
-}
 
 .label-general{
     padding: 5%;
     margin-left: -5%;
+    width:auto;
 }
 
 #comp-name{
@@ -209,6 +208,7 @@ background:#fff;
 .sidebar{
     font-size: small;
     width: 175px;
+    margin-top:10px;
 }
 
 #qBtn{
@@ -233,16 +233,19 @@ background:#fff;
 }
 
 .navbar-fixed-top{
-    background-color: #204d74;
+/*     background-color: #204d74;*/
+	background-color: white; 
 }
 
 .nav.navbar-nav.navbar-right li a {
-    color:white;
+    /*  color:white; */
+    color: #204d74;
     font-size: small;
 }
 
 .navbar-header a.navbar-brand{
-     color:white;
+     /* color:white; */
+     color: #204d74;
 }
 
 .navbar-header a.navbar-brand:hover{
@@ -283,6 +286,7 @@ background:#fff;
 .input-group-addon,.input-group,.form-control{
     font-size: small;
 }
+
 
 #displayQ  th{
 	text-align: center;
@@ -339,3 +343,62 @@ background:#fff;
     font-size: smaller;
     color: #428bca;
 }
+
+#loading {
+   width: 100%;
+   height: 100%;
+   top: 0;
+   left: 0;
+   position: fixed;
+   display: block;
+   opacity: 1;
+   background-color: #fff;
+   z-index: 99;
+   text-align: center;
+}
+
+#loading-image {
+  position: absolute;
+  top: 100px;
+  left: 440px;
+  z-index: 100;
+}
+
+.dialogStyle.ui-dialog{
+    background-color:#f5f5f5;
+    padding: 5px;
+    font-weight: bold;
+}
+
+.dialogStyle .ui-dialog-titlebar{
+  background-color:#428bca;
+  color: #f5f5f5;
+} 
+
+.dialogStyle .ui-dialog-buttonpane{
+  background-color:#f5f5f5;
+  margin-bottom: 2px;
+} 
+
+hr {
+    margin-top: 10px;
+    margin-bottom: 0px;
+    border: 0;
+    border-top: 1px solid #c8e5bc;
+    
+}
+
+.container{
+    margin-top: 25px;
+    margin-left: 220px;
+    padding: 0;
+    width: 83%;
+}
+
+.container-fluid{
+	padding-left:5px;
+}
+
+/* input[type="text"]{ */
+/* 	width: auto; */
+/* } */

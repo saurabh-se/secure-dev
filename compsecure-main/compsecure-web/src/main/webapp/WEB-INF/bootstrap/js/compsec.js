@@ -5,6 +5,18 @@
  */
 
 $(document).ready(function () {
+	$.ajax({
+		url:"/compsecure-web/checkForLoggedInUser"
+	}).done(function(data){
+		var res = $.parseJSON(data);
+		console.log("RESULT : " + res);
+		if(res==="unauthenticated"){
+			alert("Please Login");
+			window.location.href="login.html";
+		}
+	});
+	
+	$("#loading").hide();
     var assessmentSelectedObj = "";
     var complianceSelected="";
     var complianceFromDB = "";
@@ -59,6 +71,7 @@ $(document).ready(function () {
 });
 
 $("#organization").change(function () {
+	$("#loading").show();
     var selectedText = $("#organization :selected").text();
     var selectedVal = $("#organization :selected").val();
     var selfAssessmentOption = localStorage.getItem("selfAssessmentOption");
@@ -75,6 +88,7 @@ $("#organization").change(function () {
         url: "/compsecure-web/getAssessmentDetails",
         data: {selected: selectedVal}
     }).then(function (data) {
+    	$("#loading").hide();
         console.log("Inside orgchange method");
         console.log(data);
         var ddata = $.parseJSON(data);
@@ -88,6 +102,7 @@ $("#organization").change(function () {
             url: "/compsecure-web/getComplianceDetailsForOrg",
             data: {selected: selectedVal}
         }).then(function (data) {
+        	$("#loading").hide();
             console.log("Inside get Compliance Details for an organization");
             console.log(data);
             var ddata = $.parseJSON(data);
@@ -100,6 +115,7 @@ $("#organization").change(function () {
 });
 
 $("#assessment-selector").change(function () {
+	$("#loading").show();
     console.log("inside assessment selector");
     var selectedText = $("#assessment-selector :selected").text();
     var selectedVal = $("#assessment-selector :selected").val();
@@ -130,6 +146,7 @@ $("#assessment-selector").change(function () {
         url: "/compsecure-web/getComplianceDetails",
         data: {selected: selectedVal}
     }).then(function (data) {
+    	$("#loading").hide();
         console.log("Inside assessment-change method");
         console.log(data);
         var ddata = $.parseJSON(data);
@@ -194,6 +211,7 @@ $("#button-cancel").click(function(){
 function doSave(){
    
 //	alert("in dosave");
+	$("#loading").show();
 	
 	var organizationId = $("#organization :selected").val();
 	var assessmentName = $("#assessment_name").val();
@@ -213,6 +231,7 @@ function doSave(){
         contentType:"application/json",
         data: JSON.stringify(assessmentObj)
     }).then(function(data){
+    	$("#loading").hide();
     	window.location="questionnaire.html";
     });
 }

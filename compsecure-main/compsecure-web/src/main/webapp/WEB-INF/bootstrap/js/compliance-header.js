@@ -6,18 +6,22 @@
 
 $(document).ready(function () {
 	
-	$.ajax({
-		url:"/compsecure-web/authenticateRole"		
-	})
+//	$.ajax({
+//		url:"/compsecure-web/authenticateRole"		
+//	}).done(function(data){
+//		$("#loading").hide();
+//	});
    
 	var selectedOption = localStorage.getItem("selectedOption");
 	console.log("selectedOption",selectedOption);
+	var saved = "false";
 	var ddata="";
-	
+
 	if(selectedOption==="existing"){
 		$.ajax({
 			url : "/compsecure-web/getCompliances"
-		}).then(function(data){
+		}).done(function(data){
+			$("#loading").hide();
 			console.log(data);
 			ddata = $.parseJSON(data);
 			$("#compliance-name-div").html("<select class='form-control' id='compliance_name'><option>Please Select</option></select>");
@@ -25,10 +29,13 @@ $(document).ready(function () {
         		$('#compliance_name').append($('<option></option>').val(text).html(val))
         	});
 		});
+	}else{
+		$("#loading").hide();
 	}
 });
 
 $(document).on("change", "#compliance_name", function (event) {
+//	$("#loading").show();
 	var selectedOption = localStorage.getItem("selectedOption");
 	console.log("In the compliance header page - value changed!!");
 	if(selectedOption === "existing"){
@@ -39,8 +46,11 @@ $(document).on("change", "#compliance_name", function (event) {
 		//alert($("#compliance_name :selected").text());
 		$.ajax({
 			url		:"/compsecure-web/getComplianceDetails",
-			data 	: {"selectedCompliance" : selectedComplianceText}
-		}).then(function(data){
+			data 	: {"selected" : selectedComplianceText}
+		}).done(function(data){
+			console.log(data);
+			$("#loading").hide();
+//			alert(" data :" + data);
 			localStorage.setItem("assessmentId",data);
 		});
 	}else{
@@ -81,6 +91,36 @@ function doSave(){
 		 	url	: "/compsecure-web/enterComplianceDetails",
 		 	contentType:"application/json",
 	        data: JSON.stringify(compliance),
+	    }).done(function(data){
+	    	var selectedOption = localStorage.getItem("selectedOption");
+	    	if(selectedOption==="new"){
+	    	$("#dialog").dialog({
+				 modal: true,
+	             title :"Compliance-Header",
+	             dialogClass :"dialogStyle",
+	             width: 400,
+	            buttons : {
+	                Ok: function() {
+	                    $(this).dialog("close"); //closing on Ok click
+	                    window.location="compliance_definition_add";
+	                }
+	            },
+			});
+	    	}else{
+	    	$("#dialog-existing").dialog({
+				 modal: true,
+	            title :"Compliance-Header",
+	            dialogClass :"dialogStyle",
+	            width: 400,
+	           buttons : {
+	               Ok: function() {
+	                   $(this).dialog("close"); //closing on Ok click
+	               }
+	           },
+			});
+	    	}
+	    	saved = "true";
+	    	localStorage.setItem("saved",saved);
 	    });
 }
 
@@ -92,14 +132,19 @@ function ComplianceObj(complianceName,complianceDescription,regulatorId){
 
 function doNext(){
 	console.log("In the doNext method");
+	var saved = localStorage.getItem("saved");
 	var selectedOption = localStorage.getItem("selectedOption");
 	if(selectedOption==="existing"){
+		var assessmentId = localStorage.getItem("assessmentId");
+		localStorage.setItem("assessmentId",assessmentId);
 		console.log("moving to the next page without saving");
 		window.location="compliance_definition_add";
-	}else{
+	}else if(saved==="true"){
+		window.location="compliance_definition_add";
+	}
+	else{
 		doSave().done(function(){
 			console.log("moving to the next page after saving");
-			window.location="compliance_definition_add";
 		});
 	}
 }

@@ -7,24 +7,140 @@
 $(document).ready(function () {
         
 	var selectedOption 	= localStorage.getItem("selectedOption");
-	var assessmentId 	= localStorage.getItem("assessmentId");
 	var complianceName	= localStorage.getItem("complianceName");
 	
-	console.log("assessmentId in compliance-def page" + assessmentId);
+	var defaultDomainHtml = "";
+//	alert(selectedOption + "-"+ complianceName);
+	if(selectedOption==="existing"){
+//		alert("get existing compliance");
+		
+		var domainHtml = "";
+		var subdomainHtml = "";
+		var controlHtml = "";
+		
+		var domainHtml = "";
+		var subdomainHtml = "";
+		var controlHtml = "";
+		
+		$.ajax({
+			url 	: "/compsecure-web/getDomainDetailsForExistingCompliance",
+			data 	: {
+						"complianceName": complianceName
+	    			}
+		}).then(function (data) {
+	        console.log("Inside get Compliance Details");
+	        $("#loading").hide();
+	        console.log(data);
+	        var domains = $.parseJSON(data);
+	        console.log(domains);
+         
+	        $.each(domains,function(key,value){
+	        	console.log("Domain Code " + value["domainCode"]);
+	        	domainHtml =  "<div class='input-group'>" +
+	        					"<span class='input-group-addon'>Domain Name</span>" +
+	        					"<input id='domain_code' type='text' class='form-control ' name='domain_code' value='"+value["domainCode"]+"'>" +
+	        					"<input id='domain_value' type='text' class='form-control gap' name='domain_value' value='"+value["domainName"]+"'>" +
+	        				"</div>";			
+	        	subdomainHtml = "";
+	        	var subdomains = value["subdomain"];
+	        	$.each(subdomains,function(key,value){
+	        		
+	        		console.log(value["subdomainCode"]);
+	        		console.log(value["objectives"]);
+	        		console.log(value["subdomainValue"]);
+	        		console.log(value["principle"]);
+	        		controlHtml = "";
+	        		subdomainHtml = subdomainHtml + "<div id='subdomain-group' class='col-lg-12' style='padding: 0'>"
+									+"    <br> "
+									+"    <div class='input-group'>"
+									+"        <span class='input-group-addon' id='subdomainId'>Subdomain</span>"
+									+"        <input id='sub_code' type='text' class='form-control' name='sub_code' value='"+value["subdomainCode"]+"'>"
+									+"        <input id='subdomain_value' type='text' class='form-control gap' name='subdomain_value' value='"+value["subdomainValue"]+"'>"
+									+"        <textarea id='principle' class='form-control gap' name='principle' rows='2'>"+value["principle"]+"</textarea>"
+									+"        <textarea id='objective' class='form-control gap' name='objective' rows='2'>"+value["objective"]+"</textarea>"
+									+"    </div>"
+                                                                        +"<br>"
+									+"    <div>"
+									+"        <label class='input-group'>Controls</label>"
+									+"    </div>"
+									//+"    <br>"
+									+"    <div class='row'>"
+									+"        <div class='col-lg-10'>"
+									+"            <table class='table' id='subdomainTable'>"
+									+"                <thead>"
+									+"                    <tr>"
+									+"                        <th>Select</th>"
+									+"                        <th>Control Code</th>"
+									+"                        <th>Control Detail</th>"
+									+"                    </tr>"
+									+"                </thead>"
+									+"                <tbody>";
+	        		var controls = value["control"];
+	        		$.each(controls,function(key,value){
+	        			console.log(value["controlCode"]);
+	        			console.log(value["controlValue"]);
+	        		
+					controlHtml = controlHtml       +"                    <tr id='cntrl0'>"
+									+"                        <td style='width:3%;align-content: center'>"
+									+"                            <input type='checkbox' name='control_no'>"
+									+"                        </td>"
+									+"                        <td style='width: 20%'>"
+									+"                            <input id='control_code' type='text' class='form-control gap' name='control_code' value='"+value["controlCode"]+"'>"
+									+"                        </td>"
+									+"                        <td>"
+									+"<!--                     	<input id='control_value' type='text' class='form-control gap' name='control_value' value='"+value["controlValue"]+"'> -->"
+									+"                         	<textarea style='width:100%' id='control_value' rows='2' class='form-control gap' name='control_value'>"+value["controlValue"]+"</textarea>"
+									+"                        </td>"
+									+"                    </tr>"
+
+									
+	        		});
+	        		subdomainHtml = subdomainHtml + controlHtml +"    <br>"
+                                        +"    </tbody>"
+					+"   </table>"
+					+"   </div>"
+					+"  </div>"
+                                + "    <div class='col-sm-6' align='right'>"
+					+"        <button type='button' id='button-add-control' class='btn btn-success gap'>Add Control</button>"
+					+"        <button type='button' id='button-delete-control' class='btn btn-success gap'>Delete Control</button>"
+					+"        <br>"
+					+"    </div>"
+                                        +"<br>"
+                                        +"</div>"
+                                        +"<hr>"
+                                        +"<div class='row'>"
+                                        +"<div class='col-sm-3'>"
+                                        +"<button type='button' id='button-add-subdomain' class='btn btn-success gap'>Add Subdomain</button></div>"
+                                        +"</div>"
+                                    +"</div>"
+                                +"</div>"
+                            +"</div>"
+                        +"</div><br>"; ;
+	        	});
+//	        	subdomainHtml = subdomainHtml +subdomainHtml
+	        	defaultDomainHtml = defaultDomainHtml+domainHtml+subdomainHtml;
+	        	console.log(defaultDomainHtml);
+	        });
+	        $("#domainDetails").append(defaultDomainHtml);
+		});
+	}else{
+		$("#loading").hide();
+	}
+	
 	console.log("complianceId in compliance-def page" + complianceName);
 	$("label[for='comp_name']").html(complianceName);
 	
-	$.ajax({
-		url 	: "/compsecure-web/getComplianceDefinitionDetails",
-		data 	: {
-					"complianceName": complianceName
-    			}
-	}).then(function (data) {
-        console.log("Inside get Compliance Details");
-        console.log(data);
-        var ddata = $.parseJSON(data);
-        console.log(ddata);
-    });
+//	$.ajax({
+//		url 	: "/compsecure-web/getComplianceDefinitionDetails",
+//		data 	: {
+//					"complianceName": complianceName
+//    			}
+//	}).then(function (data) {
+//        console.log("Inside get Compliance Details");
+//        console.log(data);
+//        var ddata = $.parseJSON(data);
+//        console.log(ddata);
+//    });
 	
     var i = 1;
     var controlCount = 1;
@@ -44,7 +160,7 @@ $(document).ready(function () {
         					<td><input id='control_value' type='text' class='form-control gap' name='control_value' placeholder='Control Details'></td></tr>");
 
          //         clicked = clicked+1;
-         alert(clicked);  
+//         alert(clicked);  
        //controlCount++;
     });
 
@@ -117,7 +233,7 @@ $(document).ready(function () {
     });
     
     function doSave(){
-    	alert("in save");
+    	$("#loading").show();
     	console.log("In the doSave method");
     	console.log(JSON.stringify($("#complianceDefForm").serialize()));
     	var complianceName 	= $("#comp_name").text();
@@ -145,7 +261,7 @@ $(document).ready(function () {
         		   var subdomainObject 	= new SubdomainObj(subdomain_code ,subdomain_value ,principle ,objective ,control_code ,control_value);
         		   subdomainList.push(subdomainObject);
         		   
-        		   var domainObj 		= new DomainObject(domain_code,domain_value,subdomainList);
+        		   var domainObj = new DomainObject(domain_code,domain_value,subdomainList);
         		   domainList.push(domainObj);
 //    		   });
     		   
@@ -160,8 +276,35 @@ $(document).ready(function () {
     			   complianceName: complianceName,
     			   formData:JSON.stringify($("#complianceDefForm").serialize())
     		   }
-    	   }).then(function(data){
-    		   window.location="questions_add";
+    	   }).done(function(data){
+    		   $("#loading").hide();
+    		   if($.parseJSON(data)==="success"){
+    			   $("#dialog").dialog({
+  					 modal: true,
+  		             title :"Status",
+  		             dialogClass :"dialogStyle",
+  		             width: 400,
+  		            buttons : {
+  		                Ok: function() {
+  		                    $(this).dialog("close"); //closing on Ok click
+  		                  window.location="questions_add";
+  		                }
+  		            },
+      			});
+    		   }
+    		   else{
+    			   $("#dialog-fail").dialog({
+    					 modal: true,
+    		             title :"Status",
+    		             dialogClass :"dialogStyle",
+    		             width: 400,
+    		            buttons : {
+    		                Ok: function() {
+    		                    $(this).dialog("close"); //closing on Ok click
+    		                }
+    		            },
+        			});
+    		   }
     	   });
     }
     
@@ -203,7 +346,7 @@ function getControlTableHTML(controlCount){
 			   "<div class='row'> <div class='col-lg-12'><table class='table' id='subdomainTable'> <thead> <tr> <th>Select</th> <th>Control Code</th> <th>Control Detail</th> </tr> </thead>" +
 			   "<tbody> <tr id='cntrl"+controlNo+"'> <td style='width:3%;align-content: center'><input type='checkbox' name='control_no' id='control_"+controlNo+"'></td> <td style='width: 20%'>" +
 			   "<input id='control_code' type='text' class='form-control gap' name='control_code' placeholder='Control Code'></td> <td style='width: 77%'>" +
-			   "<input id='control' type='text' class='form-control gap' name='control' placeholder='Control Details'></td>" +
+			   "<input id='control_value' type='text' class='form-control gap' name='control_value' placeholder='Control Details'></td>" +
 			   "<!--<td style='width: 77%'><button id='button-save-control' type='button' class='btn btn-success gap'>Add </button></td>--> </tr> </tbody> </table></div> </div>" +
 			   "<div class='col-sm-6' align='right'> <button type='button' id='button-add-control' class='btn btn-success gap' name='"+controlNo+"'>Add Control</button> " +
 			   "<button type='button' id='button-delete-control' class='btn btn-success gap'>Delete Control</button> <br> </div>";

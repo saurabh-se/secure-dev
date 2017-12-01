@@ -64,7 +64,7 @@ public interface CompSecureDAO {
 
 	void createCompliance(ComplianceHeader complianceHeader);
 
-	String saveAssessmentDetails(AssessmentDetails assessmentDetails);
+	String saveAssessmentDetails(AssessmentDetails assessmentDetails, String self_assessment_option);
 
 	List<Questions> getComplianceQuestionsForExistingAssessment(String assessmentId);
 	
@@ -94,7 +94,7 @@ public interface CompSecureDAO {
 
 	void saveQuestions(String controlLabel, String questionCode, String question);
 
-	void saveComplianceDefinitionData(String complianceName, List<Domain> domains);
+	String saveComplianceDefinitionData(String complianceName, List<Domain> domains);
 
 	Boolean doesAssessmentIdExist(String assessmentId);
 
@@ -102,6 +102,10 @@ public interface CompSecureDAO {
 
 	ControlEffectiveness geControlEffectivenessDataForControl(String controlCode, String assessmentId);
 
-	Boolean checkIfControlExists(String controlCode);
+	Boolean checkIfControlExists(String controlCode, String assessmentId);
+
+	List<Entry<String, Domain>> getExistingComplianceDetails(String complianceId);
+
+	UploadFile getFile(String filename, String assessmentId);
 
 }

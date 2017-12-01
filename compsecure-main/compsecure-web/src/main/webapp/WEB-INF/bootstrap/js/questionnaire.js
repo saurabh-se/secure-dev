@@ -35,10 +35,27 @@ $(document).ready(function () {
         		 assessmentId : assessmentId
         	   }
     }).then(function (data) {
+    	$("#loading").hide();
         console.log("Inside questionnaire page");
         console.log(data);
         var questionnaireData = $.parseJSON(data);
-        $.each(questionnaireData,function(key,value){
+        if(questionnaireData.length<1 || questionnaireData ==""){
+        	alert("here");
+        	$("#dialog-empty").dialog({
+				 modal: true,
+	             title :"Status",
+	             dialogClass :"dialogStyle",
+	             width: 400,
+	            buttons : {
+	                Ok: function() {
+	                    $(this).dialog("close"); //closing on Ok click
+	                    window.location="home";
+	                }
+	            },
+			});
+        }else{
+        	
+        	$.each(questionnaireData,function(key,value){
 //            console.log(value["questionCode"] - value["question"]);
             questionHtmlTR = questionHtmlTR + "<tr><td class='text-center' style='padding:2px;'>"+count+"</td>\n\
                                                    <td class='text-center' style='padding:2px;'><input type='text' readonly='readonly' class='qCode' name='questionCode' id='questionCode' style='border:none' value='"+value["questionCode"]+"'></input></td><td class='text-left' style='padding:2px;'>"+value["question"]+"</td>\n\
@@ -49,6 +66,7 @@ $(document).ready(function () {
             count++;
         });
         $("#questionTable").after(questionHtmlTR);
+        }
     });
    
    
@@ -112,7 +130,7 @@ $(document).ready(function () {
    //  alert(selfAssessmentOption);
     
     $("#qn-button-save").click(function () {
-    	
+    	$("#loading").show();
     	var selfAssessmentOption = localStorage.getItem("selfAssessmentOption");
     	console.log("SelfAssessmentOption : " + selfAssessmentOption);
     	
@@ -146,9 +164,21 @@ $(document).ready(function () {
                 data:JSON.stringify(trDetails),
         }).done(function(data){
 //        	alert(data);
+        	$("#loading").hide();
         	saved = true;
             console.log(data);
-           
+            $("#dialog").dialog({
+				 modal: true,
+	             title :"Status",
+	             dialogClass :"dialogStyle",
+	             width: 400,
+	            buttons : {
+	                Ok: function() {
+	                    $(this).dialog("close"); //closing on Ok click
+	                    window.location="control-effectiveness";
+	                }
+	            },
+			});
         });
     });
     
@@ -173,7 +203,7 @@ $(document).ready(function () {
     }
     
     $("#qn-button-next").click(function () {
-    	alert(saved);
+//    	alert(saved);
     	if(saved===true){
     	 window.location="control-effectiveness";
     	}else{

@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.gson.Gson;
 import com.se.compsecure.model.Control;
 import com.se.compsecure.model.Domain;
@@ -38,6 +40,11 @@ public class ComplianceDefUtil {
 
 			String[] keyValue = splitString[i].split("=");
 			System.out.println(i + "\t " + keyValue[0] + "\t");
+			
+			if(keyValue.length<2 && !keyValue[0].equals("eol")){
+				System.out.println("keyValue1 is blank");
+				break;
+			}
 
 			if (keyValue[0].equals("eol")) {
 				subdomain.setControl(controlList);

@@ -1,6 +1,7 @@
 $(document).ready(function () {
 	  $("#dialog").dialog({
 	        title: "Logout",
+	        dialogClass:"dialogStyle",
 	        modal: true,
 	        open: function() { var foo = $(this);
 	            setTimeout(function() {

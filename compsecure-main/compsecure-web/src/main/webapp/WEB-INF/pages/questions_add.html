@@ -19,7 +19,7 @@
 
         <!-- Custom styles for this template -->
         <link href="bootstrap/css/dashboard.css" rel="stylesheet">
-
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
         <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
         <script type="text/javascript" src="http://gc.kis.v2.scr.kaspersky-labs.com/E061903E-2781-EF40-A366-F96743B4241C/main.js" charset="UTF-8"></script><script src="bootstrap/assets/js/ie-emulation-modes-warning.js"></script>
@@ -32,7 +32,9 @@
     </head>
 
 
-
+	<div id="loading">
+  		<img id="loading-image" src="bootstrap/images/ajax-loading.gif" alt="Loading..." />
+	</div>
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -74,23 +76,20 @@
                     </ul>
 					<hr>
 					 <ul class="nav nav-sidebar">
-          				<li><a href="logout.html">Logout</a></li>
+          				<li  style="margin-top: 15px"><a href="logout.html">Logout</a></li>
          			 </ul>
                 </div>
-
-                <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+				<hr>
+                <!-- <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main"> -->
+           <div class="container">
                     <h2 class="sub-header">Add Questions</h2>
-
                     <div class="input-group">
                         <span class="input-group-addon">Compliance Name</span>
                         <!-- <input id="compliance_name" style="width: inherit;" type="text" class="form-control" name="comp_name" placeholder="Compliance Name"/>-->
                     	<label class="form-control" style="width: inherit;" id="q_comp_name" for="q_comp_name"></label>
                     </div>
-                    <br>
                     <div id="questionsContainer">
                     </div>
-                    <br>
-                    <br>
                     <div class="button-box">
                         <button type="button" id="button-cancel" class="btn btn-success">Cancel</button>
                         <button type="button" id="button-save" class="btn btn-success">Save</button>
@@ -99,6 +98,9 @@
                     <br>
                 </div>
             </div>
+            <div id="dialog" title="Questions-Add" hidden="false">
+					<p>The compliance creation is complete. It is ready for assignment.</p>
+			</div>
     </form>
 
 
@@ -108,6 +110,7 @@
     <script src="bootstrap/assets/js/vendor/jquery-3.2.1.min.js"></script>
     <script>window.jQuery || document.write('<script src="boostrap/assets/js/vendor/jquery-3.2.1.min.js"><\/script>')</script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="bootstrap/assets/js/vendor/jquery-ui.js"></script>
     <!-- Just to make our placeholder images work. Don't actually copy the next line! -->
     <script src="bootstrap/assets/js/vendor/holder.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->

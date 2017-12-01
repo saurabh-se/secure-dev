@@ -16,7 +16,7 @@
 
         <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
         <link href="bootstrap/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
-
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <!-- Custom styles for this template -->
         <link href="bootstrap/css/dashboard.css" rel="stylesheet">
 
@@ -32,6 +32,9 @@
     </head>
 
     <body>
+    <div id="loading">
+  		<img id="loading-image" src="bootstrap/images/ajax-loading.gif" alt="Loading..." />
+	</div>
  <form id="controlEffectiveForm" name="controlEffectiveForm" method="post" enctype="multipart/form-data">   
         <nav class="navbar navbar-inverse navbar-fixed-top">
             <div class="container-fluid">
@@ -65,19 +68,20 @@
         <div class="row">
             <div class="col-sm-3 col-md-2 sidebar">
                 <ul class="nav nav-sidebar">
-                    <li><a href="#">Compliance Master</a></li>
-                    <li><a href="compliance-header.html">Compliance Header</a></li>
-                    <li><a href="compliance_definition_add.html">Compliance Definition</a></li>
-                    <li><a href="maturity_definition_add.html">Maturity Definition</a></li>
-                    <li><a href="#">Compliance Qualifier</a></li>
-                    <li><a href="self-assessment_1.html">Self Assessment</a></li>
+                <li><a href="self-assessment_1.html">Self Assessment</a>
+             		<ul><a href="self-assessment.html">Assessment Details</a></ul><br>
+             		<ul><a href="questionnaire.html">Questions</a></ul><br>
+             		<ul><a href="control-effectiveness.html">Control Effectiveness</a></ul><br>
+             		<ul><a href="maturity-effectiveness.html">Summary</a></ul>
+             	</li>
                 </ul>
 				  <hr>
 					 <ul class="nav nav-sidebar">
-          				<li><a href="logout.html">Logout</a></li>
+          				<li  style="margin-top: 15px"><a href="logout.html">Logout</a></li>
          			 </ul>
             </div>
-            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <!-- <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">  -->
+          <div class="container">
            <div class="row sub-header">
               <div class="col-lg-4"> <h2>Complete Assessment Details</h2></div>
               <div class="col-lg-2"></div>
@@ -105,9 +109,17 @@
               <a class="breadcrumb-item active" href="control-effectiveness.html">Control Effectiveness</a><span class="glyphicon glyphicon-arrow-right"></span>
               <a class="breadcrumb-item" href="maturity-effectiveness.html">Maturity Effectiveness</a>
           </nav>
-                    <!-- Panel for Domains -->
+				<div class="row">
+					<div class="col-lg-10"></div>
+					<div class="col-lg-2">
+						<button id="exportToExcel" class="btn btn-warning">Export to Excel</button>
+					</div>
+				</div>
+				
+				<!-- Panel for Domains -->
                     <div class="panel panel-default" style="border: 0;background-color: white">
                         <div class="panel-heading" style="padding: 1px;border: 0" id="ce-mainPanelId">
+                        
                             <!--<h4 class="panel-title" id="ce-domain-panel-title"> 
                             <a data-toggle="collapse" style="border:0;" href="#collapse1" id="ce-panel-heading"><label class="label label-default" style="background: none;color: #1b6d85">Domain</label></a>
                             <!--</h4>-->
@@ -119,6 +131,10 @@
                             </div>-->
                         </div>
                     </div>
+                    <div id="dialog-export" title="Export" hidden="false">
+					<p>The data has been exported to the following location <br></p>
+						<div><p id="fileExportLocation"></p></div>
+				</div>
                         <br>
                         <div class="button-box">
                             <button type="button" id="button-home" class="btn btn-success">Home</button>
@@ -139,7 +155,7 @@
         <script src="bootstrap/assets/js/vendor/holder.min.js"></script>
         <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
         <script src="bootstrap/assets/js/ie10-viewport-bug-workaround.js"></script>
-
+		 <script src="bootstrap/assets/js/vendor/jquery-ui.js"></script>
         <!-- Using the jquery dataTables CSS CDN -->
         <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">
         <!-- Using the jquery dataTables API CDN -->

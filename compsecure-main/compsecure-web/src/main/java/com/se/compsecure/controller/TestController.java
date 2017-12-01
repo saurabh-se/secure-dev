@@ -3,6 +3,7 @@ package com.se.compsecure.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,6 +39,7 @@ import com.se.compsecure.model.Questions;
 import com.se.compsecure.model.QuestionsResponse;
 import com.se.compsecure.model.User;
 import com.se.compsecure.service.CompSecureService;
+import com.se.compsecure.utility.CompSecureConstants;
 import com.se.compsecure.utility.CompSecureUtil;
 import com.se.compsecure.utility.QuestionsUtil;
 
@@ -135,7 +137,7 @@ public class TestController {
 
 		List<ComplianceHeader> complianceDetails = compSecureService.getComplianceDetailsForOrg(organizationId);
 
-		Map<String, String> complianceDetailsKV = new HashMap<String, String>();
+		Map<String, String> complianceDetailsKV = new LinkedHashMap<String, String>();
 		for (Iterator iterator = complianceDetails.iterator(); iterator.hasNext();) {
 
 			ComplianceHeader complianceDetail = (ComplianceHeader) iterator.next();
@@ -147,8 +149,6 @@ public class TestController {
 			model.addAttribute("complianceId", complianceDetail.getComplianceId());
 
 		}
-		
-		SortedMap<String, String> sortedMap = new TreeMap<String, String>();
 		
 		Gson gson = new Gson();
 		String complianceDetailsList = gson.toJson(complianceDetailsKV);
@@ -286,21 +286,26 @@ public class TestController {
 
 	@RequestMapping("/getControls")
 	@ResponseBody
-	public String getControls(@RequestParam("complianceName") String complianceName,HttpSession httpSession) {
+	public String getControls(@RequestParam("complianceName") String complianceName, @RequestParam("selectedOption") String selectedOption,HttpSession httpSession) {
 		LOGGER.info("Inside getControls method");
 
 		List<Control> controlList = new ArrayList<Control>();
-
+		
 		controlList = compSecureService.getControls(complianceName);
 		
-		Gson gson = new Gson();
-		String controlJson = gson.toJson(controlList);
+		
 
 		for (Iterator iterator = controlList.iterator(); iterator.hasNext();) {
 			Control control2 = (Control) iterator.next();
+			if(CompSecureConstants.EXISTING.equals(selectedOption)){
+				List<Questions> questions = compSecureService.getQuestions(control2.getControlCode());
+				control2.setControlQuestions(questions);
+			}
 			LOGGER.info(control2.getControlCode());
 		}
-
+		
+		Gson gson = new Gson();
+		String controlJson = gson.toJson(controlList);
 		return controlJson;
 
 	}
@@ -327,7 +332,7 @@ public class TestController {
 		}
 			
 			List<Domain> domainList = new ArrayList<Domain>();
-
+ 
 			for (Iterator iterator = domainDetailsList.iterator(); iterator.hasNext();) {
 				Entry<String, Domain> entry = (Entry<String, Domain>) iterator.next();
 				domainList.add(entry.getValue());
@@ -340,6 +345,46 @@ public class TestController {
 //		}
 		return json;
 	}
+	
+	
+	/**
+	 * Domain details for existing compliance created by an Admin
+	 * @param assessmentId
+	 * @param complianceId
+	 * @param httpSession
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/getDomainDetailsForExistingCompliance")
+	public @ResponseBody String getExistingComplianceDetails(@RequestParam("complianceName") String complianceName,HttpSession httpSession) {
+
+		LOGGER.info(" inside the getExistingComplianceDetails method");
+		List<Entry<String, Domain>> domainDetailsList = null;
+
+		if (httpSession.isNew()) {
+			System.out.println("Session Expired");
+		}
+
+		String json = null;
+
+		domainDetailsList = compSecureService.getExistingComplianceDetails(complianceName);
+
+		List<Domain> domainList = new ArrayList<Domain>();
+
+		for (Iterator iterator = domainDetailsList.iterator(); iterator.hasNext();) {
+			Entry<String, Domain> entry = (Entry<String, Domain>) iterator.next();
+			domainList.add(entry.getValue());
+		}
+
+		Gson gson = new Gson();
+		json = gson.toJson(domainList);
+		// }
+		// else{
+		// }
+		return json;
+	}
+	
+	
 	
 	
 	/**
@@ -436,7 +481,7 @@ public class TestController {
 				
 		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option");
 		
-		String assessmentID = compSecureService.saveAssessmentDetails(assessmentDetails);
+		String assessmentID = compSecureService.saveAssessmentDetails(assessmentDetails,self_assessment_option);
 		
 		httpSession.setAttribute("assessmentId", assessmentID);
 		System.out.println(assessmentDetails.getAssessmentName());
@@ -453,10 +498,13 @@ public class TestController {
 		
 		
 //		complianceId = (String)httpSession.getAttribute("complianceDesc");
-		
+		System.out.println("Inside getCompleteDetails");
 		System.out.println("Compliance Id " + complianceId);
-		assessmentId = (String)httpSession.getAttribute("assessmentId");
+		System.out.println("Assessment Id " + assessmentId);
 		
+		if(assessmentId.isEmpty()){
+			assessmentId = (String)httpSession.getAttribute("assessmentId");
+		}
 		domainDetailsList = compSecureService.getCompleteDetails(assessmentId,complianceId);
 		
 		List<Domain> domainList = new ArrayList<Domain>();
@@ -472,21 +520,6 @@ public class TestController {
 		return json;
 	}
 	
-	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/getControlEffectivenessDetails")
-	public @ResponseBody String getControlEffectivenessDetails(@RequestParam("assessmentId") String assessmentId,@RequestParam("complianceId") String complianceId, HttpSession httpSession) {
-
-		List<ControlEffectiveness> controlEffectivenessList = null;
-		
-		complianceId = (String)httpSession.getAttribute("complianceDesc");
-		
-		controlEffectivenessList = compSecureService.getControlEffectivenessDetails(assessmentId,complianceId);
-		
-		Gson gson = new Gson();
-		String json = gson.toJson(controlEffectivenessList);
-
-		return json;
-	}
 	
 	@RequestMapping(value = "/authenticateRole")
 	public String getRole(HttpSession httpSession){

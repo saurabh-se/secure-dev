@@ -74,7 +74,7 @@ public interface CompSecureService {
 
 	void createCompliance(ComplianceHeader complianceHeader);
 
-	String saveAssessmentDetails(AssessmentDetails assessmentDetails);
+	String saveAssessmentDetails(AssessmentDetails assessmentDetails, String self_assessment_option);
 
 	List<Questions> getComplianceQuestionsForExistingAssessment(String assessmentId);
 
@@ -98,7 +98,7 @@ public interface CompSecureService {
 
 	void saveQuestions(String controlLabel, String questionCode, String question);
 
-	void saveComplianceDefinitionData(String complianceName, List<Domain> domains);
+	String saveComplianceDefinitionData(String complianceName, List<Domain> domains);
 
 	Boolean isExistsAssessmentId(String assessmentId);
 
@@ -106,5 +106,9 @@ public interface CompSecureService {
 
 	ControlEffectiveness geControlEffectivenessDataForControl(String controlCode, String assessmentId);
 
-	Boolean checkIfControlExists(String controlCode);
+	Boolean checkIfControlExists(String controlCode,String assessmentId);
+
+	List<Entry<String, Domain>> getExistingComplianceDetails(String complianceId);
+
+	UploadFile getUploadedFile(String filename, String assessmentId);
 }
