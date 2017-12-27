@@ -203,6 +203,9 @@ $("#button-start").click(function(){
    }
 });
 
+$("#button-save").click(function(){
+	doSave();
+});
 
 $("#button-cancel").click(function(){
 	window.location="home";
@@ -211,7 +214,6 @@ $("#button-cancel").click(function(){
 function doSave(){
    
 //	alert("in dosave");
-	$("#loading").show();
 	
 	var organizationId = $("#organization :selected").val();
 	var assessmentName = $("#assessment_name").val();
@@ -225,12 +227,21 @@ function doSave(){
 	console.log(assessmentObj);
 	localStorage.setItem("complianceId",complianceId);
 	
+//	alert(assessmentFromDate);
+//	alert(assessmentToDate);
+	
+	if(assessmentFromDate==="" || assessmentToDate===""){
+		alert("Please fill up the date fields");
+		$("#assessment-from").focus();
+		return;
+	}
+	$("#loading").show();
    $.ajax({
 	    url: "/compsecure-web/saveAssessmentDetails",
 	    type:"POST",
         contentType:"application/json",
         data: JSON.stringify(assessmentObj)
-    }).then(function(data){
+    }).done(function(data){
     	$("#loading").hide();
     	window.location="questionnaire.html";
     });

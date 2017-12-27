@@ -2,6 +2,7 @@ package com.se.compsecure.dao;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,9 +12,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,14 +23,14 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
-import com.mysql.jdbc.Blob;
-import com.mysql.jdbc.StringUtils;
 import com.se.compsecure.model.AssessmentDetails;
 import com.se.compsecure.model.ComplianceHeader;
 import com.se.compsecure.model.Control;
@@ -44,6 +45,7 @@ import com.se.compsecure.model.UploadFile;
 import com.se.compsecure.model.User;
 import com.se.compsecure.model.UserRoles;
 import com.se.compsecure.utility.CompSecureConstants;
+import com.se.compsecure.utility.ValidityObj;
 
 @Component
 public class CompSecureDAOImpl implements CompSecureDAO {
@@ -87,7 +89,7 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 	 */
 	public List<AssessmentDetails> getAssessmentDetails(String organizationId) {
 
-		String sql = "select * from assessment_details where organization_id=" + organizationId;
+		String sql = "select * from assessment_details where organization_id=" + organizationId + " order by creation_date desc";
 
 		List<AssessmentDetails> assessmentDetailsList = new ArrayList<AssessmentDetails>();
 
@@ -114,7 +116,7 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 		
 		LOGGER.info("inside getComplianceDetails method : assessmentId " + assessmentId);
 		
-		String sql = "select * from compliance_header ch join assessment_details ad on ch.compliance_id = ad.compliance_id and ad.assessment_id = '" + assessmentId +"' order by ch.creation_date";
+		String sql = "select * from compliance_header ch join assessment_details ad on ch.compliance_id = ad.compliance_id and ad.assessment_id = '" + assessmentId +"' order by ch.creation_date desc";
 //		String sql = " select * from compsecure_sama.compliance_header ch join compsecure_sama.assessment_details ad "
 //				+ "on ch.compliance_id = ad.compliance_id where ad.assessment_id= " + assessmentId;
 		
@@ -147,7 +149,7 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 	 *  Return a list of compliance based on organization
 	 */
 	public List<ComplianceHeader> getComplianceDetailsForOrg(String organizationId) {
-		String sql = "select * from compliance_header where organization_id=" + organizationId + " order by creation_date";
+		String sql = "select * from compliance_header where organization_id=" + organizationId + " order by creation_date desc";
 
 		List<ComplianceHeader> complianceDetailsList = new ArrayList<ComplianceHeader>();
 
@@ -280,7 +282,7 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 	public List<Entry<String, Domain>> getDomainDetailsForCompliance(String complianceName) {
 		System.out.println("Inside getDomainDetailsForCompliance");
 		
-		List<Domain> domainList = new ArrayList<Domain>();		
+		List<Domain> domainList = new LinkedList();		
 //		String sql = "select c.control_code,c.control_value,sd.subdomain_code,sd.subdomain_name,ab.domain_name,ab.domain_code"
 //				+ ",po.principle,po.objective "
 //				+ " from 			compsecure_sama.subdomain sd, compsecure_sama.controls c,compsecure_sama.principle_objective po "
@@ -326,10 +328,10 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 	}
 
 	private List<Entry<String, Domain>> listDomainDetails(String sql, String assessmentId) {
-		Map<String, Domain> domainMap = new HashMap<String, Domain>();
+		Map<String, Domain> domainMap = new LinkedHashMap<String, Domain>();
 		
-		Map<String, Subdomain> subdomainMap = new HashMap<String, Subdomain>();
-		Map<Subdomain, Control> subdomainControlMap = new HashMap<Subdomain, Control>();
+		Map<String, Subdomain> subdomainMap = new LinkedHashMap<String, Subdomain>();
+		Map<Subdomain, Control> subdomainControlMap = new LinkedHashMap<Subdomain, Control>();
 		
 		List<Subdomain> subdomains = new ArrayList<Subdomain>();
 		List<Control> controls = new ArrayList<Control>();
@@ -410,7 +412,7 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 	    }
 
 	    Set<Entry<String,Domain>> setDomain =  domainMap.entrySet();
-		List<Entry<String , Domain>> domainListFinal = new ArrayList<Entry<String ,Domain>>(setDomain);
+		List<Entry<String , Domain>> domainListFinal = new LinkedList<Entry<String ,Domain>>(setDomain);
 	    
 		return domainListFinal;
 	}
@@ -513,7 +515,7 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 	}
 
 	@SuppressWarnings("unchecked")
-	public User authenticateUser(User user) {
+	public User authenticateUser(User user,String salt) {
 		
 		User authenticatedUser = null;
 		try{
@@ -521,9 +523,11 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 		
 		String password = jdbcTemplate.queryForObject(sql,new Object[]{user.getUsername()},String.class);
 		
-		if(password.equals(user.getPassword())){
+		String saltedPassword = getHashedValue((password.toLowerCase()+salt));
+		
+		if(saltedPassword.toLowerCase().equals(user.getPassword())){
 			String sqlForUser = "select * from login_details where username = ? and password = ?";
-			authenticatedUser = (User)jdbcTemplate.queryForObject(sqlForUser, new Object[]{user.getUsername(),user.getPassword()},new BeanPropertyRowMapper(User.class));
+			authenticatedUser = (User)jdbcTemplate.queryForObject(sqlForUser, new Object[]{user.getUsername(),password},new BeanPropertyRowMapper(User.class));
 		}
 		else{
 			return null;
@@ -532,6 +536,23 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 			LOGGER.info(ex.getMessage());
 		}
 		return authenticatedUser;
+	}
+	
+	
+	public static String getHashedValue(String pwd) {
+	    try{
+	        MessageDigest digest = MessageDigest.getInstance("SHA-512");
+	        byte[] hash = digest.digest(pwd.getBytes("ISO-8859-1"));
+	        StringBuffer hexString = new StringBuffer();
+
+		    for (int i = 0; i < hash.length; i++) {
+		    	hexString.append(Integer.toString((hash[i] & 0xff) + 0x100, 16).substring(1));
+		    }
+		    return hexString.toString();
+	       
+	    } catch(Exception ex){
+	       throw new RuntimeException(ex);
+	    }
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1050,10 +1071,10 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 		List<Map<String, Object>> rows = null;
 		
 		if(organizationId.equals("0")){
-			sql = "select compliance_name,compliance_description from compliance_header order by creation_date";
+			sql = "select compliance_name,compliance_description from compliance_header order by creation_date desc";
 			rows = jdbcTemplate.queryForList(sql);
 		}else{
-			sql = "select compliance_name,compliance_description from compliance_header where organization_id = ? order by creation_date";
+			sql = "select compliance_name,compliance_description from compliance_header where organization_id = ? order by creation_date desc";
 			rows = jdbcTemplate.queryForList(sql,organizationId);
 		}
 		ComplianceHeader complianceHeader = null; 
@@ -1130,9 +1151,23 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 	}
 
 	public void saveQuestions(String controlLabel,final String questionCode,final String question) {
+		
 		final String controlId = getControlId(controlLabel);
 		
-	final String sql = "insert into questionnaire_master (question,control_id,question_code) values (?,?,?)";
+		String insertSql = "";
+	
+		String checkForExistingQuestions = "select count(*) from questionnaire_master where question_code = '" + questionCode+"'";
+	
+		String count = jdbcTemplate.queryForObject(checkForExistingQuestions,String.class);
+		
+		if(count.equals("0")){
+			insertSql = "insert into questionnaire_master (question,control_id,question_code) values (?,?,?)";
+		}else{
+			updateQuestions(controlId,questionCode,question);
+			return;
+		}
+		
+		final String sql = insertSql;
 		
         try {
             synchronized(this) {
@@ -1152,8 +1187,30 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
         }
 	}
 
+	private void updateQuestions(final String controlId, final String questionCode, final String question) {
+		final String insertSql = "update questionnaire_master set question=?, question_code=? where control_id = ?";
+		
+		try {
+            synchronized(this) {
+                jdbcTemplate.update(new PreparedStatementCreator() {
+ 
+                    public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                        PreparedStatement statement = con.prepareStatement(insertSql);
+                        statement.setString(1, question);
+                        statement.setString(2, questionCode);
+                        statement.setString(3, controlId);
+                        return statement;
+                    }
+                });
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+		
+	}
+
 	private String getControlId(String controlLabel) {
-		String sql = "select control_id from controls where control_code=?";
+		String sql = "select max(control_id) from controls where control_code=?";
 		LOGGER.info("inside the getControlId method " + sql + controlLabel);
 		return jdbcTemplate.queryForObject(sql,new Object[]{controlLabel},String.class);
 	}
@@ -1446,5 +1503,346 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 		return fileList.get(0);
 	}
 
+	@Override
+	public String enterMaturityDefinitionValues(final String complianceId, final String rangeFrom, final String rangeTo) {
+		
+		String checkForExistingQuestions = "select count(*) from maturity_definition where compliance_id = '" + complianceId+"'";
+		String count = jdbcTemplate.queryForObject(checkForExistingQuestions,String.class);
+		
+		if(!count.equals("0")){
+			String noOfRecordsUpdated = updateMaturityDefinitionValues(complianceId,rangeFrom,rangeTo);
+			return noOfRecordsUpdated;
+		}
+		
+		final String sql = "insert into maturity_definition (compliance_id,mat_def_from,mat_def_to) values (?,?,?)";
+		int noOfRecUpdated = 0;
+		
+		System.out.println(sql);
+		
+		try {
+		    synchronized(this) {
+		    	noOfRecUpdated = jdbcTemplate.update(new PreparedStatementCreator() {
+ 
+		            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+		                PreparedStatement statement = con.prepareStatement(sql);
+		                statement.setString(1, complianceId);
+		                statement.setString(2, rangeFrom);
+		                statement.setString(3, rangeTo);
+		                return statement;
+		            }
+		        });
+		    }
+		} catch (Exception ex) {
+			LOGGER.info("Values in maturity_definition have not been stored. There was some exception while saving data!!");
+		    ex.printStackTrace();
+		}
+		LOGGER.info("METHOD : Number of control records updated : " + noOfRecUpdated);
+		
+		return String.valueOf(noOfRecUpdated);
+	}
+
+	private String updateMaturityDefinitionValues(final String complianceId, final String rangeFrom, final String rangeTo) {
+		
+		final String updateQuery = "update maturity_definition set mat_def_from = ?, mat_def_to=? where compliance_id=?";
+		int noOfRecUpdated = 0;
+		
+		try {
+            synchronized(this) {
+            		noOfRecUpdated = jdbcTemplate.update(new PreparedStatementCreator() {
+ 
+                    public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                        PreparedStatement statement = con.prepareStatement(updateQuery);
+                        statement.setString(1, rangeFrom);
+                        statement.setString(2, rangeTo);
+                        statement.setString(3, complianceId);
+                        return statement;
+                    }
+                });
+            }
+        } catch (Exception ex) {
+        	LOGGER.info("Values in maturity_definition have not been updated. There was some exception while saving data!!");
+		    ex.printStackTrace();
+        }
+		
+		LOGGER.info("METHOD : Number of control records updated : " + noOfRecUpdated);
+		return String.valueOf(noOfRecUpdated);
+	}
+
+	@Override
+	public String[] getMaturityLevels(String complianceId) {
+		String [] range = new String[2];
+		
+		String sql = "select mat_def_from,mat_def_to from maturity_definition where compliance_id = ?";
+		try{
+			List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql,new Object[]{complianceId});
+			for (Map row : rows) {
+				range[0] = (String)row.get("mat_def_from");
+				range[1] = (String)row.get("mat_def_to");
+			}
+		}catch(Exception ex){
+			System.out.println("Error : " + ex.getMessage());
+		}
+		return range;
+	}
+	
+	@Override
+	public List<User> getUsersInOrg(String orgId,Integer userId) {
+		
+		List<User> users = new LinkedList<User>();
+		Date date = Calendar.getInstance().getTime();
+		
+		String sql = "select u.username,o.organization_name,r.role_desc,u.email_id,u.creation_date,u.status from organization_details o join login_details u "
+				+ "on o.organization_id = u.organization_id join roles r on r.role_id = u.role_id "
+				+ "where u.organization_id = ? order by creation_date desc, u.status";
+		try{
+			List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql,new Object[]{orgId});
+			for (Map row : rows) {
+				User user = new User();
+				user.setUsername((String)row.get("username"));
+				user.setOrganizationName((String)row.get("organization_name"));
+				user.setEmailId((String)row.get("email_id"));
+				user.setCreationDate(getDate((Date)row.get("creation_date")));
+				user.setStatus((String)row.get("status"));
+				UserRoles roles = new UserRoles();
+				roles.setRoleDescription((String)row.get("role_desc"));
+				user.setRole(roles);
+				users.add(user);
+			}
+		}catch(Exception ex){
+			System.out.println("Error : " + ex.getMessage());
+		}
+		
+		return users;
+	}
+	
+//	private String formatDate(String date) {
+//		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+//		LOGGER.info(dateFormat.format(date));
+//		return dateFormat.format(date);
+//	}
+
+	private String getDate(Date date) {
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+		
+		return dateFormat.format(date);
+	}
+
+	@Override
+	public Integer createNewUser(final User userDetails) {
+		
+		final String sql = "insert into login_details (user_id,username,password,organization_id,role_id,email_id,status) values (?,?,?,?,?,?,?)";
+		int noOfRecUpdated = 0;
+		
+		try {
+		
+		String currentId = jdbcTemplate.queryForObject("select max(user_id) from login_details",String.class);
+		userDetails.setUserId(Integer.valueOf(currentId)+1);
+		
+		String orgId = jdbcTemplate.queryForObject("select organization_id from organization_details where organization_name='"+userDetails.getOrganizationName()+"'",String.class);
+		
+		userDetails.setUserId(Integer.valueOf(currentId)+1);
+		userDetails.setOrganizationId(orgId);
+		
+		System.out.println(sql);
+		System.out.println(userDetails.getPassword());
+		
+		    synchronized(this) {
+		    	noOfRecUpdated = jdbcTemplate.update(new PreparedStatementCreator() {
+ 
+		            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+		                PreparedStatement statement = con.prepareStatement(sql);
+		                statement.setInt(1, Integer.valueOf(userDetails.getUserId()));
+		                statement.setString(2, userDetails.getUsername());
+		                statement.setString(3, userDetails.getPassword());
+		                statement.setString(4, userDetails.getOrganizationId());
+		                statement.setInt(5, Integer.valueOf(userDetails.getRole().getRoleId()));
+		                statement.setString(6,userDetails.getEmailId());
+		                statement.setString(7,userDetails.getStatus());
+		                return statement;
+		            }
+		        });
+		    }
+		} catch (Exception ex) {
+			LOGGER.info("Values in the login table have not been stored. There was some exception while saving data!!");
+		    ex.printStackTrace();
+		}
+		LOGGER.info("METHOD : Number of control records updated : " + noOfRecUpdated);
+		return noOfRecUpdated;
+	}
+	
+	@Override
+	public Integer updateUserDetails(final User userDetails) {
+		final String sql = "update login_details set username = ?,organization_id = ?, email_id=?,role_id=?, status=? where user_id = ?";
+		int noOfRecUpdated = 0;
+		
+		String orgId = jdbcTemplate.queryForObject("select organization_id from organization_details where organization_name='"+userDetails.getOrganizationName()+"'",String.class);
+		userDetails.setOrganizationId(orgId);
+		
+		String userId = jdbcTemplate.queryForObject("select user_id from login_details where username='"+userDetails.getUsername()+"'",String.class);
+		userDetails.setUserId(Integer.valueOf(userId));
+		
+		System.out.println(sql);
+		try{
+		 synchronized(this) {
+		    	noOfRecUpdated = jdbcTemplate.update(new PreparedStatementCreator() {
+
+		            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+		                PreparedStatement statement = con.prepareStatement(sql);
+		                statement.setString(1, userDetails.getUsername());
+		                statement.setString(2, userDetails.getOrganizationId());
+		                statement.setString(3, userDetails.getEmailId());
+		                statement.setInt(4, Integer.valueOf(userDetails.getRole().getRoleId()));
+		                statement.setString(5, userDetails.getStatus());
+		                statement.setInt(6, Integer.valueOf(userDetails.getUserId()));
+		                return statement;
+		            }
+		        });
+		    }
+		} catch (Exception ex) {
+			LOGGER.info("Values in the login table have not been stored. There was some exception while saving data!!");
+		    ex.printStackTrace();
+		}
+		LOGGER.info("METHOD : Number of control records updated : " + noOfRecUpdated);
+		return null;
+	}
+	
+	@Override
+	public Boolean checkAdminGenPassword(String username, String password) {
+		LOGGER.info("inside the checkAdminGenPassword - DAOIMPL Class");
+		try {
+			String db_password = jdbcTemplate.queryForObject("select password from login_details where username='" + username + "'", String.class);
+			if (db_password.equals(password)) {
+				return true;
+			}
+		} catch (Exception ex) {
+			LOGGER.info(ex.getMessage());
+		}
+		return false;
+	}
+	
+	@Override
+	public String getUserId(String username) {
+		LOGGER.info("inside the getUserId - DAOIMPL Class");
+		try {
+			String userId = jdbcTemplate.queryForObject("select user_id from login_details where username='" + username + "'", String.class);
+			if (!StringUtils.isEmpty(userId)) {
+				return userId;
+			}
+		} catch (Exception ex) {
+			LOGGER.info(ex.getMessage());
+		}
+		return null;
+	}
+	
+	@Override
+	public String saveChangedPasswordDetails(final ValidityObj validityObj) {
+		LOGGER.info("inside the saveChangedPasswordDetails - DAOIMPL Class");
+		
+		final String passwordUpdateSql = "update login_details set password = ? where username = ?";
+		final String insertSecurityQuestions = "insert into security_questions(security_question,security_answer,user_id) values (?,?,?)";
+		
+		int noOfRecUpdated = 0;
+		
+		final String userId = getUserId(validityObj.getUserName());
+		
+		try{
+			 synchronized(this) {
+			    	noOfRecUpdated = jdbcTemplate.update(new PreparedStatementCreator() {
+
+			            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+			                PreparedStatement statement = con.prepareStatement(passwordUpdateSql);
+			                statement.setString(1, validityObj.getChangedPassword());
+			                statement.setString(2, validityObj.getUserName());
+			                return statement;
+			            }
+			        });
+			    }
+			 
+			 synchronized(this) {
+			    	noOfRecUpdated = jdbcTemplate.update(new PreparedStatementCreator() {
+
+			            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+			                PreparedStatement statement = con.prepareStatement(insertSecurityQuestions);
+			                statement.setString(1, validityObj.getSecurityQuestion());
+			                statement.setString(2, validityObj.getSecurityAnswer());
+			                statement.setInt(3, Integer.valueOf(userId));
+			                return statement;
+			            }
+			        });
+			    }
+			} catch (Exception ex) {
+				LOGGER.info("Values in the login table have not been stored. There was some exception while saving data!!");
+			    ex.printStackTrace();
+			}
+		
+		return String.valueOf(noOfRecUpdated);
+	}
+
+	@Override
+	public String getSecurityQuestion(String username) {
+		LOGGER.info("inside the getSecurityQuestion - DAOIMPL Class");
+		
+		String sqlSecurityQues = "select security_question from security_questions sq join login_details ld "
+								+"on ld.user_id=sq.user_id where ld.username= '" + username;
+		
+		try {
+			String securityQuestion = jdbcTemplate.queryForObject(sqlSecurityQues, String.class);
+			if (!StringUtils.isEmpty(securityQuestion)) {
+				return securityQuestion;
+			}
+		} catch (Exception ex) {
+			LOGGER.info(ex.getMessage());
+		}
+		return null;
+	}
+	
+	@Override
+	public Boolean verifyAnswer(String username, String answer) {
+		LOGGER.info("inside the verifyAnswer - DAOIMPL Class");
+		
+		String sqlSecAns="select security_answer from security_questions sq join login_details ld "
+								+"on ld.user_id=sq.user_id where ld.username= '" + username +"'";
+		
+		try {
+			String dbAnswer = jdbcTemplate.queryForObject(sqlSecAns,String.class);
+			if (dbAnswer.equals(answer)) {
+				return true;
+			}
+		} catch (Exception ex) {
+			LOGGER.info(ex.getMessage());
+		}
+		return false;
+	}
+	
+	@Override
+	public String savePassword(final String pwd, final String username) {
+		
+		LOGGER.info("inside the savePassword - DAOIMPL Class");
+		
+		int noOfRecUpdated = 0;
+		final String passwordUpdateSql = "update login_details set password = ? where username = ?";
+		
+		try{
+			 synchronized(this) {
+			    	noOfRecUpdated = jdbcTemplate.update(new PreparedStatementCreator() {
+
+			            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+			                PreparedStatement statement = con.prepareStatement(passwordUpdateSql);
+			                statement.setString(1, pwd);
+			                statement.setString(2, username);
+			                return statement;
+			            }
+			        });
+			    }
+		}catch(Exception ex){
+			LOGGER.info(ex.getMessage());
+		}
+		if(noOfRecUpdated>0){
+			return "done";
+		}
+		return null;
+	}
+	
 }
 

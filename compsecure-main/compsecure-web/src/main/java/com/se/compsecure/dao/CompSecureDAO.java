@@ -21,6 +21,7 @@ import com.se.compsecure.model.Subdomain;
 import com.se.compsecure.model.UploadFile;
 import com.se.compsecure.model.User;
 import com.se.compsecure.model.UserRoles;
+import com.se.compsecure.utility.ValidityObj;
 
 public interface CompSecureDAO {
 	
@@ -44,7 +45,7 @@ public interface CompSecureDAO {
 
 	Integer saveComplianceQuestionsResponse(List<QuestionsResponse> questRes,String assessmentId);
 
-	User authenticateUser(User user);
+	User authenticateUser(User user,String salt);
 
 	UserRoles getRole(User user);
 
@@ -107,5 +108,27 @@ public interface CompSecureDAO {
 	List<Entry<String, Domain>> getExistingComplianceDetails(String complianceId);
 
 	UploadFile getFile(String filename, String assessmentId);
+
+	String enterMaturityDefinitionValues(String complianceId, String rangeFrom, String rangeTo);
+
+	String[] getMaturityLevels(String complianceId);
+
+	List<User> getUsersInOrg(String orgId, Integer userId);
+
+	Integer createNewUser(User userDetails);
+
+	Integer updateUserDetails(User userDetails);
+
+	Boolean checkAdminGenPassword(String userId, String password);
+
+	String getUserId(String username);
+
+	String saveChangedPasswordDetails(ValidityObj validityObj);
+
+	String getSecurityQuestion(String username);
+
+	Boolean verifyAnswer(String username, String answer);
+
+	String savePassword(String pwd, String username);
 
 }

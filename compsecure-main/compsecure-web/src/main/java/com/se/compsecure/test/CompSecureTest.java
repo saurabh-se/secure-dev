@@ -1,19 +1,17 @@
 package com.se.compsecure.test;
 
 public class CompSecureTest {
+	
+	public static void main(String[] args) {
+		CompSecureTest compSecureTest = new CompSecureTest();
+		compSecureTest.test();
+	}
 
-//	//@Test
-//	public void test() {
-//		fail("Not yet implemented");
-//	}
-//
-//	//@Test
-//	public void testGetAssessmentDetails(){
-//		CompSecureService compSecureService = new CompSecureServiceImpl();
-//		AssessmentDetails assessmentDetails = compSecureService.getAssessmentDetails("1");
-//		
-//		System.out.println(assessmentDetails.getAssessmentStatus());
-//		System.out.println(assessmentDetails.getRemarks());
-//		System.out.println(assessmentDetails.getAssessmentStartDate());
-//	}
+	private void test() {
+		String testing = "BearerABCD";
+		
+		System.out.println(testing.startsWith("Bearer"));
+		
+	}
+
 }

@@ -59,10 +59,11 @@ $(document).on("change", "#compliance_name", function (event) {
 });
 
 $("#button-cancel").click(function(){
-	window.location="welcome";
+	window.location="home";
 });
 
 $("#button-save").click(function(){
+	$("#loading").show();
 	doSave().done(function(){
 		console.log("The Data has been saved");
 	});
@@ -92,6 +93,7 @@ function doSave(){
 		 	contentType:"application/json",
 	        data: JSON.stringify(compliance),
 	    }).done(function(data){
+	    	$("#loading").hide();
 	    	var selectedOption = localStorage.getItem("selectedOption");
 	    	if(selectedOption==="new"){
 	    	$("#dialog").dialog({

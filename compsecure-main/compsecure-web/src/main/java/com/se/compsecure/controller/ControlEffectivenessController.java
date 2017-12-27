@@ -94,6 +94,10 @@ private static final Logger LOGGER = Logger.getLogger(ControlEffectivenessContro
 		
 //		complianceId = (String)httpSession.getAttribute("complianceDesc");
 		
+		if(assessmentId.isEmpty()){
+			assessmentId = (String)httpSession.getAttribute("assessmentId");
+		}
+		
 		controlEffectivenessList = compSecureService.getControlEffectivenessDetails(assessmentId,complianceId);
 		
 		Gson gson = new Gson();
@@ -101,6 +105,7 @@ private static final Logger LOGGER = Logger.getLogger(ControlEffectivenessContro
 		
 		if(controlEffectivenessList.size()>0){
 		 json = gson.toJson(controlEffectivenessList.get(0));
+		 LOGGER.info(json);
 		}
 
 		return json;

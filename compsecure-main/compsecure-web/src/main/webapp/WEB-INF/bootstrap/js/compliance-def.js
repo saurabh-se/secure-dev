@@ -54,10 +54,10 @@ $(document).ready(function () {
 									+"    <br> "
 									+"    <div class='input-group'>"
 									+"        <span class='input-group-addon' id='subdomainId'>Subdomain</span>"
-									+"        <input id='sub_code' type='text' class='form-control' name='sub_code' value='"+value["subdomainCode"]+"'>"
-									+"        <input id='subdomain_value' type='text' class='form-control gap' name='subdomain_value' value='"+value["subdomainValue"]+"'>"
-									+"        <textarea id='principle' class='form-control gap' name='principle' rows='2'>"+value["principle"]+"</textarea>"
-									+"        <textarea id='objective' class='form-control gap' name='objective' rows='2'>"+value["objective"]+"</textarea>"
+									+"        <input id='sub_code' type='text' class='form-control' name='sub_code' value='"+value["subdomainCode"].trim()+"'>"
+									+"        <input id='subdomain_value' type='text' class='form-control gap' name='subdomain_value' value='"+value["subdomainValue"].trim()+"'>"
+									+"        <textarea id='principle' class='form-control gap' name='principle' rows='2'>"+value["principle"].trim()+"</textarea>"
+									+"        <textarea id='objective' class='form-control gap' name='objective' rows='2'>"+value["objective"].trim()+"</textarea>"
 									+"    </div>"
                                                                         +"<br>"
 									+"    <div>"
@@ -349,7 +349,7 @@ function getControlTableHTML(controlCount){
 			   "<input id='control_value' type='text' class='form-control gap' name='control_value' placeholder='Control Details'></td>" +
 			   "<!--<td style='width: 77%'><button id='button-save-control' type='button' class='btn btn-success gap'>Add </button></td>--> </tr> </tbody> </table></div> </div>" +
 			   "<div class='col-sm-6' align='right'> <button type='button' id='button-add-control' class='btn btn-success gap' name='"+controlNo+"'>Add Control</button> " +
-			   "<button type='button' id='button-delete-control' class='btn btn-success gap'>Delete Control</button> <br> </div>";
+			   "<button type='button' disabled='disabled' id='button-delete-control' class='btn btn-success gap'>Delete Control</button> <br> </div>";
 }
 
 function doNext(){

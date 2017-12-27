@@ -28,7 +28,8 @@ $(document).ready(function () {
          for(var i in obj){
               console.log(obj[i]['controlCode']);
               //var strDiv ="<label class='label-general input-group' style='padding-left:55px;padding-bottom:5px;' id='qControlLabel' name='qControlLabel'>Control " + obj[i]['controlCode']+"</label>";
-              var strDiv = "<label class='label-general input-group' style='padding-left:55px;padding-bottom:5px;'>Control : <input type='text' readonly='readonly' id='qControlLabel' name='qControlLabel' value='"+obj[i]['controlCode']+"'></label>";
+              var strDiv = "<label class='label-general input-group' style='padding-left:55px;'>Control : <input type='text' readonly='readonly' id='qControlLabel' name='qControlLabel' value='"+obj[i]['controlCode']+"'></label> " + 
+              		"<label class='label-general input-group' id='qControlValueLabel' style='padding-left:55px;padding-bottom:5px;'> Control-Value : " +obj[i]['controlValue']+"</label>";
               var quesSpan = "";
               var questionsList = obj[i]['controlQuestions'];
               if(!$.isEmptyObject(questionsList)){
@@ -68,7 +69,7 @@ $(document).on('click','.qb',function(){
                                 <input id='controlQuestionCode' style='width: inherit;' type='text' class='form-control' name='controlQuestionCode' placeholder='Question Code'/></div><br>\n\
                                 \n\<div class='input-group'><span class='input-group-addon'>Question</span>\n\
                                 <input id='controlQuestion' style='width: 50%;' type='text' class='form-control' name='controlQuestion' placeholder='Question'/></div>";
-        $(this).before("<br> "+quesSpan);
+        $(this).before("<br> "+quesSpan+"<br>");
     });
     
 $("#button-save").click(function () {
@@ -93,7 +94,7 @@ $("#button-save").click(function () {
 	            buttons : {
 	                Ok: function() {
 	                    $(this).dialog("close"); //closing on Ok click
-	                    window.location.href="home.html";
+	                    window.location.href="maturity_definition_add.html";
 	                }
 	            },
 			});

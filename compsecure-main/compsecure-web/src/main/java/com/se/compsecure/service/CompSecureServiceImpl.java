@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +28,7 @@ import com.se.compsecure.model.Subdomain;
 import com.se.compsecure.model.UploadFile;
 import com.se.compsecure.model.User;
 import com.se.compsecure.model.UserRoles;
+import com.se.compsecure.utility.ValidityObj;
 
 @Component
 public class CompSecureServiceImpl implements CompSecureService {
@@ -70,10 +72,6 @@ public class CompSecureServiceImpl implements CompSecureService {
 		return null;
 	}
 
-	// 4. Get the Maturity Effectiveness details
-	public List<Maturity> getMaturityDetails(Integer levelHeaderId) {
-		return null;
-	}
 
 	// this method has to populate the assessment details and then return to the control
 	public MasterAssessmentDetails getMasterAssessmentDetails(String organizationId) {
@@ -93,6 +91,9 @@ public class CompSecureServiceImpl implements CompSecureService {
 		return orgList;
 	}
 
+	/**
+	 * TODO : Change complianceId to compliance Name wherever necessary!!
+	 */
 	public List<Entry<String , Domain>> getDomainDetails(String assessmentId,String complianceId) {
 
 		// get all the domain related data and return a list.
@@ -118,11 +119,12 @@ public class CompSecureServiceImpl implements CompSecureService {
 		return compSecureDAO.saveComplianceQuestionsResponse(questRes,assessmentId);
 	}
 
-	public User authenticate(User user) {
+	public User authenticate(User user,String salt) {
 		
 		Boolean validationRes = false;
 		
-		User authenticatedUser = compSecureDAO.authenticateUser(user);
+		User authenticatedUser = compSecureDAO.authenticateUser(user,salt);
+		
 		return authenticatedUser;
 	}
 
@@ -278,5 +280,60 @@ public class CompSecureServiceImpl implements CompSecureService {
 	public UploadFile getUploadedFile(String filename, String assessmentId) {
 		
 		return compSecureDAO.getFile(filename,assessmentId);
+	}
+
+	@Override
+	public String enterMaturityDefinitionValues(String complianceId, String rangeFrom, String rangeTo) {
+		return compSecureDAO.enterMaturityDefinitionValues(complianceId,rangeFrom,rangeTo);
+	}
+
+	@Override
+	public String[] getMaturityDetails(String complianceId) {
+		return compSecureDAO.getMaturityLevels(complianceId);
+	}
+	
+	@Override
+	public List<User> getUsersInOrg(String orgId,Integer userId) {
+		return compSecureDAO.getUsersInOrg(orgId,userId);
+	}
+	
+	@Override
+	public Integer createNewUser(User userDetails) {
+		return compSecureDAO.createNewUser(userDetails);
+	}
+	
+	@Override
+	public Integer updateUserDetails(User userDetails) {
+		return compSecureDAO.updateUserDetails(userDetails);
+	}
+	
+	@Override
+	public Boolean checkAdminGenPassword(String userId, String password) {
+		return compSecureDAO.checkAdminGenPassword(userId,password);
+	}
+	
+	@Override
+	public String getUserId(String username) {
+		return compSecureDAO.getUserId(username);
+	}
+	
+	@Override
+	public String saveChangedPasswordDetails(ValidityObj validityObj) {
+		return compSecureDAO.saveChangedPasswordDetails(validityObj);
+	}
+	
+	@Override
+	public String getSecurityQuestion(String username) {
+		return compSecureDAO.getSecurityQuestion(username);
+	}
+
+	@Override
+	public Boolean verifyAnswer(String username, String answer) {
+		return compSecureDAO.verifyAnswer(username,answer);
+	}
+
+	@Override
+	public String savePassword(String pwd, String username) {
+		return compSecureDAO.savePassword(pwd,username);
 	}
 }

@@ -108,12 +108,10 @@ $(document).ready(function () {
                                                                 <td>"+displayFiles(controlEffDetails["docEffEvidences"])+"</a></td> \n\
                                                                 <td>"+controlEffDetails["docEffRemarks"]+"</td>\n\
                                                                 <td>"+controlEffDetails["implEffectiveness"]+"</td>\n\
-                                                                <td><input name='upload-implEffectiveness' type='file' id='upload-implEffectiveness'>" +
-                                                                	"<button class='btn btn-info btnUpload' id='implEff'>Upload</button></td>\n\
+                                                                <td>"+displayFiles(controlEffDetails["implEffEvidences"])+"</td>\n\
                                                                 <td>"+controlEffDetails["implEffRemarks"]+"</td>\n\
                                                                 <td>"+controlEffDetails["recEffectiveness"]+"</td>\n\
-                                                                <td><input name='upload-recEffectiveness' type='file' id='upload-recEffectiveness'>" +
-                                                                "<button class='btn btn-info btnUpload' id='recEff'>Upload</button></td>\n\
+                                                                <td>"+displayFiles(controlEffDetails["recEffEvidences"])+"</td>\n\
                                                                 <td>"+ controlEffDetails["recEffRemarks"]+"</td> " +
                                                                 "<td><select class='form-control' id='maturityEffSelector'><option>1</option><option>2</option><option>3</option></select></td></tr>\n\
 \n\<tr id='qDisplay'><td colspan='12' style='display:none;' id='tdQuestions"+count+"'><div id='demo" + count + "' class='collapse'>Questions</div></td></tr>\
@@ -233,6 +231,19 @@ $("#exportToExcel").click(function(event){
 	});	
 });
 
+//   function setVal(value){
+//    	switch(value){
+//    	case "0":	
+//    		return "";
+//    	case "1":
+//    		return "Compliant";
+//    	case "2":	
+//    		return "Non Compliant";
+//    	case "3":	
+//    		return "Partially Compliant";
+//    	}
+//    }
+
 $("#button-home").click(function(data){
 	window.location="home";
 });
@@ -240,4 +251,6 @@ $("#button-home").click(function(data){
 $("#button-logout").click(function(data){
 	window.location="logout.html";
 });
+
+
 

@@ -58,7 +58,10 @@ $(document).ready(function () {
         	$.each(questionnaireData,function(key,value){
 //            console.log(value["questionCode"] - value["question"]);
             questionHtmlTR = questionHtmlTR + "<tr><td class='text-center' style='padding:2px;'>"+count+"</td>\n\
-                                                   <td class='text-center' style='padding:2px;'><input type='text' readonly='readonly' class='qCode' name='questionCode' id='questionCode' style='border:none' value='"+value["questionCode"]+"'></input></td><td class='text-left' style='padding:2px;'>"+value["question"]+"</td>\n\
+                                                   <td class='text-center' style='padding:2px;'>" +
+                                                   		"<input type='text' readonly='readonly' class='qCode' name='questionCode' id='questionCode' style='border:none' value='"+value["questionCode"]+"'></input>" +
+                                                   	"</td>" +
+                                                   	"<td class='text-left' style='padding:2px;'>"+value["question"]+"</td>\n\
                                                    <td class='text-center' style='padding:2px;'>" + setSelect(value["questionResponse"]) +
                                                    	"</td>\n\
                                                     <td class='text-center' style='padding:2px;'>" +

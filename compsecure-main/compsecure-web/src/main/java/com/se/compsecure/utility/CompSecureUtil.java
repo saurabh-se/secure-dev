@@ -30,6 +30,12 @@ public class CompSecureUtil {
 			System.out.println(splitString[i]);
 			
 			String [] keyValue = splitString[i].split("=");	
+			
+			if(keyValue.length<2 && !keyValue[0].equals("eol")){
+				System.out.println("keyValue1 is blank");
+				break;
+			}
+			
 			if(keyValue[0].equals("qControlLabel")){
 				newObj = new QuestionsUtil();
 				newObj.setqControlLabel(keyValue[1]);				

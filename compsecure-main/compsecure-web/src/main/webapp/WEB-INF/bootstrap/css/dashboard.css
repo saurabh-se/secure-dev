@@ -111,7 +111,7 @@ body {
 
 
 .label-general{
-    padding: 5%;
+	padding: 1%;
     margin-left: -5%;
     width:auto;
 }
@@ -229,7 +229,9 @@ background:#fff;
 }
 
 .breadcrumb{
+	margin-top : 5px;
     font-size: smaller;
+    margin-left:-15px;
 }
 
 .navbar-fixed-top{
@@ -380,9 +382,31 @@ background:#fff;
   margin-bottom: 2px;
 } 
 
+
+<!--for the user admin -->
+.dialogStyleUA.ui-dialog{
+    background-color:#f5f5f5;
+    padding: 5px;
+    font-weight: normal;
+}
+
+.dialogStyleUA .ui-dialog-titlebar{
+  background-color:khaki;
+  color: #666;
+} 
+
+.dialogStyleUA .ui-dialog-buttonpane{
+/*   background-color:#f8efc0; */
+  margin-bottom: 2px;
+} 
+
+.ui-dialog-content {
+    overflow:hidden !important;
+}
+
 hr {
     margin-top: 10px;
-    margin-bottom: 0px;
+    margin-bottom:8px;
     border: 0;
     border-top: 1px solid #c8e5bc;
     
@@ -399,6 +423,85 @@ hr {
 	padding-left:5px;
 }
 
+#loginForm{
+	margin-left:250px;
+}
+
+#qControlValueLabel{
+	padding-top:0px;
+}
+
+#selFromRangeVal,#selToRangeVal{
+	font-size: small;
+	margin-left: 1px;
+}
+
+#userAdminTable{
+    background-color: #f5f5f5;
+    color: #666;
+    border-color: #999;
+    align-items: center;
+    
+}
+#tableHeader{
+    background-color:khaki;
+    font-weight: bolder;
+    border-bottom: #fff thin solid;
+    padding: 4px;
+}
+#tableBody{
+    /*margin-top: 15px;*/
+    border: transparent thin solid;
+    border-top: black;
+}
+#tableBody.div{
+    padding: 3px;
+}
+.tb-text{
+    padding: 5px;
+    background-color: #ede9ce;
+    color:#222;
+    font-weight: lighter;
+    font-size: smaller;
+}
+#button-addUser{
+    background-color:#d9534f;
+}
+#ua-button-cancel{
+    background-color:indianred;
+}
+#newUserName,#newUserPassword,#newUserOrg,#newUserRole,#newUserEmailId,#userStatus{
+    margin: 5px;
+    padding: 8px;
+    font-weight: normal;
+}
+#user-creation-form{
+    align-content: center;
+}
+.ua-lbs{
+   padding: 10px;
+    margin-left: 20px;
+    margin-right: -45px;
+    align-items: center;
+}
+
+.icons{
+    padding: 75px;
+    margin-top: 20px;
+}
+#adminHomePageHR{
+	margin-bottom:0px;
+}
+
+#existing,#new,#user-admin{
+    font-weight: bold;
+    font-size: small;
+    color: #2b669a;
+}
+
+#ok{
+	color:green;
+}
 /* input[type="text"]{ */
 /* 	width: auto; */
 /* } */

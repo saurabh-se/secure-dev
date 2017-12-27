@@ -5,25 +5,41 @@
  */
 
 $(document).ready(function () {
+	
+	$("#loading").hide();
+	var salt = "";
+	
 	console.log("here");
+	
+	$.ajax({
+		url: "getSalt"
+	}).done(function(data){
+		console.log("salt" + data);
+		salt = data;
+	})
 	$("#btnSubmit").click(function(event){
             event.preventDefault();
-                var username = $("#username").val();
-                var password = $("#inputPassword").val();
-                
-                var loginObj = new LoginObj(username,password);
+            var username = $("#username").val();
+            var password = $("#inputPassword").val();
+//            alert(sha512(password));
+            var newPwd = sha512(password)+salt;
+            var saltedPwd = sha512(newPwd);
+            
+            $("#inputPassword").val(saltedPwd);
+            var loginObj = new LoginObj(username,saltedPwd);
 		
 		var formObj = $("#loginForm").serialize();
 		console.log(JSON.stringify(loginObj));
-               
+        $("#loading").show();
 		$.ajax({
 			 url: "/compsecure-web/login",
 			 type:"POST",
 			 contentType:"application/json",
              dataType: "JSON",
 			 data: JSON.stringify(loginObj)			
-		}).then(function(data){
+		}).done(function(data){
 			console.log(data);
+			$("#loading").hide();
 			if(data==="invalid"){
 				alert("Invalid Credentials");
 				localStorage.clear();
@@ -31,16 +47,22 @@ $(document).ready(function () {
 			}
 			else{
 				console.log(data);
-				var role=data["role"]["roleDescription"];
-				var roleId = data["role"]["roleId"];
-				var userId=data["userId"];
 				
+				userId = data["userId"];
+				roleId = data["roleId"];
+				var token= data["token"];
+				
+//				var role=data["role"]["roleDescription"];
+//				var roleId = data["role"]["roleId"];
+//				var userId=data["userId"];
 //				alert(role  + " " + roleId + " " +userId);
 				
 				localStorage.setItem("userId",userId);
 				localStorage.setItem("roleId",roleId);
-				console.log(role);
-				if (role === "admin") {
+				localStorage.setItem("token",token);
+				
+				
+				if (roleId === "1") {
 					window.location.href = "home";
 				} else {
 					window.location.href = "self-assessment_1";

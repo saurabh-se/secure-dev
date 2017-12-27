@@ -1,4 +1,4 @@
-package com.se.compsecure.controller;
+package com.se.compsecure.filter;
 
 import java.io.IOException;
 

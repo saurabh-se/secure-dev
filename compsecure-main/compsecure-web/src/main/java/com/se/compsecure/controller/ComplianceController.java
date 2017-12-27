@@ -101,4 +101,51 @@ public class ComplianceController {
 		
         return gson.toJson(outcome);
     }
+	
+	
+	@RequestMapping(value="/enterMaturityDefinitionValues", method = RequestMethod.POST)
+	@ResponseBody
+    public String enterMaturityDefinitionValues(@RequestParam(value="complianceName") String complianceName,
+    							@RequestParam(value="rangeFrom") String rangeFrom,
+    							@RequestParam(value="rangeTo") String rangeTo,HttpSession httpSession) {
+		
+		Gson gson = new Gson();
+		       
+		LOGGER.info("***************** INSIDE enterMaturityDefinitionValues **********************");
+		LOGGER.info("***************** COMPLIANCE NAME :  ********************** : " + complianceName.toUpperCase());
+		
+		String complianceId = compSecureService.getComplianceId(complianceName);
+		
+		String outcome = compSecureService.enterMaturityDefinitionValues(complianceId,rangeFrom,rangeTo);
+		
+        return gson.toJson(outcome);
+    }
+	
+	@RequestMapping(value="/getMaturityLevels")
+	@ResponseBody
+    public String getMaturityLevels(@RequestParam(value="complianceName") String complianceName,HttpSession httpSession) {
+		
+		       
+		LOGGER.info("***************** INSIDE enterMaturityDefinitionValues **********************");
+		LOGGER.info("***************** COMPLIANCE ID :  ********************** : " + complianceName.toUpperCase());
+		
+		String complianceId = compSecureService.getComplianceId(complianceName);
+		
+		String [] levels = compSecureService.getMaturityDetails(complianceId);
+		
+		if(levels.length>0){		
+			int from = Integer.parseInt(levels[0]);
+			int to = Integer.parseInt(levels[1]);
+			
+			String options = "";
+			
+			for(int i=from;i<=to;i++){
+				options = options+"<option>"+i+"</option>";
+			}
+			
+	        return ("<options>"+options+"</options>");
+		}
+		else return "";
+    }
+	
 }

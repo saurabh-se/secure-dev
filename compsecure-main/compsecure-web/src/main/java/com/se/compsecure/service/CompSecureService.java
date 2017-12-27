@@ -22,6 +22,7 @@ import com.se.compsecure.model.Subdomain;
 import com.se.compsecure.model.UploadFile;
 import com.se.compsecure.model.User;
 import com.se.compsecure.model.UserRoles;
+import com.se.compsecure.utility.ValidityObj;
 
 @Component
 public interface CompSecureService {
@@ -42,7 +43,7 @@ public interface CompSecureService {
 	List<Control> getControlDetails(Integer levelHeaderId);
 	
 	// 4. Get the Maturity Effectiveness details
-	List<Maturity> getMaturityDetails(Integer levelHeaderId);
+	String[] getMaturityDetails(String complianceId);
 
 	List<ComplianceHeader> getComplianceDetails(String assessmentId);
 	
@@ -54,7 +55,7 @@ public interface CompSecureService {
 
 	Integer saveComplianceQuestionsResponse(List<QuestionsResponse> questRes,String assessmentId);
 
-	User authenticate(User user);
+	User authenticate(User user, String salt);
 
 	UserRoles getRole(User user);
 
@@ -111,4 +112,24 @@ public interface CompSecureService {
 	List<Entry<String, Domain>> getExistingComplianceDetails(String complianceId);
 
 	UploadFile getUploadedFile(String filename, String assessmentId);
+
+	String enterMaturityDefinitionValues(String complianceId, String rangeFrom, String rangeTo);
+
+	List<User> getUsersInOrg(String orgId, Integer userId);
+
+	Integer createNewUser(User userDetails);
+
+	Integer updateUserDetails(User userDetails);
+
+	Boolean checkAdminGenPassword(String userId, String password);
+
+	String getUserId(String username);
+
+	String saveChangedPasswordDetails(ValidityObj validityObj);
+
+	String getSecurityQuestion(String username);
+
+	Boolean verifyAnswer(String username, String answer);
+
+	String savePassword(String pwd, String username);
 }

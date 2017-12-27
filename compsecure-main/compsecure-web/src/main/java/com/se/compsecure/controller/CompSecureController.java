@@ -10,14 +10,16 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.google.gson.Gson;
 import com.se.compsecure.model.OrganizationDetails;
@@ -55,6 +57,12 @@ public class CompSecureController {
         return "self-assessment_1";
     }
 	
+	@RequestMapping(value={"/change-password"})
+    public String getChangePassword(@ModelAttribute User user) {
+		
+        return "change-password";
+    }
+	
 	@RequestMapping(value={"/home"})
     public String home(@ModelAttribute User user,HttpSession httpSession) {
 		
@@ -67,7 +75,7 @@ public class CompSecureController {
 			if(roleId==2){
 				return_location =  "self-assessment_1";
 			}else{
-	            return_location = "home";
+	            return_location = "admin-home";
 			}
 			}catch(Exception ex){
 				LOGGER.info(" Exception in the COMPSECURECONTROLLER class  " + ex.getMessage());
@@ -161,6 +169,10 @@ public class CompSecureController {
 		return "welcome";
     }
 	
+	@RequestMapping("/user-administration")
+    public String getUserAdministration(Model model) {
+		return "user-administration";
+    }
 	
 	
 	@RequestMapping("/getOrgDetails/{userId}/{roleId}")
@@ -203,15 +215,12 @@ public class CompSecureController {
 	
 	@RequestMapping("/maturity-effectiveness")
     public String getMaturityEffPage(Model model) {
-		
 		return "maturity-effectiveness";
-	
     }
 	
 	@RequestMapping("/questions_add")
     public String getQuestionsPage(Model model) {
 		return "questions_add";
-	
     }
 	
 }

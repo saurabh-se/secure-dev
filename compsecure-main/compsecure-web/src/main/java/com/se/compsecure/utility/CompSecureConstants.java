@@ -7,5 +7,6 @@ public class CompSecureConstants {
 	public static final Object REC_EFFECTIVE = "recEff";
 	public static final Object NEW = "new";
 	public static final Object EXISTING = "existing";
+	public static final Object ADMIN_ROLE_ID = "1";
 
 }

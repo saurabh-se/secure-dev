@@ -1,9 +1,11 @@
 package com.se.compsecure.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -12,6 +14,7 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.text.StringEscapeUtils;
@@ -67,7 +70,7 @@ public class TestController {
 		
 		List<AssessmentDetails> assessmentDetails = compSecureService.getAssessmentDetails(selectedVal);
 
-		Map<String, AssessmentDetails> assessmentDetailsKV = new HashMap<String, AssessmentDetails>();
+		Map<String, AssessmentDetails> assessmentDetailsKV = new LinkedHashMap<String, AssessmentDetails>();
 		for (Iterator iterator = assessmentDetails.iterator(); iterator.hasNext();) {
 			AssessmentDetails assessmentDetails2 = (AssessmentDetails) iterator.next();
 			LOGGER.info("ID: " + assessmentDetails2.getAssessmentId());
@@ -312,24 +315,31 @@ public class TestController {
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/getDomainDetails")
-	public @ResponseBody String getDomainDetails(@RequestParam("assessmentId") String assessmentId,@RequestParam("complianceId") String complianceId, HttpSession httpSession) {
+	public @ResponseBody String getDomainDetails(@RequestParam("assessmentId") String assessmentId,@RequestParam("complianceName") String complianceName,
+			HttpSession httpSession) {
 
 		List<Entry<String, Domain>> domainDetailsList = null;
 		
+		
 		if(httpSession.isNew()){
 			System.out.println("Session Expired");
+			return "/login";
 		}
 		
 		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option");
-		complianceId = (String)httpSession.getAttribute("complianceDesc");
+		String complianceId = (String)httpSession.getAttribute("complianceDesc");
 		String json = null;
 		
-		if(self_assessment_option.equals("new")){
-			domainDetailsList = compSecureService.getDomainDetailsForCompliance(complianceId);
+		if(assessmentId.isEmpty()){
+			assessmentId = (String)httpSession.getAttribute("assessmentId");
 		}
-		else{
+		
+//		if(self_assessment_option.equals("new")){
+//			domainDetailsList = compSecureService.getDomainDetailsForCompliance(complianceId);
+//		}
+//		else{
 			domainDetailsList = compSecureService.getDomainDetails(assessmentId,complianceId);
-		}
+//		}
 			
 			List<Domain> domainList = new ArrayList<Domain>();
  
@@ -344,6 +354,7 @@ public class TestController {
 //		else{
 //		}
 		return json;
+		
 	}
 	
 	
@@ -477,6 +488,7 @@ public class TestController {
 
 	
 	@RequestMapping(value = "/saveAssessmentDetails", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
 	public String saveAssessmentDetails(@RequestBody AssessmentDetails assessmentDetails,HttpSession httpSession) {
 				
 		String self_assessment_option = (String)httpSession.getAttribute("self_assessment_option");
@@ -486,8 +498,9 @@ public class TestController {
 		httpSession.setAttribute("assessmentId", assessmentID);
 		System.out.println(assessmentDetails.getAssessmentName());
 		System.out.println(assessmentDetails.getAssessmentDesc());
-				
-		return "questionnaire";
+		
+		Gson gson = new Gson();
+		return gson.toJson(assessmentID);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -545,7 +558,7 @@ public class TestController {
 		
 		//String organizationId = ((User)httpSession.getAttribute("user")).getOrganizationId();
 		
-		if(organizationId.equals("0")){
+		if(role.equals(1)){
 			Map<String, String> compMap = compSecureService.getCompliances(organizationId);
 			Gson gson = new Gson();
 			String json =  gson.toJson(compMap);
