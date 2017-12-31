@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.se.compsecure.model.OrganizationDetails;
 import com.se.compsecure.model.User;
 import com.se.compsecure.service.CompSecureService;
 import com.se.compsecure.utility.EmailUtil;
@@ -32,6 +34,7 @@ public class AdminController {
 	
 	@Autowired
 	private CompSecureService compSecureService;
+	
 	
 	@RequestMapping(value="/getUsers")
 	@ResponseBody
@@ -129,5 +132,16 @@ public class AdminController {
 		
 		return gson.toJson(userList);
 		
+	}
+	
+	@RequestMapping("/getOrgList")
+	@ResponseBody
+	public String getOrgList(HttpSession httpSession,@RequestParam String id){
+		
+		Gson gson = new Gson();
+		
+		List<OrganizationDetails> organizationDetails = compSecureService.getOrganizationList();
+		
+		return gson.toJson(organizationDetails);
 	}
 }

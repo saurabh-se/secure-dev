@@ -12,11 +12,19 @@ $(document).ready(function() {
 				$("#securityAnswer").removeAttr( "disabled" );
 				$("#securityAnswer").focus();
 				$("#btnSubmit").removeAttr("disabled");
-				
 				$("#securityQuestion").val(data);
-				
 			}else{
-				alert("Email does not exist! Please contact your administrator");
+				$("#invalid-user").dialog({
+					 modal: true,
+		             title :"Status",
+		             dialogClass :"dialogStyle",
+		             width: 400,
+		            buttons : {
+		                Ok: function() {
+		                    $(this).dialog("close"); //closing on Ok click
+		                }
+		            },
+				});
 			}
 		});
 	});
@@ -30,9 +38,20 @@ $("#securityAnswer").focusout(function(){
 		if(data===true){
 			$("#answer-ok").css("color","green");
 			$("#changePassword").removeAttr( "disabled" );
+			$("#changePassword").focus();
 			$("#confirmChangePassword").removeAttr( "disabled" );
 		}else{
-			alert("Answer is incorrect!!\nPlease try again or contact Admin");
+			$("#incorrect-answer").dialog({
+				 modal: true,
+	             title :"Status",
+	             dialogClass :"dialogStyle",
+	             width: 400,
+	            buttons : {
+	                Ok: function() {
+	                    $(this).dialog("close"); //closing on Ok click
+	                }
+	            },
+			});
 		}
 	});
 });
@@ -49,11 +68,31 @@ $("#btnSubmit").click(function(){
 			async:false
 		}).done(function(data){
 			if(data){
-				alert("Password Changed");
+				 $("#confirmation").dialog({
+					 modal: true,
+		             title :"Status",
+		             dialogClass :"dialogStyle",
+		             width: 400,
+		            buttons : {
+		                Ok: function() {
+		                    $(this).dialog("close"); //closing on Ok click
+		                }
+		            },
+				});
 			}
 		});
 	}else{
-		alert("Passwords do not match");
+		$("#password-mismatch").dialog({
+			 modal: true,
+            title :"Status",
+            dialogClass :"dialogStyle",
+            width: 400,
+           buttons : {
+               Ok: function() {
+                   $(this).dialog("close"); //closing on Ok click
+               }
+           },
+		});
 		$("#confirmChangePassword").css("border-color","red");
 		return false;
 	}

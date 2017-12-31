@@ -487,21 +487,42 @@ hr {
 
 .icons{
     padding: 75px;
+    padding-top: 15px;
+    margin:0px;
     margin-top: 20px;
 }
+
+#icon-label{
+	margin:0px;
+    margin-top: -70px;
+    padding: 75px;
+    padding-top: 0px;
+    
+}
+
 #adminHomePageHR{
 	margin-bottom:0px;
 }
 
-#existing,#new,#user-admin{
-    font-weight: bold;
-    font-size: small;
-    color: #2b669a;
+#existing,#new,#user-admin,#manage-organization{
+    font-weight: 400;
+    font-size: smaller;
+    color: #204d74;
+    /* color: #2b669a; */
 }
 
 #ok{
 	color:green;
 }
+
+#forgotPassword{
+	color: beige;
+}
+
+#orgManagementTbl{
+	font-size: smaller;
+}
+
 /* input[type="text"]{ */
 /* 	width: auto; */
 /* } */

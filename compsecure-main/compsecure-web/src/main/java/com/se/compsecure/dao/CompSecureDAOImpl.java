@@ -165,8 +165,6 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 	}
 	
 	
-	
-	
 	// TODO to retrieve all controls
 
 	// to retrieve control object
@@ -242,6 +240,9 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 			OrganizationDetails orgDetails = new OrganizationDetails();
 			orgDetails.setOrganizationId((Integer) row.get("organization_id"));
 			orgDetails.setOrganizationName((String) row.get("organization_name"));
+			orgDetails.setOrgAdminId((String) row.get("org_admin_id"));
+			orgDetails.setCreationDate((String) row.get("org_creation_date"));
+			orgDetails.setStatus((String) row.get("status"));
 			organizationList.add(orgDetails);
 		}
 		System.out.println(organizationList.size());
@@ -1784,7 +1785,7 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 		LOGGER.info("inside the getSecurityQuestion - DAOIMPL Class");
 		
 		String sqlSecurityQues = "select security_question from security_questions sq join login_details ld "
-								+"on ld.user_id=sq.user_id where ld.username= '" + username;
+								+"on ld.user_id=sq.user_id where ld.username= '" + username+"'";
 		
 		try {
 			String securityQuestion = jdbcTemplate.queryForObject(sqlSecurityQues, String.class);

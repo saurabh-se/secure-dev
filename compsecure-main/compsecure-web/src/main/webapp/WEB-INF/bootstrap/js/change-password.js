@@ -16,7 +16,17 @@ $(document).ready(function() {
 //		alert(validity +" "+ userId);
 		
 		if (validity===false) {
-			alert("Sorry, the token has expired. Please check with admin!!");
+			$("#token-expired").dialog({
+				 modal: true,
+	             title :"Status",
+	             dialogClass :"dialogStyle",
+	             width: 400,
+	            buttons : {
+	                Ok: function() {
+	                    $(this).dialog("close"); //closing on Ok click
+	                }
+	            },
+			});
 			window.close();
 		}
 		return false;
@@ -34,7 +44,17 @@ $(document).ready(function() {
 		if(!$("#adminGenPassword").val()){
 			alert('Username ' + $("#username").val());
 			if(!$("#username").val()){
-				alert("Username is not valid.\nPlease try again!!");
+				 $("#invalid").dialog({
+					 modal: true,
+		             title :"Status",
+		             dialogClass :"dialogStyle",
+		             width: 400,
+		            buttons : {
+		                Ok: function() {
+		                    $(this).dialog("close"); //closing on Ok click
+		                }
+		            },
+				});
 				
 				return false;
 			}
@@ -73,7 +93,17 @@ $("#confirmChangePassword").focusout(function(){
 	$("#confirmChangePassword").css("border-color","");
 	
 	if(!($("#confirmChangePassword").val() == $("#changePassword").val())){
-		alert("The passwords do not match. \n Please verify and try again!");
+		 $("#password-mismatch").dialog({
+			 modal: true,
+             title :"Status",
+             dialogClass :"dialogStyle",
+             width: 400,
+            buttons : {
+                Ok: function() {
+                    $(this).dialog("close"); //closing on Ok click
+                }
+            },
+		});
 		$("#confirmChangePassword").css("border-color","red");
 //		$("#confirmChangePassword").focus();
 		return false;
@@ -97,7 +127,17 @@ $("#btnSubmit").click(function(){
 		contentType:"application/json",
 		async:false
 	}).done(function(data){
-		alert("Password has been changed");
+		 $("#confirmation").dialog({
+				 modal: true,
+	             title :"Status",
+	             dialogClass :"dialogStyle",
+	             width: 400,
+	            buttons : {
+	                Ok: function() {
+	                    $(this).dialog("close"); //closing on Ok click
+	                }
+	            },
+			});
 		window.location.href="/";
 	});
 	

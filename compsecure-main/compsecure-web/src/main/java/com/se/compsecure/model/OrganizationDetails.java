@@ -4,6 +4,10 @@ public class OrganizationDetails {
 
 	private Integer organizationId;
 	private String organizationName;
+	private String orgAdminId;
+	private String orgAdminEmail;
+	private String creationDate;
+	private String status;
 
 	public Integer getOrganizationId() {
 		return organizationId;
@@ -21,4 +25,36 @@ public class OrganizationDetails {
 		this.organizationName = organizationName;
 	}
 
+	public String getOrgAdminId() {
+		return orgAdminId;
+	}
+
+	public void setOrgAdminId(String orgAdminId) {
+		this.orgAdminId = orgAdminId;
+	}
+
+	public String getOrgAdminEmail() {
+		return orgAdminEmail;
+	}
+
+	public void setOrgAdminEmail(String orgAdminEmail) {
+		this.orgAdminEmail = orgAdminEmail;
+	}
+
+	public String getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(String creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
 }

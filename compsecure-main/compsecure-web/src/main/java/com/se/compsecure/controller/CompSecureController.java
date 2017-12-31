@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,7 @@ public class CompSecureController {
     }
 	
 	@RequestMapping(value={"/home"})
-    public String home(@ModelAttribute User user,HttpSession httpSession) {
+    public String home(@ModelAttribute User user,HttpSession httpSession,HttpServletRequest request) {
 		
 		String return_location = "";
 		
@@ -84,6 +85,12 @@ public class CompSecureController {
 		}
 		return return_location;
     }
+	
+	@RequestMapping(value="/manage-organization")
+	 public String getManageOrg(Model model) {
+		LOGGER.info("inside manage organization");
+		return "org-management";
+  }
 	
 	@RequestMapping("/self-assessment")
     public String getSelfAssessmentPage(Model model,HttpSession httpSession) {

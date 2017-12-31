@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="icon" href="../../favicon.ico">
+        <script type="text/javascript" src="bootstrap/bCrypt/bCrypt.js"></script>
+
+        <title>SAMA Cyber Security Framework</title>
+
+        <!-- Bootstrap core CSS -->
+        <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+        <link href="bootstrap/assets/css/ie10-viewport-bug-workaround.css"
+              rel="stylesheet">
+        <link rel="stylesheet"
+              href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <!-- Custom styles for this template -->
+        <link href="bootstrap/css/dashboard.css" rel="stylesheet">
+
+        <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+        <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+        <script type="text/javascript"
+                src="http://gc.kis.v2.scr.kaspersky-labs.com/E061903E-2781-EF40-A366-F96743B4241C/main.js"
+        charset="UTF-8"></script>
+        <script src="bootstrap/assets/js/ie-emulation-modes-warning.js"></script>
+
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+                  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+                  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+                <![endif]-->
+    </head>
+
+    <body>
+	<div id="loading" hidden="false">
+  		<img id="loading-image" src="bootstrap/images/ajax-loading.gif" alt="Loading..." />
+	</div>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed"
+                        data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                        aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span> <span
+                        class="icon-bar"></span> <span class="icon-bar"></span> <span
+                        class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">SAMA Cyber Security Framework</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="home">Home</a></li>
+                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="#">User Management</a></li>
+                    <li><a href="#">Client Environment</a></li>
+                    <li>
+                    <li><a href="#">Compliance Master</a></li>
+                    <li><a href="#">Self Assessment</a></li>
+                    <li><a href="#">Reports</a></li>
+                    <li><a href="#">Help</a></li>
+                    <li id="logo"><img src="bootstrap/images/se-logo-4.jpg"></li>
+                </ul>
+            </div>
+            <hr id="adminHomePageHR">
+        </div>
+    </nav>
+    <form method="post" id="complianceDefForm">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-3 col-md-2 sidebar">
+                    <ul class="nav nav-sidebar">
+                        <li><a href="home"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+                        
+                    </ul>
+                    <hr>
+                    <ul class="nav nav-sidebar">
+                        <li style="margin-top: 0px"><a
+                                href="user-administration.html"><span class="glyphicon glyphicon-user"></span> User Administration</a></li>
+                        <li><a href="logout.html"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="container">
+            <h2 class="sub-header">Organization Management</h2>
+            
+              <div class="row">
+                <div class="col-lg-8">
+                    <div class="button-box" align="center">
+                        <button type="button" id="button-addUser" class="btn btn-danger">Add Organization</button>
+                        <button type="button" id="ua-button-cancel" class="btn btn-success">Cancel</button>
+
+                    </div>
+                </div>
+            </div>
+            
+            <h3>
+                <div id="user-details"></div>
+            </h3>
+            <div class="row">
+                <div class="col-lg-12" align="center">                                                                                        
+                    <div id="orgManagementTbl" class="col-lg-12">
+                        <div class="row" id="tableHeader">
+                            <div class="col-lg-1">#</div>
+                            <div class="col-lg-2">Organization</div>
+                            <div class="col-lg-2">Org Admin</div>
+                            <div class="col-lg-2">Email Id</div>
+                            <div class="col-lg-2">Created On</div>
+                            <div class="col-lg-1">Status</div>
+                            <div class="col-lg-1">Edit</div>
+                            <div class="col-lg-1">Reactivate</div>
+                        </div>
+                        <div class="row" id="tableBody">
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <br>
+          
+
+            <div id="confirmation" title="User-Creation" hidden="false">
+                <p>The user has been created.</p>
+            </div>
+            <div id="dialog-fail" title="Not Authorised" hidden="false">
+                <p>
+                    You are not authorized to view this page.<br>Please try again
+                    or contact the admin
+                </p>
+            </div>
+              <div id="reactivation" title="User-Creation" hidden="false">
+                <p>The user has been activated.</p>
+            </div>
+            <div class="row"><div class="col-lg-12">
+            <div id="user-creation-form" title="Create User" hidden="false">
+            <form name="userDetailsForm">
+                <div class="row">
+                    <div class="col-lg-4 ua-lbs">
+                        <label for="newUserName">Username</label>
+                    </div>
+                    <div class="col-lg-6">
+                        <input type="text" id="newUserName" name="newUserName" placeholder="enter user name" size="35"><br>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 ua-lbs">
+                        <label for="newUserPassword">Password</label>
+                    </div>
+                    <div class="col-lg-6">
+                       <input type="password" id="newUserPassword" name="newUserPassword" placeholder="enter password" size="35"><br>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 ua-lbs">
+                        <label for="newUserEmailId">Email</label>
+                    </div>
+                    <div class="col-lg-6">
+                       <input type="email" id="newUserEmailId" name="newUserEmailId" placeholder="enter email id" size="35"><br>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 ua-lbs">
+                        <label for="newUserRole">Role</label>
+                    </div>
+                    <div class="col-lg-6">
+                        <select id="newUserRole" name="newUserRole"><option value="1">Admin</option><option value="2">Assessor</option></select><br>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 ua-lbs">
+                        <label for="newUserOrg">Organization</label>
+                    </div>
+                    <div class="col-lg-6">
+                        <select id="newUserOrg" name="newUserOrg"></select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 ua-lbs">
+                        <label for="userStatus">Status</label>
+                    </div>
+                    <div class="col-lg-6">
+                        <select id="userStatus" name="userStatus"><option value="1">ACTIVE</option><option value="2">INACTIVE</option></select>
+                    </div>
+                </div>
+                </form>
+            </div>
+            </div>
+            </div>
+          <br>
+        </div>
+
+
+    <!-- Bootstrap core JavaScript
+        ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="bootstrap/assets/js/vendor/jquery-3.2.1.min.js"></script>
+    <script>window.jQuery || document.write('<script src="bootstrap/assets/js/vendor/jquery-3.2.1.min.js"><\/script>')</script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+    <script src="bootstrap/assets/js/vendor/holder.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="bootstrap/assets/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="bootstrap/assets/js/vendor/jquery-ui.js"></script>
+    <script src="bootstrap/assets/js/vendor/sha512.js"></script>
+    <script src="bootstrap/js/menu.js"></script>
+    <script src="bootstrap/js/org-management.js"></script>
+
+</body>
+</html>
