@@ -21,6 +21,7 @@ import com.google.gson.Gson;
 import com.se.compsecure.model.OrganizationDetails;
 import com.se.compsecure.model.User;
 import com.se.compsecure.service.CompSecureService;
+import com.se.compsecure.utility.CompSecureConstants;
 import com.se.compsecure.utility.EmailUtil;
 
 import io.jsonwebtoken.Jwts;
@@ -134,13 +135,24 @@ public class AdminController {
 		
 	}
 	
-	@RequestMapping("/getOrgList")
+	@RequestMapping(value="/getOrgList",method = RequestMethod.GET)
 	@ResponseBody
-	public String getOrgList(HttpSession httpSession,@RequestParam String id){
+	public String getOrgList(HttpSession httpSession){
+		
+		System.out.println("inside getOrgList");
+		
+		User user = (User)httpSession.getAttribute("user"); 
+		if(user==null || !CompSecureConstants.ADMIN_ROLE_ID.equals(user.getRole().getRoleId().toString())){
+			return null;
+		}
+		
+		Integer userId = user.getUserId();
 		
 		Gson gson = new Gson();
 		
 		List<OrganizationDetails> organizationDetails = compSecureService.getOrganizationList();
+		
+		System.out.println(gson.toJson(organizationDetails));
 		
 		return gson.toJson(organizationDetails);
 	}

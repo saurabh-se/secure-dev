@@ -78,6 +78,7 @@ public class AdminFilter implements Filter {
 			HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 			httpResponse.setContentLength(0);
 			httpResponse.setStatus(STATUS_CODE_UNAUTHORIZED);
+			res.sendRedirect(req.getContextPath());
 		}
 	}
 

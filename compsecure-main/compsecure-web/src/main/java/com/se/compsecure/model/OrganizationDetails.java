@@ -5,6 +5,7 @@ public class OrganizationDetails {
 	private Integer organizationId;
 	private String organizationName;
 	private String orgAdminId;
+	private String orgAdminName;
 	private String orgAdminEmail;
 	private String creationDate;
 	private String status;
@@ -55,6 +56,14 @@ public class OrganizationDetails {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getOrgAdminName() {
+		return orgAdminName;
+	}
+
+	public void setOrgAdminName(String orgAdminName) {
+		this.orgAdminName = orgAdminName;
 	}
 	
 }

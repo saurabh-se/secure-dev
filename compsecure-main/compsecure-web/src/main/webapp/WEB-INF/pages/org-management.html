@@ -106,13 +106,20 @@
             </h3>
             <div class="row">
                 <div class="col-lg-12" align="center">                                                                                        
+                	<div class="col-lg-8"></div>
+                	<div class="col-lg-4"><input type="text" id="myInput" class="form-control" onkeyup="search()" placeholder="Search.." title="Type in the search criteria"></div>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-lg-12" align="center">                                                                                        
                     <div id="orgManagementTbl" class="col-lg-12">
                         <div class="row" id="tableHeader">
                             <div class="col-lg-1">#</div>
                             <div class="col-lg-2">Organization</div>
                             <div class="col-lg-2">Org Admin</div>
-                            <div class="col-lg-2">Email Id</div>
-                            <div class="col-lg-2">Created On</div>
+                            <div class="col-lg-3">Email Id</div>
+                            <div class="col-lg-1">Created On</div>
                             <div class="col-lg-1">Status</div>
                             <div class="col-lg-1">Edit</div>
                             <div class="col-lg-1">Reactivate</div>
@@ -140,50 +147,54 @@
                 <p>The user has been activated.</p>
             </div>
             <div class="row"><div class="col-lg-12">
-            <div id="user-creation-form" title="Create User" hidden="false">
-            <form name="userDetailsForm">
-                <div class="row">
-                    <div class="col-lg-4 ua-lbs">
-                        <label for="newUserName">Username</label>
+            <div id="org-create-form" title="Create User" hidden="false">
+            <form name="orgDetailsForm">
+            <div class="row">
+                    <div class="col-lg-6 orgmgmt-lbs">
+                        <label for="orgName">Organization Name</label>
                     </div>
                     <div class="col-lg-6">
-                        <input type="text" id="newUserName" name="newUserName" placeholder="enter user name" size="35"><br>
+                        <input type="text" id="orgName" name="orgName" placeholder="enter organization name" size="35"><br>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 ua-lbs">
-                        <label for="newUserPassword">Password</label>
+                    <div class="col-lg-6 orgmgmt-lbs">
+                        <label for="userStatus">Status</label>
                     </div>
                     <div class="col-lg-6">
-                       <input type="password" id="newUserPassword" name="newUserPassword" placeholder="enter password" size="35"><br>
+                        <select id="userStatus" name="userStatus"><option value="1">ACTIVE</option><option value="2">INACTIVE</option></select>
+                    </div>
+                </div>
+                </form>
+            </div>
+            <div id="org-edit-form" title="Edit User" hidden="false">
+            <form name="orgEditForm">
+            <div class="row">
+                    <div class="col-lg-6 orgmgmt-lbs">
+                        <label for="orgName">Organization Name</label>
+                    </div>
+                    <div class="col-lg-6">
+                        <input type="text" id="orgName" name="orgName" placeholder="enter organization name" size="35"><br>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 ua-lbs">
-                        <label for="newUserEmailId">Email</label>
+                    <div class="col-lg-6 orgmgmt-lbs">
+                        <label for="orgAdminName">Organization Admin's Name</label>
                     </div>
                     <div class="col-lg-6">
-                       <input type="email" id="newUserEmailId" name="newUserEmailId" placeholder="enter email id" size="35"><br>
+                        <input type="text" id="orgAdminName" name="adminName" placeholder="enter admin name" size="35"><br>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 ua-lbs">
-                        <label for="newUserRole">Role</label>
+                    <div class="col-lg-6 orgmgmt-lbs">
+                        <label for="orgAdminEmail">Org-Admin Email</label>
                     </div>
                     <div class="col-lg-6">
-                        <select id="newUserRole" name="newUserRole"><option value="1">Admin</option><option value="2">Assessor</option></select><br>
+                       <input type="text" id="orgAdminEmail" name="orgAdminEmail" placeholder="enter org admin email id" size="35"><br>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 ua-lbs">
-                        <label for="newUserOrg">Organization</label>
-                    </div>
-                    <div class="col-lg-6">
-                        <select id="newUserOrg" name="newUserOrg"></select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 ua-lbs">
+                    <div class="col-lg-6 orgmgmt-lbs">
                         <label for="userStatus">Status</label>
                     </div>
                     <div class="col-lg-6">

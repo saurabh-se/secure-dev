@@ -233,16 +233,19 @@ public class CompSecureDAOImpl implements CompSecureDAO {
 	public List<OrganizationDetails> getOrganizationList() {
 
 		List<OrganizationDetails> organizationList = new ArrayList<OrganizationDetails>();
-		String sql = "select * from organization_details";
+		String sql = "SELECT od.organization_id,od.organization_name,od.org_admin_id,od.org_creation_date,od.status,ld.username,ld.email_id"
+					+" FROM organization_details od join login_details ld on ld.user_id = od.org_admin_id order by org_creation_date desc";
 
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
 		for (Map row : rows) {
 			OrganizationDetails orgDetails = new OrganizationDetails();
 			orgDetails.setOrganizationId((Integer) row.get("organization_id"));
 			orgDetails.setOrganizationName((String) row.get("organization_name"));
-			orgDetails.setOrgAdminId((String) row.get("org_admin_id"));
-			orgDetails.setCreationDate((String) row.get("org_creation_date"));
+			orgDetails.setOrgAdminId(String.valueOf((Integer) row.get("org_admin_id")));
+			orgDetails.setCreationDate(getDate((Date)row.get("org_creation_date")));
 			orgDetails.setStatus((String) row.get("status"));
+			orgDetails.setOrgAdminName((String)row.get("username"));
+			orgDetails.setOrgAdminEmail((String)row.get("email_id"));
 			organizationList.add(orgDetails);
 		}
 		System.out.println(organizationList.size());
@@ -579,9 +582,12 @@ public List<Entry<String , Domain>> getCompleteDetails(String assessmentId,Strin
 
 	public List<OrganizationDetails> getOrganizationList(String userId) {
 		List<OrganizationDetails> organizationList = new ArrayList<OrganizationDetails>();
-		String sql = "select od.organization_id,od.organization_name from 	compsecure_sama.organization_details od join compsecure_sama.login_details ld on ld.organization_id = od.organization_id and ld.user_id =?";
+		String sql = "select od.organization_id,od.organization_name "
+					+"from compsecure_sama.organization_details od "
+					+"join compsecure_sama.login_details ld on ld.organization_id = od.organization_id and ld.user_id =?";
 
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql,userId);
+		
 		for (Map row : rows) {
 			OrganizationDetails orgDetails = new OrganizationDetails();
 			orgDetails.setOrganizationId((Integer) row.get("organization_id"));

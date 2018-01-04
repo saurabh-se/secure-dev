@@ -90,6 +90,12 @@ public class CompSecureServiceImpl implements CompSecureService {
 		LOGGER.info(" Returned  : " + orgList.size());
 		return orgList;
 	}
+	
+	public List<OrganizationDetails> getOrganizationList(String userId) {
+		LOGGER.info("inside the getOrganizationList with userId");
+		return compSecureDAO.getOrganizationList(userId);
+	}
+	
 
 	/**
 	 * TODO : Change complianceId to compliance Name wherever necessary!!
@@ -130,15 +136,6 @@ public class CompSecureServiceImpl implements CompSecureService {
 
 	public UserRoles getRole(User user) {
 		return compSecureDAO.getRole(user);
-	}
-
-	public List<OrganizationDetails> getOrganizationList(String userId) {
-		return compSecureDAO.getOrganizationList(userId);
-	}
-
-	public String getOrganizationBasedOnLogin(String userId) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	public void save(MultipartFile uploadFile,String docToUpload,String assessmentId,String controlCode) throws IOException {

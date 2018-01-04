@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 import com.se.compsecure.model.OrganizationDetails;
 import com.se.compsecure.model.User;
 import com.se.compsecure.service.CompSecureService;
+import com.se.compsecure.utility.CompSecureConstants;
 
 @Controller
 public class CompSecureController {
@@ -200,7 +201,7 @@ public class CompSecureController {
 		
 		List<OrganizationDetails> orgList = new ArrayList<OrganizationDetails>();
 		
-		if(roleId.equals("1")){
+		if(roleId.equals(CompSecureConstants.ADMIN_ROLE_ID)){
 			orgList = compSecureService.getOrganizationList();
 		}
 		else{

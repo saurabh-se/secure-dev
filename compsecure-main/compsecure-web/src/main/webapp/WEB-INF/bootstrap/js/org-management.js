@@ -1,10 +1,211 @@
 $(document).ready(function(){
-	$("#loading").hide();
 	$.ajax({
-		url :"ad/getOrgList",
-		type:"GET",
+		url  :"ad/getOrgList",
+		type :"GET",
 		headers: {"Authorization": "Bearer "+localStorage.getItem('token')}
 	}).done(function(data){
+		if(!data){
+			$("<div><p>The session has expired.<br>You will be redirected to the login page.</p></div></div>").dialog({
+				        title: "Session Expired",
+				        dialogClass:"dialogStyle",
+				        modal: true,
+				        buttons : {
+			                Ok: function() {
+			                    $(this).dialog("close"); // closing on Ok
+															// click
+			                    window.location.href="logout.html";
+			                }
+			            }
+				    });
+		}
+		$("#loading").hide();
 		console.log(data);
+		var userListHtml = "";
+		var users = $.parseJSON(data);
+		var count = 1;
+		$.each(users,function(index,value){
+			userListHtml = userListHtml + "<div id='tblRow'><div class='col-lg-1 tb-text' id='countId'>"+count+"</div>"+
+            "<div class='col-lg-2 tb-text' id='organizationName'>"+value["organizationName"]+"</div>"+
+            "<div class='col-lg-2 tb-text' id='orgAdminName'>"+value["orgAdminName"]+"</div>"+
+            "<div class='col-lg-3 tb-text' id='orgAdminEmailId'>"+value["orgAdminEmail"]+"</div>"+
+            "<div class='col-lg-1 tb-text' id='creationDate'>"+value["creationDate"]+"</div>"+
+            "<div class='col-lg-1 tb-text' id='statusId'>"+value["status"]+"</div>"+
+            "<div class='col-lg-1 tb-text'><a href='#' id='editUser' name="+count+">Edit</a></div>"+
+			"<div class='col-lg-1 tb-text'><a href='#' id='reactivate' name="+count+">Reactivate</a></div></div>";
+			count++;
+			localStorage.setItem("orgName",value["organizationName"]);
+		});
+		$("#tableBody").append(userListHtml);
+		
 	});
 });
+
+
+	$("#button-addUser").click(function () {
+		displayUserForm("new");
+	});
+	
+	  $(document).on("click", "#editUser", function (event){
+		  event.preventDefault();
+		  var target = event.target || event.srcElement;
+		  var i = target.name;
+		  displayUserForm("edit",i);
+	});
+	  
+	  $(document).on("click", "#reactivate", function (event){
+		event.preventDefault();
+		var target = event.target || event.srcElement;
+		var i = target.name;
+		
+		var username = $("div#username").eq(i-1).text();
+		var emailId = $("div#emailId").eq(i-1).text();
+		$("#loading").show();
+		$.ajax({
+			url : "ad/reactivateUsers",
+			data: {"username": username, "email":emailId},
+			type:"POST",
+			dataType: "json",
+			headers: {"Authorization": "Bearer "+localStorage.getItem('token')}
+		}).done(function(data){
+			$("#loading").hide();
+			$("#reactivation").dialog({
+				 modal: true,
+	             title :"Reactivated",
+	             dialogClass :"dialogStyle",
+	             width: 400,
+	            buttons : {
+	                Ok: function() {
+	                    $(this).dialog("close"); // closing on Ok click
+	                }
+	            },
+			});
+			console.log(data);
+		});
+	  });
+	
+	
+	
+	function displayUserForm(variant,i){
+	$("#newUserOrg").html("<options><option>"+localStorage.getItem("orgName")+"<option></options>");
+	if(variant==="edit"){
+		$("#newUserPassword").prop("disabled",true);
+		$("#newUserName").val($("div#username").eq(i-1).text());
+		$("#newUserEmailId").val($("div#emailId").eq(i-1).text());
+	// $("#newUserRole :selected").text($("div#roleId").eq(i-1).text());
+	// $("#userStatus").val($("div#statusId").eq(i-1).val());
+	$("#org-edit-form").dialog({
+	    modal: true,
+	    title: "Edit User",
+	    dialogClass: "dialogStyleUA",
+	    width: 550,
+	    buttons: {
+	        Submit: function () {
+	        	var username=$("#newUserName").val();
+	        	var password =$("#newUserPassword").val();
+	        	$("#newUserPassword").val=sha512(password);
+	        	var emailId = $("#newUserEmailId").val();
+	        	var urole = $("#newUserRole :selected").val();
+	        	var org = $("#newUserOrg :selected").val();
+	        	var status = $("#userStatus :selected").text();
+	
+	        	var userObj = new UserObj(username,sha512(password),emailId,urole,org,status);
+	        	
+	        	addUser(userObj,variant);
+	        	console.log(JSON.stringify(userObj));
+	            $(this).dialog("close"); // closing on Ok click
+	        },
+	        Cancel: function(){
+	        	$(this).dialog("close");
+	        }
+	    },
+	});
+	}else{
+		$("#org-create-form").dialog({
+		    modal: true,
+		    title: "Edit User",
+		    dialogClass: "dialogStyleUA",
+		    width: 550,
+		    buttons: {
+		        Submit: function () {
+		        	var username=$("#newUserName").val();
+		        	var password =$("#newUserPassword").val();
+		        	$("#newUserPassword").val=sha512(password);
+		        	var emailId = $("#newUserEmailId").val();
+		        	var urole = $("#newUserRole :selected").val();
+		        	var org = $("#newUserOrg :selected").val();
+		        	var status = $("#userStatus :selected").text();
+		
+		        	var userObj = new UserObj(username,sha512(password),emailId,urole,org,status);
+		        	
+		        	addUser(userObj,variant);
+		        	console.log(JSON.stringify(userObj));
+		            $(this).dialog("close"); // closing on Ok click
+		        },
+		        Cancel: function(){
+		        	$(this).dialog("close");
+		        }
+		    },
+		});
+	}
+	}
+	
+	function UserObj(username,password,emailId,urole,org,status){
+	
+	this.username=username;
+	this.password=password;
+	this.emailId=emailId;
+	
+	var roleObj = new RoleObj(urole);
+	this.role=roleObj;
+	this.organizationName = org;
+	this.status = status;
+	}
+	
+	
+	function RoleObj(role){
+	this.roleId = role;
+	}
+	
+	function addUser(userObj,variant){
+	var url = "/compsecure-web/ad/saveNewUserDetails";
+	// alert("add/edit - " + variant);
+	$("#loading").show();
+	if(variant==="edit"){
+		url="/compsecure-web/ad/updateUserDetails"
+	}
+	$.ajax({
+		url: url,
+		data : JSON.stringify(userObj),
+		type:"POST",
+		dataType: "json",
+		 contentType:"application/json",
+		 headers: {"Authorization": "Bearer "+localStorage.getItem('token')}
+	}).done(function(data){
+		$("#loading").hide();
+		console.log(data);
+		$("#confirmation").dialog({
+	        modal: true,
+	        title: "User Created",
+	        dialogClass: "dialogStyleUA",
+	        width: 400,
+	        buttons: {
+	                Ok: function(){
+	            	$(this).dialog("close");
+	            	window.location.href="user-administration";
+	            }
+	        },
+	    });
+	});
+	}
+	
+	
+	
+	function search(){
+		$("#myInput").on("keyup", function() {
+		    var value = $(this).val().toLowerCase();
+		    $("#tableBody #tblRow").filter(function() {
+		      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+		    });
+		  });
+	}
+	

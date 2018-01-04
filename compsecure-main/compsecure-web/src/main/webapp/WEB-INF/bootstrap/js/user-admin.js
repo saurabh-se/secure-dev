@@ -18,7 +18,7 @@ $(document).ready(function(){
 				var users = $.parseJSON(data);
 				var count = 1;
 				$.each(users,function(index,value){
-					userListHtml = userListHtml + "<div class='col-lg-1 tb-text' id='countId'>"+count+"</div>"+
+					userListHtml = userListHtml + "<div id='tblRow'><div class='col-lg-1 tb-text' id='countId'>"+count+"</div>"+
                     "<div class='col-lg-1 tb-text' id='username'>"+value["username"]+"</div>"+
                     "<div class='col-lg-1 tb-text' id='roleId'>"+value["role"]["roleDescription"]+"</div>"+
                     "<div class='col-lg-3 tb-text' id='emailId'>"+value["emailId"]+"</div>"+
@@ -26,7 +26,7 @@ $(document).ready(function(){
                     "<div class='col-lg-1 tb-text' >"+value["creationDate"]+"</div>"+
                     "<div class='col-lg-1 tb-text' id='statusId'>"+value["status"]+"</div>"+
                     "<div class='col-lg-1 tb-text'><a href='#' id='editUser' name="+count+">Edit</a></div>"+
-					"<div class='col-lg-1 tb-text'><a href='#' id='reactivate' name="+count+">Reactivate</a></div>";
+					"<div class='col-lg-1 tb-text'><a href='#' id='reactivate' name="+count+">Reactivate</a></div></div>";
 					count++;
 					localStorage.setItem("orgName",value["organizationName"]);
 				});
@@ -179,4 +179,13 @@ function addUser(userObj,variant){
             },
         });
 	});
+}
+
+function search(){
+	$("#myInput").on("keyup", function() {
+	    var value = $(this).val().toLowerCase();
+	    $("#tableBody #tblRow").filter(function() {
+	      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+	    });
+	  });
 }

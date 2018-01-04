@@ -462,7 +462,7 @@ hr {
     background-color: #ede9ce;
     color:#222;
     font-weight: lighter;
-    font-size: smaller;
+    font-size: small;
 }
 #button-addUser{
     background-color:#d9534f;
@@ -475,14 +475,29 @@ hr {
     padding: 8px;
     font-weight: normal;
 }
+
 #user-creation-form{
     align-content: center;
 }
+
+#orgDetailsForm{
+    
+}
+
+
 .ua-lbs{
    padding: 10px;
     margin-left: 20px;
     margin-right: -45px;
     align-items: center;
+}
+
+.orgmgmt-lbs{
+	padding: 10px;
+    margin-left: 20px;
+    margin-right: -45px;
+    align-items: left;
+    font-size : small;
 }
 
 .icons{
@@ -520,7 +535,12 @@ hr {
 }
 
 #orgManagementTbl{
-	font-size: smaller;
+	font-size: small;
+}
+
+#myInput{
+	border-radius: 5px;
+	font-size: small;
 }
 
 /* input[type="text"]{ */

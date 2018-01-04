@@ -29,8 +29,6 @@ public interface CompSecureService {
 	
 	List<OrganizationDetails> getOrganizationList();
 	
-	String getOrganizationBasedOnLogin(String userId);
-	
 	MasterAssessmentDetails getMasterAssessmentDetails(String organizationId);
 	
 	// 1. Get the assessment details 
